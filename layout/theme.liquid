@@ -1,18 +1,28 @@
 <!doctype html>
 <html lang="{{ request.locale.iso_code }}">
-  <head>
-    <meta charset="utf-8">
+<head>
+  <meta charset="utf-8">
 
-     <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1"
-    >
-    <title>{{page_title}} | {{shop.name}}</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
-    {{'base.css' |  asset_url |  stylesheet_tag}}
+  <title>{{ page_title }} | {{ shop.name }}</title>
 
-    {{ content_for_header }}
-  </head>
+  {{ 'base.css' | asset_url | stylesheet_tag }}
+
+  {% style %}
+    :root {
+      --color-background: {{ settings.color_background }};
+      --color-text: {{ settings.color_text }};
+      --color-button-background: {{ settings.color_button_background }};
+      --color-button-text: {{ settings.color_button_text }};
+    }
+  {% endstyle %}
+
+  {{ content_for_header }}
+</head>
 
   <body>
     <a class="skip-link" href="#MainContent">Skip to Content</a>
