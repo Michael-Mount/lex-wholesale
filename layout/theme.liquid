@@ -1,15 +1,24 @@
 <!doctype html>
 <html lang="{{ request.locale.iso_code }}">
   <head>
+    <meta charset="utf-8">
+
+     <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    >
+    <title>{{page_title}} | {{shop.name}}</title>
+
+    {{'base.css' |  asset_url |  stylesheet_tag}}
 
     {{ content_for_header }}
   </head>
 
   <body>
-  
+    <a class="skip-link" href="#MainContent">Skip to Content</a>
 
-    {{ content_for_layout }}
-
-  
+    <main id="MainContent" role="main" tabindex="-1">
+      {{content_for_layout}}
+    </main>
   </body>
 </html>

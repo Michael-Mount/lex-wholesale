@@ -1,0 +1,71 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f7f3ee;
+  color: #2f241d;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+.page-width {
+  width: min(1200px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  left: 1rem;
+  z-index: 999;
+  padding: 0.75rem 1rem;
+  background: white;
+}
+
+.hero {
+  padding-block: 7rem;
+}
+
+.hero__eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero__title {
+  max-width: 13ch;
+  margin: 0;
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  line-height: 0.95;
+}
+
+.hero__text {
+  max-width: 40rem;
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.hero__button {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.875rem 1.25rem;
+  border: 1px solid currentColor;
+  text-decoration: none;
+}
