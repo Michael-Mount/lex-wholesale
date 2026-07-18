@@ -1,25 +1,13 @@
-{% assign logo_alt = section.settings.logo.alt
-  | default: shop.name
-  | escape
+{% comment  %} Create var 'logo_alt' if there is an alt assigned to logo use alt, else use default shop name {% endcomment %}
+{% assign logo_alt = section.settings.logo.alt | default: shop.name | escape
 %}
 
-<header
-  id="SiteHeader-{{ section.id }}"
-  class="site-header"
->
+<header id="SiteHeader-{{ section.id }}" class="site-header">
   <div class="page-width site-header__inner">
-    <a
-      class="site-header__brand"
-      href="{{ routes.root_url }}"
-    >
+    <a class="site-header__brand" href="{{ routes.root_url }}">
       {% if section.settings.logo != blank %}
         {{
-          section.settings.logo
-          | image_url: width: 600
-          | image_tag:
-            class: 'site-header__logo',
-            widths: '120, 180, 240, 360, 480, 600',
-            alt: logo_alt
+          section.settings.logo | image_url: width: 600 | image_tag: class: 'site-header__logo', widths: '120, 180, 240, 360, 480, 600', alt: logo_alt
         }}
       {% else %}
         <span class="site-header__wordmark">
@@ -29,10 +17,7 @@
     </a>
 
     {% if section.settings.menu != blank %}
-      <nav
-        class="site-header__nav"
-        aria-label="Primary navigation"
-      >
+      <nav class="site-header__nav" aria-label="Primary navigation">
         <ul class="site-header__menu" role="list">
           {% for link in section.settings.menu.links %}
             <li>
@@ -45,9 +30,8 @@
                 "
                 href="{{ link.url }}"
                 {% if link.current %}
-                  aria-current="page"
-                {% endif %}
-              >
+                aria-current="page"
+                {% endif %}>
                 {{ link.title | escape }}
               </a>
             </li>
@@ -57,28 +41,22 @@
     {% endif %}
 
     <div class="site-header__actions">
+      {% comment  %} if store has customer accounts enabled {% endcomment %}
       {% if shop.customer_accounts_enabled %}
+        {% comment  %} if customer is signed in {% endcomment %}
         {% if customer %}
-          <a
-            class="site-header__action site-header__account"
-            href="{{ routes.account_url }}"
-          >
+          <a class="site-header__action site-header__account" href="{{ routes.account_url }}">
             Account
           </a>
         {% else %}
-          <a
-            class="site-header__action site-header__account"
-            href="{{ routes.account_login_url }}"
-          >
+          <a class="site-header__action site-header__account" href="{{ routes.account_login_url }}">
             Sign in
           </a>
         {% endif %}
+        {% comment  %} Don't render this{% endcomment %}
       {% endif %}
 
-      <a
-        class="site-header__action"
-        href="{{ routes.cart_url }}"
-      >
+      <a class="site-header__action" href="{{ routes.cart_url }}">
         Cart
         <span aria-hidden="true">
           ({{ cart.item_count }})
@@ -92,10 +70,7 @@
           Menu
         </summary>
 
-        <nav
-          class="mobile-menu__panel"
-          aria-label="Mobile navigation"
-        >
+        <nav class="mobile-menu__panel" aria-label="Mobile navigation">
           <ul class="mobile-menu__list" role="list">
             {% for link in section.settings.menu.links %}
               <li>
@@ -103,9 +78,8 @@
                   class="mobile-menu__link"
                   href="{{ link.url }}"
                   {% if link.current %}
-                    aria-current="page"
-                  {% endif %}
-                >
+                  aria-current="page"
+                  {% endif %}>
                   {{ link.title | escape }}
                 </a>
               </li>
@@ -114,17 +88,11 @@
             {% if shop.customer_accounts_enabled %}
               <li class="mobile-menu__account-item">
                 {% if customer %}
-                  <a
-                    class="mobile-menu__link"
-                    href="{{ routes.account_url }}"
-                  >
+                  <a class="mobile-menu__link" href="{{ routes.account_url }}">
                     Account
                   </a>
                 {% else %}
-                  <a
-                    class="mobile-menu__link"
-                    href="{{ routes.account_login_url }}"
-                  >
+                  <a class="mobile-menu__link" href="{{ routes.account_login_url }}">
                     Sign in
                   </a>
                 {% endif %}
@@ -139,62 +107,58 @@
 
 {% style %}
   #SiteHeader-{{ section.id }} {
-    --header-background:
-      {{ section.settings.background_color }};
+    --header-background: {{ section.settings.background_color }};
 
-    --header-text:
-      {{ section.settings.text_color }};
+    --header-text: {{ section.settings.text_color }};
 
-    --header-logo-width:
-      {{ section.settings.logo_width }}px;
+    --header-logo-width: {{ section.settings.logo_width }}px;
   }
 {% endstyle %}
 
 {% schema %}
-{
-  "name": "Header",
-  "settings": [
-    {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "Logo"
-    },
-    {
-      "type": "range",
-      "id": "logo_width",
-      "label": "Logo width",
-      "min": 80,
-      "max": 260,
-      "step": 10,
-      "unit": "px",
-      "default": 150
-    },
-    {
-      "type": "link_list",
-      "id": "menu",
-      "label": "Menu",
-      "default": "main-menu"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background",
-      "default": "#f7f3ee"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text",
-      "default": "#2f241d"
+  {
+    "name": "Header",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "label": "Logo width",
+        "min": 80,
+        "max": 260,
+        "step": 10,
+        "unit": "px",
+        "default": 150
+      },
+      {
+        "type": "link_list",
+        "id": "menu",
+        "label": "Menu",
+        "default": "main-menu"
+      },
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#f7f3ee"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#2f241d"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Header"
+      }
+    ],
+    "enabled_on": {
+      "groups": ["header"]
     }
-  ],
-  "presets": [
-    {
-      "name": "Header"
-    }
-  ],
-  "enabled_on": {
-    "groups": ["header"]
   }
-}
 {% endschema %}
