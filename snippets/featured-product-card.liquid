@@ -1,0 +1,29 @@
+<section class="featured-product-card">
+  <div class="page-width">
+    {% if section.settings.product != blank %}
+      {% render 'product-card'
+        , card_product: section.settings.product
+      %}
+    {% else %}
+      <p>Select a product in the Theme Editor.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Featured Product Card",
+    "settings": [
+      {
+        "type": "product",
+        "id": "product",
+        "label": "Product"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Featured Product Card"
+      }
+    ]
+  }
+{% endschema %}
