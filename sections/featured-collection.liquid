@@ -1,0 +1,154 @@
+{% assign featured_collection = section.settings.collection %}
+
+<section class="featured-collection">
+  <div class="page-width">
+    <div class="featured-collection__header">
+      {% if section.settings.heading != blank %}
+        <h2 class="featured-collection__heading">
+          {{ section.settings.heading | escape }}
+        </h2>
+      {% endif %}
+
+      {% if featured_collection != blank %}
+        <a class="featured-collection__view-all" href="{{ featured_collection.url }}">
+          View collection
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="featured-collection__grid">
+      {% for product in featured_collection.products limit: section.settings.products_to_show
+      %}
+        <div class="featured-collection__item" style="--card-index: {{ forloop.index0 }};">
+          {% render 'product-card'
+            , card_product: product
+          %}
+        </div>
+      {% else %}
+        <p class="featured-collection__empty">
+          This collection does not contain any products yet.
+        </p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .featured-collection {
+    padding-block: clamp(4rem, 8vw, 7rem);
+  }
+
+  .featured-collection__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .featured-collection__heading {
+    max-width: 16ch;
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.75rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .featured-collection__view-all {
+    flex-shrink: 0;
+    color: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .featured-collection__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  .featured-collection .product-card {
+    width: 100%;
+  }
+
+  .featured-collection__empty {
+    margin: 0;
+    padding: 2rem;
+    border: 1px dashed currentColor;
+    text-align: center;
+    opacity: 0.7;
+  }
+
+  .featured-collection__item {
+    animation: product-card-reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    animation-delay: calc(var(--card-index) * 80ms);
+  }
+
+  @keyframes product-card-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .featured-collection__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 39.99rem) {
+    .featured-collection__header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .featured-collection__item {
+      animation: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+  {
+    "name": "Featured Collection",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Shop the fall edit"
+      }, {
+        "type": "collection",
+        "id": "collection",
+        "label": "Collection"
+      }, {
+        "type": "range",
+        "id": "products_to_show",
+        "label": "Products to show",
+        "min": 2,
+        "max": 8,
+        "step": 1,
+        "default": 4
+      }
+    ],
+    "presets": [
+      {
+        "name": "Featured Collection"
+      }
+    ]
+  }
+{% endschema %}
