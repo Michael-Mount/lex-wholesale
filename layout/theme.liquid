@@ -24,11 +24,15 @@
   {{ content_for_header }}
 </head>
 
-  <body>
-    <a class="skip-link" href="#MainContent">Skip to Content</a>
+ <body>
+  <a class="skip-link" href="#MainContent">
+    Skip to content
+  </a>
 
-    <main id="MainContent" role="main" tabindex="-1">
-      {{content_for_layout}}
-    </main>
-  </body>
+  {% sections 'header-group' %}
+
+  <main id="MainContent" role="main" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+</body>
 </html>

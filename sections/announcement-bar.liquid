@@ -1,0 +1,80 @@
+{% if section.settings.show_announcement
+  and section.settings.text != blank
+%}
+  <div
+    id="AnnouncementBar-{{ section.id }}"
+    class="announcement-bar"
+    role="region"
+    aria-label="Store announcement"
+  >
+    <div class="page-width announcement-bar__inner">
+      {% if section.settings.link != blank %}
+        <a
+          class="announcement-bar__link"
+          href="{{ section.settings.link }}"
+        >
+          {{ section.settings.text | escape }}
+        </a>
+      {% else %}
+        <p class="announcement-bar__text">
+          {{ section.settings.text | escape }}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% style %}
+    #AnnouncementBar-{{ section.id }} {
+      --announcement-background:
+        {{ section.settings.background_color }};
+
+      --announcement-text:
+        {{ section.settings.text_color }};
+    }
+  {% endstyle %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Announcement",
+      "default": "Fall collection now available for approved retailers"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#2f241d"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}
