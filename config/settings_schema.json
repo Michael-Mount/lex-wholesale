@@ -6,5 +6,34 @@
     "theme_author": "Michael Mount",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Page Background",
+        "default": "#f7f3ee"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Text Color",
+        "default": "#2f241d"
+      },
+      {
+        "type": "color",
+        "id": "color_button_background",
+        "label": "Button Background Color",
+        "default": "#2f241d"
+      },
+      {
+        "type": "color",
+        "id": "color_button_text",
+        "label": "Button Text Color",
+        "default": "#ffffff"
+      }
+    ]
   }
 ]
