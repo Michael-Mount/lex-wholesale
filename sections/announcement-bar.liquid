@@ -1,0 +1,84 @@
+{{ 'section-announcement-bar.css' | asset_url | stylesheet_tag }}
+
+{% if section.blocks.size > 0 %}
+  <aside
+    class="announcement-bar"
+    aria-label="Store announcements"
+    style="
+      --announcement-background: {{ section.settings.background_color }};
+      --announcement-text: {{ section.settings.text_color }};
+    ">
+    <div class="page-width">
+      <ul class="announcement-bar__list">
+        {% for block in section.blocks %}
+          {% if block.settings.text != blank %}
+            <li class="announcement-bar__item" {{ block.shopify_attributes }}>
+              {% if block.settings.link != blank %}
+                <a class="announcement-bar__link" href="{{ block.settings.link }}">
+                  {{ block.settings.text | escape }}
+                </a>
+              {% else %}
+                <p class="announcement-bar__text">
+                  {{ block.settings.text | escape }}
+                </p>
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </aside>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Announcement bar",
+    "tag": "section",
+    "class": "section-announcement-bar",
+    "max_blocks": 3,
+    "settings": [
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background color",
+        "default": "#2c211c"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text color",
+        "default": "#ffffff"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "announcement",
+        "name": "Announcement",
+        "settings": [
+          {
+            "type": "text",
+            "id": "text",
+            "label": "Text",
+            "default": "Wholesale ordering is now available"
+          }, {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Announcement bar",
+        "blocks": [
+          {
+            "type": "announcement"
+          }
+        ]
+      }
+    ],
+    "enabled_on": {
+      "groups": ["header"]
+    }
+  }
+{% endschema %}
