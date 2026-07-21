@@ -1,0 +1,22 @@
+{% comment %}
+  Renders a product quantity input.
+
+  Required:
+  - input_id
+{% endcomment %}
+
+<div class="quantity-input">
+  <label class="quantity-input__label" for="{{ input_id }}">
+    Quantity
+  </label>
+
+  <input
+    id="{{ input_id }}"
+    class="quantity-input__field"
+    type="number"
+    name="quantity"
+    min="{{ minimum | default: 1 }}"
+    value="{{ value | default: 1 }}"
+    inputmode="numeric"
+    pattern="[0-9]*">
+</div>
