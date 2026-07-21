@@ -75,6 +75,7 @@
       Number.isNaN(parsedQuantity) || parsedQuantity < 1 ? 1 : parsedQuantity;
 
     const bundleId = createBundleId(bundleHandle);
+    const componentCount = variantElements.length;
 
     return variantElements.map((element, index) => {
       const variantId = Number.parseInt(element.value, 10);
@@ -93,6 +94,9 @@
           _bundle_handle: bundleHandle,
           _bundle_title: bundleTitle,
           _bundle_component_position: String(index + 1),
+          _bundle_component_count: String(componentCount),
+          _bundle_quantity_per_product: String(quantity),
+          _bundle_schema_version: "1",
         },
       };
     });

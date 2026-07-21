@@ -8,7 +8,7 @@
         "show_collection_description": true,
         "show_product_count": true,
         "instructions": "<p>All products in this collection are required. Choose one available variant for each item.</p>",
-        "disclaimer": "The collection discount is calculated in the cart when all required products qualify.",
+        "disclaimer": "The complete-collection discount is applied automatically in the cart when the order meets the configured requirements.",
 
         "show_vendor": false,
         "show_individual_price": true,
