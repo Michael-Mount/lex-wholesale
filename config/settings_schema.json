@@ -100,5 +100,46 @@
         "default": "Apply for wholesale access"
       }
     ]
+  },
+  {
+    "name": "Bundle cart",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_bundle_cart_groups",
+        "label": "Group complete collections in the cart",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "bundle_group_label",
+        "label": "Bundle group label",
+        "default": "Complete collection"
+      },
+      {
+        "type": "text",
+        "id": "bundle_complete_label",
+        "label": "Complete bundle label",
+        "default": "Complete set"
+      },
+      {
+        "type": "text",
+        "id": "bundle_incomplete_label",
+        "label": "Incomplete bundle label",
+        "default": "Incomplete set"
+      },
+      {
+        "type": "textarea",
+        "id": "bundle_incomplete_warning",
+        "label": "Incomplete bundle warning",
+        "default": "The automatic collection discount may no longer apply."
+      },
+      {
+        "type": "textarea",
+        "id": "bundle_unknown_warning",
+        "label": "Missing bundle data warning",
+        "default": "Remove and re-add this collection to refresh its bundle information."
+      }
+    ]
   }
 ]
