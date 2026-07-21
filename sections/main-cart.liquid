@@ -87,7 +87,15 @@
       %}
         <div class="main-cart__layout">
           <div class="main-cart__items-column">
-            <ul class="main-cart__items">
+            <ul
+              class="main-cart__items"
+              data-bundle-group-container
+              data-enable-bundle-groups="{{ settings.show_bundle_cart_groups }}"
+              data-bundle-group-label="{{ settings.bundle_group_label | escape }}"
+              data-bundle-complete-label="{{ settings.bundle_complete_label | escape }}"
+              data-bundle-incomplete-label="{{ settings.bundle_incomplete_label | escape }}"
+              data-bundle-incomplete-warning="{{ settings.bundle_incomplete_warning | escape }}"
+              data-bundle-unknown-warning="{{ settings.bundle_unknown_warning | escape }}">
               {% for item in cart.items %}
                 <li
                   class="main-cart__item"
@@ -95,6 +103,8 @@
                   data-cart-line-index="{{ forloop.index }}"
                   {% if is_approved_customer %}
                   data-line-key="{{ item.key | escape }}"
+
+                  {% render 'bundle-line-metadata', item: item, output: 'attributes' %}
                   {% endif %}>
                   <a
                     class="main-cart__image-link"
@@ -125,6 +135,12 @@
                             {{ item.product.title | escape }}
                           </a>
                         </h2>
+                        {% if is_approved_customer %}
+                          {% render 'bundle-line-metadata'
+                            , item: item
+                            , output: 'label'
+                          %}
+                        {% endif %}
                       </div>
 
                       {% if is_approved_customer %}

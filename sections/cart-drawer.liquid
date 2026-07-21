@@ -77,9 +77,22 @@
           </a>
         </div>
       {% else %}
-        <ul class="cart-drawer__items">
+        <ul
+          class="cart-drawer__items"
+          data-bundle-group-container
+          data-enable-bundle-groups="{{ settings.show_bundle_cart_groups }}"
+          data-bundle-group-label="{{ settings.bundle_group_label | escape }}"
+          data-bundle-complete-label="{{ settings.bundle_complete_label | escape }}"
+          data-bundle-incomplete-label="{{ settings.bundle_incomplete_label | escape }}"
+          data-bundle-incomplete-warning="{{ settings.bundle_incomplete_warning | escape }}"
+          data-bundle-unknown-warning="{{ settings.bundle_unknown_warning | escape }}">
           {% for item in cart.items %}
-            <li class="cart-drawer__item">
+            <li class="cart-drawer__item" {% if is_approved_customer %}
+    {% render 'bundle-line-metadata',
+      item: item,
+      output: 'attributes'
+    %}
+  {% endif %}>
               <a
                 class="cart-drawer__item-image-link"
                 href="{{ item.url }}"
@@ -107,6 +120,13 @@
                     {{ item.product.title | escape }}
                   </a>
                 </h3>
+
+                {% if is_approved_customer %}
+  {% render 'bundle-line-metadata',
+    item: item,
+    output: 'label'
+  %}
+{% endif %}
 
                 {% unless item.product.has_only_default_variant %}
                   <dl class="cart-drawer__options">
