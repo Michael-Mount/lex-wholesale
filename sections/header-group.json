@@ -1,0 +1,36 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "announcement": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Wholesale ordering is now available"
+          }
+        }
+      },
+      "block_order": ["announcement1"],
+      "settings": {
+        "background_color": "#2c211c",
+        "text_color": "#ffffff"
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_width": 140,
+        "menu": "main-menu",
+        "show_account_link": true,
+        "show_cart_link": true,
+        "sticky_header": false,
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3"
+      }
+    }
+  },
+  "order": ["announcement", "header"]
+}
