@@ -1,0 +1,78 @@
+{% comment %}
+  Renders one product card.
+
+  Required:
+  - product
+
+  Optional:
+  - image_ratio: square, portrait, or landscape
+  - image_fit: cover or contain
+  - text_alignment: left or center
+  - show_vendor
+  - show_sold_out_badge
+  - show_price_range
+  - show_compare_at_price
+{% endcomment %}
+
+{% liquid
+  assign card_image = product.featured_image
+  assign product_title = product.title | escape
+
+  assign image_ratio = image_ratio | default: 'portrait'
+  assign image_fit = image_fit | default: 'cover'
+  assign text_alignment = text_alignment | default: 'left'
+%}
+
+<article class="
+    product-card
+    product-card--align-{{ text_alignment }}
+  " style="
+    --product-card-image-fit: {{ image_fit }};
+  ">
+  <div class="
+      product-card__media
+      product-card__media--{{ image_ratio }}
+    ">
+    <a
+      class="product-card__image-link"
+      href="{{ product.url }}"
+      tabindex="-1"
+      aria-hidden="true">
+      {% if card_image != blank %}
+        {{
+          card_image | image_url: width: 1000 | image_tag: class: 'product-card__image', widths: '240, 360, 480, 600, 800, 1000', sizes: '(min-width: 1200px) 25vw, (min-width: 750px) 33vw, 50vw', loading: 'lazy', alt: ''
+        }}
+      {% else %}
+        <div class="product-card__image-placeholder">
+          <span>No image</span>
+        </div>
+      {% endif %}
+    </a>
+
+    {% if show_sold_out_badge and product.available == false %}
+      <span class="product-card__badge">
+        Sold out
+      </span>
+    {% endif %}
+  </div>
+
+  <div class="product-card__content">
+    {% if show_vendor and product.vendor != blank %}
+      <p class="product-card__vendor">
+        {{ product.vendor | escape }}
+      </p>
+    {% endif %}
+
+    <h3 class="product-card__title">
+      <a class="product-card__title-link" href="{{ product.url }}">
+        {{ product_title }}
+      </a>
+    </h3>
+
+    {% render 'price'
+      , product: product
+      , show_price_range: show_price_range
+      , show_compare_at_price: show_compare_at_price
+    %}
+  </div>
+</article>
