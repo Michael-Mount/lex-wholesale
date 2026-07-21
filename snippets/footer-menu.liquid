@@ -1,0 +1,45 @@
+{% comment %}
+  Renders a footer menu.
+
+  Parameters:
+  - menu
+  - heading
+  - section_id
+  - block_id
+{% endcomment %}
+
+{% if menu != blank %}
+  {% assign menu_heading = heading | default: menu.title %}
+
+  {% assign heading_id = 'FooterMenuHeading-' | append: section_id | append: '-' | append: block_id
+  %}
+
+  <div class="site-footer__menu">
+    <h2 id="{{ heading_id }}" class="site-footer__block-heading">
+      {{ menu_heading | escape }}
+    </h2>
+
+    <nav aria-labelledby="{{ heading_id }}">
+      <ul class="site-footer__menu-list">
+        {% for link in menu.links %}
+          <li>
+            <a
+              class="
+                site-footer__link
+
+                {% if link.active %}
+                  site-footer__link--active
+                {% endif %}
+              "
+              href="{{ link.url }}"
+              {% if link.current %}
+              aria-current="page"
+              {% endif %}>
+              {{ link.title | escape }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+{% endif %}
