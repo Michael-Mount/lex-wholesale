@@ -1,0 +1,68 @@
+<section class="home-introduction">
+  <div class="page-width">
+    {% if section.settings.eyebrow != blank %}
+      <p class="home-introduction__eyebrow">
+        {{ section.settings.eyebrow }}
+      </p>
+    {% endif %}
+
+    {% if section.settings.heading != blank %}
+      <h1 class="home-introduction__heading">
+        {{ section.settings.heading }}
+      </h1>
+    {% endif %}
+
+    {% if section.settings.text != blank %}
+      <div class="home-introduction__text">
+        {{ section.settings.text }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.button_label != blank %}
+      <a class="button" href="{{ section.settings.button_link | default: routes.all_products_collection_url }}">
+        {{ section.settings.button_label }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Home introduction",
+    "settings": [
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow",
+        "default": "Wholesale clothing"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Curated collections for independent retailers"
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text",
+        "default": "<p>Browse seasonal collections and apply for wholesale access.</p>"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button label",
+        "default": "Browse collections"
+      }, {
+        "type": "url",
+        "id": "button_link",
+        "label": "Button link"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Home introduction"
+      }
+    ]
+  }
+{% endschema %}

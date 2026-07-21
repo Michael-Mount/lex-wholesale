@@ -12,5 +12,67 @@ body {
   margin: 0;
   background: var(--color-background);
   color: var(--color-text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+}
+
+.page-width {
+  width: min(100% - 2rem, var(--page-width));
+  margin-inline: auto;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--color-text);
+  color: var(--color-background);
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.home-introduction {
+  padding-block: 5rem;
+}
+
+.home-introduction__eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-introduction__heading {
+  max-width: 18ch;
+  margin: 0;
+  font-size: clamp(2.25rem, 7vw, 5rem);
+  line-height: 1;
+}
+
+.home-introduction__text {
+  max-width: 42rem;
+  margin-top: 1.5rem;
+}
+
+.button {
+  display: inline-flex;
+  margin-top: 1.5rem;
+  padding: 0.875rem 1.25rem;
+  border: 2px solid currentColor;
+  text-decoration: none;
 }
