@@ -13,11 +13,11 @@
       {
         "type": "range",
         "id": "page_width",
+        "label": "Page width",
         "min": 800,
         "max": 1600,
-        "step": 20,
+        "step": 50,
         "unit": "px",
-        "label": "Maximum page width",
         "default": 1200
       }
     ]
@@ -28,13 +28,13 @@
       {
         "type": "color",
         "id": "background_color",
-        "label": "Background",
+        "label": "Page background",
         "default": "#ffffff"
       },
       {
         "type": "color",
         "id": "text_color",
-        "label": "Text",
+        "label": "Page text",
         "default": "#231f1c"
       }
     ]
@@ -46,14 +46,8 @@
         "type": "text",
         "id": "approved_customer_tag",
         "label": "Approved customer tag",
-        "default": "wholesale-approved",
-        "info": "Customers with this tag can view prices and purchase products."
-      },
-      {
-        "type": "textarea",
-        "id": "locked_price_message",
-        "label": "Hidden price message",
-        "default": "Sign in with an approved wholesale account to view pricing."
+        "info": "Customers with this Shopify customer tag are treated as approved wholesale customers.",
+        "default": "approved-wholesale"
       }
     ]
   }

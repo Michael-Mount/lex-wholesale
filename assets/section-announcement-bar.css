@@ -1,14 +1,14 @@
 .announcement-bar {
   background: var(--announcement-background);
   color: var(--announcement-text);
+  border-bottom: 1px solid var(--announcement-border);
 }
 
 .announcement-bar__list {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
+  gap: 1.5rem;
 
   min-height: 2.5rem;
   margin: 0;
@@ -18,44 +18,23 @@
 }
 
 .announcement-bar__item {
-  display: flex;
-  align-items: center;
+  margin: 0;
 
   font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  line-height: 1.4;
   text-align: center;
-  text-transform: uppercase;
-}
-
-.announcement-bar__item + .announcement-bar__item::before {
-  content: "";
-  display: block;
-
-  width: 1px;
-  height: 1rem;
-  margin-right: 1.5rem;
-
-  background: currentColor;
-  opacity: 0.35;
-}
-
-.announcement-bar__text {
-  margin: 0;
 }
 
 .announcement-bar__link {
   color: inherit;
-  text-decoration-color: transparent;
-  text-underline-offset: 0.2em;
-
-  transition:
-    opacity 180ms ease,
-    text-decoration-color 180ms ease;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
 }
 
 .announcement-bar__link:hover {
-  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
 }
 
 .announcement-bar__link:focus-visible {
@@ -63,23 +42,12 @@
   outline-offset: 3px;
 }
 
-@media screen and (max-width: 749px) {
+@media screen and (max-width: 599px) {
   .announcement-bar__list {
-    gap: 0.25rem;
+    gap: 0.75rem;
   }
 
   .announcement-bar__item {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .announcement-bar__item + .announcement-bar__item::before {
-    display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .announcement-bar__link {
-    transition: none;
+    font-size: 0.75rem;
   }
 }
