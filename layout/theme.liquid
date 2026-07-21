@@ -28,6 +28,11 @@
 
     <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
 
+    {{ 'component-bundle-cart-groups.css' | asset_url | stylesheet_tag
+    }}
+
+    <script src="{{ 'bundle-cart-groups.js' | asset_url }}" defer></script>
+
     <style>
       {{ settings.body_font | font_face: font_display: 'swap' }}{{ settings.heading_font | font_face: font_display: 'swap' }}:root {
         --color-background: {{ settings.background_color }};
