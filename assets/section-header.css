@@ -9,7 +9,7 @@
 
 .site-header__inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 2rem;
 
@@ -79,9 +79,24 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: nowrap;
   gap: 1rem;
 
+  min-width: 0;
   white-space: nowrap;
+}
+
+.site-header__search {
+  flex: 0 1 18rem;
+
+  width: 18rem;
+  min-width: 12rem;
+  max-width: 18rem;
+}
+
+.site-header__search .header-search {
+  display: block;
+  width: 100%;
 }
 
 .site-header__cart-link {
@@ -389,6 +404,22 @@
   }
 
   .site-header__approval-badge {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 899px) {
+  .site-header__search {
+    flex-basis: 14rem;
+
+    width: 14rem;
+    min-width: 10rem;
+    max-width: 14rem;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .site-header__search {
     display: none;
   }
 }

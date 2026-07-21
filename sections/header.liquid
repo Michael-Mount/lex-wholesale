@@ -71,94 +71,79 @@
       , view_all_label: section.settings.view_all_label
     %}
 
-   {% if section.settings.show_search %}
-  <div class="site-header__search">
-    <predictive-search
-      class="header-search"
-      data-predictive-search-url="{{ routes.predictive_search_url }}"
-      data-predictive-search-enabled="{{ section.settings.enable_predictive_search }}"
-    >
-      <form
-        class="header-search__form"
-        action="{{ routes.search_url }}"
-        method="get"
-        role="search"
-      >
-        <label
-          class="visually-hidden"
-          for="HeaderSearch-{{ section.id }}"
-        >
-          Search the store
-        </label>
+    <div class="site-header__actions">
+      {% if section.settings.show_search %}
+        <div class="site-header__search">
+          <predictive-search
+            class="header-search"
+            data-predictive-search-url="{{ routes.predictive_search_url }}"
+            data-predictive-search-enabled="{{ section.settings.enable_predictive_search }}">
+            <form
+              class="header-search__form"
+              action="{{ routes.search_url }}"
+              method="get"
+              role="search">
+              <label class="visually-hidden" for="HeaderSearch-{{ section.id }}">
+                Search the store
+              </label>
 
-        <input
-          id="HeaderSearch-{{ section.id }}"
-          class="header-search__input"
-          type="search"
-          name="q"
-          placeholder="{{ section.settings.search_placeholder | escape }}"
-          autocomplete="off"
-          role="combobox"
-          aria-expanded="false"
-          aria-controls="HeaderPredictiveSearchResults-{{ section.id }}"
-          aria-haspopup="listbox"
-          aria-autocomplete="list"
-        >
+              <input
+                id="HeaderSearch-{{ section.id }}"
+                class="header-search__input"
+                type="search"
+                name="q"
+                placeholder="{{ section.settings.search_placeholder | escape }}"
+                autocomplete="off"
+                role="combobox"
+                aria-expanded="false"
+                aria-controls="HeaderPredictiveSearchResults-{{ section.id }}"
+                aria-haspopup="listbox"
+                aria-autocomplete="list">
 
-        <input
-          type="hidden"
-          name="options[prefix]"
-          value="last"
-        >
+              <input
+                type="hidden"
+                name="options[prefix]"
+                value="last">
 
-        <input
-          type="hidden"
-          name="type"
-          value="product,article,page"
-        >
+              <input
+                type="hidden"
+                name="type"
+                value="product,article,page">
 
-        <button
-          class="header-search__button"
-          type="submit"
-        >
-          Search
-        </button>
+              <button class="header-search__button" type="submit">
+                Search
+              </button>
 
-        <div
-          id="HeaderPredictiveSearchResults-{{ section.id }}"
-          class="header-search__results"
-          data-predictive-search-results
-          tabindex="-1"
-          hidden
-        ></div>
-      </form>
-    </predictive-search>
-  </div>
-{% endif %}
+              <div
+                id="HeaderPredictiveSearchResults-{{ section.id }}"
+                class="header-search__results"
+                data-predictive-search-results
+                tabindex="-1"
+                hidden></div>
+            </form>
+          </predictive-search>
+        </div>
+      {% endif %}
 
       {% if section.settings.show_cart_link %}
         <a
-          class="site-header__action-link site-header__cart-label"
+          class="site-header__action-link site-header__cart-link"
           href="{{ routes.cart_url }}"
           data-cart-drawer-open
           aria-label="Open cart, {{ cart.item_count }} items">
-          <span>Cart</span>
+          <span>{{ section.settings.cart_label | escape }}</span>
 
           <span class="site-header__cart-count" aria-hidden="true">
             (<span data-cart-count>{{ cart.item_count }}</span>)
           </span>
         </a>
       {% endif %}
-      {% if section.settings.show_account_link
-  and shop.customer_accounts_enabled
-%}
-  <div class="site-header__account">
-    <shopify-account
-      menu="{{ section.settings.customer_account_menu }}"
-    >
-    </shopify-account>
-  </div>
-{% endif %}
+
+      {% if section.settings.show_account_link and shop.customer_accounts_enabled %}
+        <div class="site-header__account">
+          <shopify-account menu="{{ section.settings.customer_account_menu }}"></shopify-account>
+        </div>
+      {% endif %}
     </div>
   </div>
 </header>
@@ -170,37 +155,34 @@
     "class": "section-header",
     "settings": [
       {
-  "type": "header",
-  "content": "Search"
-},
-{
-  "type": "checkbox",
-  "id": "show_search",
-  "label": "Show search",
-  "default": true
-},
-{
-  "type": "checkbox",
-  "id": "enable_predictive_search",
-  "label": "Enable predictive search",
-  "default": true
-},
-{
-  "type": "text",
-  "id": "search_placeholder",
-  "label": "Search placeholder",
-  "default": "Search"
-},
-      {
         "type": "header",
-        "content": "Logo"
+        "content": "Search"
       },
       {
+        "type": "checkbox",
+        "id": "show_search",
+        "label": "Show search",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_predictive_search",
+        "label": "Enable predictive search",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "search_placeholder",
+        "label": "Search placeholder",
+        "default": "Search"
+      }, {
+        "type": "header",
+        "content": "Logo"
+      }, {
         "type": "image_picker",
         "id": "logo",
         "label": "Logo"
-      },
-      {
+      }, {
         "type": "range",
         "id": "logo_width",
         "min": 80,
@@ -209,9 +191,7 @@
         "unit": "px",
         "label": "Logo width",
         "default": 140
-      },
-      
-      {
+      }, {
         "type": "header",
         "content": "Navigation"
       }, {
@@ -260,11 +240,11 @@
         "label": "Show account link",
         "default": true
       }, {
-  "type": "link_list",
-  "id": "customer_account_menu",
-  "label": "Customer account menu",
-  "default": "customer-account-main-menu"
-}, {
+        "type": "link_list",
+        "id": "customer_account_menu",
+        "label": "Customer account menu",
+        "default": "customer-account-main-menu"
+      }, {
         "type": "text",
         "id": "account_label",
         "label": "Account label",
