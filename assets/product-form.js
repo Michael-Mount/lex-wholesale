@@ -1,7 +1,10 @@
 (() => {
-  let activeRequest = null;
+  let activeVariantRequest = null;
 
-  document.addEventListener("change", async (event) => {
+  document.addEventListener("change", handleOptionChange);
+  document.addEventListener("submit", handleProductSubmit);
+
+  async function handleOptionChange(event) {
     const input = event.target.closest(
       "[data-product-options] input[data-option-value-id]",
     );
@@ -34,11 +37,11 @@
       return;
     }
 
-    if (activeRequest) {
-      activeRequest.abort();
+    if (activeVariantRequest) {
+      activeVariantRequest.abort();
     }
 
-    activeRequest = new AbortController();
+    activeVariantRequest = new AbortController();
 
     section.classList.add("main-product--loading");
     section.setAttribute("aria-busy", "true");
@@ -54,7 +57,7 @@
       );
 
       const response = await fetch(sectionUrl.toString(), {
-        signal: activeRequest.signal,
+        signal: activeVariantRequest.signal,
         headers: {
           "X-Requested-With": "XMLHttpRequest",
         },
@@ -65,6 +68,7 @@
       }
 
       const responseText = await response.text();
+
       const parsedDocument = new DOMParser().parseFromString(
         responseText,
         "text/html",
@@ -75,7 +79,7 @@
       );
 
       if (!updatedSection) {
-        throw new Error("Updated product section was not found.");
+        throw new Error("The updated product section was not found.");
       }
 
       const focusedInputId = input.id;
@@ -96,9 +100,7 @@
         `${browserUrl.pathname}${browserUrl.search}`,
       );
 
-      const updatedInput = document.getElementById(focusedInputId);
-
-      updatedInput?.focus();
+      document.getElementById(focusedInputId)?.focus();
     } catch (error) {
       if (error.name === "AbortError") {
         return;
@@ -116,7 +118,122 @@
           "The selected options could not be updated. Please try again.";
       }
     } finally {
-      activeRequest = null;
+      activeVariantRequest = null;
     }
-  });
+  }
+
+  async function handleProductSubmit(event) {
+    const form = event.target.closest(".main-product__form");
+
+    if (!form) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (form.dataset.submitting === "true") {
+      return;
+    }
+
+    const productSection = form.closest("[data-product-section]");
+    const status = productSection?.querySelector("[data-product-status]");
+
+    const submitButton = form.querySelector("[data-add-to-cart-button]");
+
+    const submitText = submitButton?.querySelector("[data-add-to-cart-text]");
+
+    const originalButtonText = submitText?.textContent ?? "";
+    const originalDisabledState = submitButton?.disabled ?? false;
+
+    const cartDrawer = document.querySelector("[data-cart-drawer]");
+
+    const cartDrawerSectionId = cartDrawer?.dataset.sectionId;
+
+    form.dataset.submitting = "true";
+    form.setAttribute("aria-busy", "true");
+
+    if (status) {
+      status.textContent = "";
+    }
+
+    if (submitButton) {
+      submitButton.disabled = true;
+    }
+
+    if (submitText) {
+      submitText.textContent = "Adding…";
+    }
+
+    try {
+      const formData = new FormData(form);
+
+      if (cartDrawerSectionId) {
+        formData.append("sections", cartDrawerSectionId);
+
+        formData.append(
+          "sections_url",
+          `${window.location.pathname}${window.location.search}`,
+        );
+      }
+
+      const cartRoot = window.Shopify?.routes?.root ?? "/";
+
+      const response = await fetch(`${cartRoot}cart/add.js`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: formData,
+      });
+
+      const responseData = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          responseData.description ||
+            responseData.message ||
+            "The product could not be added to the cart.",
+        );
+      }
+
+      if (status) {
+        status.textContent = "Added to cart.";
+      }
+
+      const updatedDrawerHtml = responseData.sections?.[cartDrawerSectionId];
+
+      if (cartDrawerSectionId && updatedDrawerHtml) {
+        document.dispatchEvent(
+          new CustomEvent("cart:updated", {
+            detail: {
+              sectionId: cartDrawerSectionId,
+              html: updatedDrawerHtml,
+              open: true,
+            },
+          }),
+        );
+      }
+    } catch (error) {
+      console.error(error);
+
+      if (status) {
+        status.textContent =
+          error instanceof Error
+            ? error.message
+            : "The product could not be added to the cart.";
+      }
+    } finally {
+      form.dataset.submitting = "false";
+      form.removeAttribute("aria-busy");
+
+      if (submitButton) {
+        submitButton.disabled = originalDisabledState;
+      }
+
+      if (submitText) {
+        submitText.textContent = originalButtonText;
+      }
+    }
+  }
 })();

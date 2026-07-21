@@ -130,20 +130,24 @@
                   {{ form.errors | default_errors }}
                 </div>
               {% endif %}
-
               <button
                 class="main-product__submit"
                 type="submit"
+                data-add-to-cart-button
+
+
                 {% if selected_variant == blank or selected_variant.available == false %}
                 disabled
                 {% endif %}>
-                {% if selected_variant == blank %}
-                  Unavailable
-                {% elsif selected_variant.available %}
-                  {{ section.settings.add_to_cart_label | escape }}
-                {% else %}
-                  Sold out
-                {% endif %}
+                <span data-add-to-cart-text>
+                  {% if selected_variant == blank %}
+                    Unavailable
+                  {% elsif selected_variant.available %}
+                    {{ section.settings.add_to_cart_label | escape }}
+                  {% else %}
+                    Sold out
+                  {% endif %}
+                </span>
               </button>
 
               {% if section.settings.show_dynamic_checkout and selected_variant != blank and selected_variant.available
