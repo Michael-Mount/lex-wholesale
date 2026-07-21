@@ -1,0 +1,491 @@
+{{ 'section-wholesale-access.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign wholesale_state = 'signed_out'
+  assign status_heading = section.settings.signed_out_heading
+  assign status_text = section.settings.signed_out_text
+  assign status_label = section.settings.signed_out_label
+
+  if customer
+    assign wholesale_state = 'not_applied'
+    assign status_heading = section.settings.not_applied_heading
+    assign status_text = section.settings.not_applied_text
+    assign status_label = section.settings.not_applied_label
+
+    if settings.rejected_customer_tag != blank
+      if customer.tags contains settings.rejected_customer_tag
+        assign wholesale_state = 'rejected'
+        assign status_heading = section.settings.rejected_heading
+        assign status_text = section.settings.rejected_text
+        assign status_label = section.settings.rejected_label
+      endif
+    endif
+
+    if settings.pending_customer_tag != blank
+      if customer.tags contains settings.pending_customer_tag
+        assign wholesale_state = 'pending'
+        assign status_heading = section.settings.pending_heading
+        assign status_text = section.settings.pending_text
+        assign status_label = section.settings.pending_label
+      endif
+    endif
+
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign wholesale_state = 'approved'
+        assign status_heading = section.settings.approved_heading
+        assign status_text = section.settings.approved_text
+        assign status_label = section.settings.approved_label
+      endif
+    endif
+  endif
+%}
+
+<section class="
+    wholesale-access
+    wholesale-access--{{ wholesale_state }}
+  " style="
+    --wholesale-background: {{ section.settings.background_color }};
+    --wholesale-text: {{ section.settings.text_color }};
+    --wholesale-border: {{ section.settings.border_color }};
+    --wholesale-card-background: {{ section.settings.card_background_color }};
+    --wholesale-primary-background: {{ section.settings.button_background_color }};
+    --wholesale-primary-text: {{ section.settings.button_text_color }};
+    --wholesale-padding-top: {{ section.settings.padding_top }}px;
+    --wholesale-padding-bottom: {{ section.settings.padding_bottom }}px;
+  ">
+  <div class="page-width">
+    <header class="wholesale-access__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="wholesale-access__eyebrow">
+          {{ section.settings.eyebrow | escape }}
+        </p>
+      {% endif %}
+
+      <h1 class="wholesale-access__title">
+        {{ section.settings.heading | escape }}
+      </h1>
+
+      {% if section.settings.introduction != blank %}
+        <div class="wholesale-access__introduction">
+          {{ section.settings.introduction }}
+        </div>
+      {% endif %}
+    </header>
+
+    <div class="wholesale-access__layout">
+      <div class="
+          wholesale-access__status
+          wholesale-access__status--{{ wholesale_state }}
+        ">
+        <div class="wholesale-access__status-header">
+          <p class="wholesale-access__status-eyebrow">
+            Account status
+          </p>
+
+          <span class="
+              wholesale-access__badge
+              wholesale-access__badge--{{ wholesale_state }}
+            ">
+            {{ status_label | escape }}
+          </span>
+        </div>
+
+        <h2 class="wholesale-access__status-heading">
+          {{ status_heading | escape }}
+        </h2>
+
+        {% if status_text != blank %}
+          <div class="wholesale-access__status-text">
+            {{ status_text }}
+          </div>
+        {% endif %}
+
+        {% if customer and section.settings.show_customer_information %}
+          <dl class="wholesale-access__customer">
+            {% if customer.name != blank %}
+              <div class="wholesale-access__customer-row">
+                <dt>Name</dt>
+                <dd>{{ customer.name | escape }}</dd>
+              </div>
+            {% endif %}
+
+            {% if customer.email != blank %}
+              <div class="wholesale-access__customer-row">
+                <dt>Email</dt>
+                <dd>{{ customer.email | escape }}</dd>
+              </div>
+            {% endif %}
+          </dl>
+        {% endif %}
+
+        <div class="wholesale-access__actions">
+          {% case wholesale_state %}
+            {% when 'signed_out' %}
+              <a class="
+                  wholesale-access__button
+                  wholesale-access__button--primary
+                " href="{{ routes.storefront_login_url }}">
+                {{ section.settings.sign_in_label | escape }}
+              </a>
+
+              {% if settings.wholesale_application_url != blank %}
+                <a class="
+                    wholesale-access__button
+                    wholesale-access__button--secondary
+                  " href="{{ settings.wholesale_application_url }}">
+                  {{ settings.wholesale_application_label | escape }}
+                </a>
+              {% endif %}
+
+            {% when 'not_applied' %}
+              {% if settings.wholesale_application_url != blank %}
+                <a class="
+                    wholesale-access__button
+                    wholesale-access__button--primary
+                  " href="{{ settings.wholesale_application_url }}">
+                  {{ settings.wholesale_application_label | escape }}
+                </a>
+              {% endif %}
+
+              <a class="
+                  wholesale-access__button
+                  wholesale-access__button--secondary
+                " href="{{ routes.account_url }}">
+                {{ section.settings.account_label | escape }}
+              </a>
+
+            {% when 'pending' %}
+              <a class="
+                  wholesale-access__button
+                  wholesale-access__button--secondary
+                " href="{{ routes.account_url }}">
+                {{ section.settings.account_label | escape }}
+              </a>
+
+              {% if section.settings.contact_url != blank %}
+                <a class="
+                    wholesale-access__button
+                    wholesale-access__button--secondary
+                  " href="{{ section.settings.contact_url }}">
+                  {{ section.settings.contact_label | escape }}
+                </a>
+              {% endif %}
+
+            {% when 'approved' %}
+              <a class="
+                  wholesale-access__button
+                  wholesale-access__button--primary
+                " href="{{ section.settings.shop_url | default: routes.collections_url }}">
+                {{ section.settings.shop_label | escape }}
+              </a>
+
+              <a class="
+                  wholesale-access__button
+                  wholesale-access__button--secondary
+                " href="{{ routes.account_url }}">
+                {{ section.settings.orders_label | escape }}
+              </a>
+
+            {% when 'rejected' %}
+              {% if section.settings.contact_url != blank %}
+                <a class="
+                    wholesale-access__button
+                    wholesale-access__button--primary
+                  " href="{{ section.settings.contact_url }}">
+                  {{ section.settings.contact_label | escape }}
+                </a>
+              {% endif %}
+
+              {% if settings.wholesale_application_url != blank %}
+                <a class="
+                    wholesale-access__button
+                    wholesale-access__button--secondary
+                  " href="{{ settings.wholesale_application_url }}">
+                  {{ section.settings.reapply_label | escape }}
+                </a>
+              {% endif %}
+          {% endcase %}
+        </div>
+      </div>
+
+      <aside class="wholesale-access__process">
+        <h2 class="wholesale-access__process-heading">
+          {{ section.settings.process_heading | escape }}
+        </h2>
+
+        <ol class="wholesale-access__steps">
+          {% for block in section.blocks %}
+            <li class="wholesale-access__step" {{ block.shopify_attributes }}>
+              <span class="wholesale-access__step-number" aria-hidden="true">
+                {{ forloop.index }}
+              </span>
+
+              <div>
+                <h3 class="wholesale-access__step-heading">
+                  {{ block.settings.heading | escape }}
+                </h3>
+
+                {% if block.settings.text != blank %}
+                  <div class="wholesale-access__step-text">
+                    {{ block.settings.text }}
+                  </div>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Wholesale access",
+    "tag": "section",
+    "class": "section-wholesale-access",
+    "max_blocks": 6,
+    "settings": [
+      {
+        "type": "header",
+        "content": "Introduction"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow",
+        "default": "Retailer access"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Wholesale account"
+      },
+      {
+        "type": "richtext",
+        "id": "introduction",
+        "label": "Introduction",
+        "default": "<p>Sign in to review your wholesale application and access status.</p>"
+      }, {
+        "type": "checkbox",
+        "id": "show_customer_information",
+        "label": "Show the signed-in customer name and email",
+        "default": true
+      }, {
+        "type": "header",
+        "content": "Signed-out state"
+      }, {
+        "type": "text",
+        "id": "signed_out_label",
+        "label": "Status label",
+        "default": "Signed out"
+      }, {
+        "type": "text",
+        "id": "signed_out_heading",
+        "label": "Heading",
+        "default": "Sign in to check your access"
+      }, {
+        "type": "richtext",
+        "id": "signed_out_text",
+        "label": "Message",
+        "default": "<p>Use the email associated with your retailer account to sign in and review your wholesale status.</p>"
+      }, {
+        "type": "text",
+        "id": "sign_in_label",
+        "label": "Sign-in label",
+        "default": "Sign in"
+      }, {
+        "type": "header",
+        "content": "Not-applied state"
+      }, {
+        "type": "text",
+        "id": "not_applied_label",
+        "label": "Status label",
+        "default": "Not applied"
+      }, {
+        "type": "text",
+        "id": "not_applied_heading",
+        "label": "Heading",
+        "default": "Apply for wholesale access"
+      }, {
+        "type": "richtext",
+        "id": "not_applied_text",
+        "label": "Message",
+        "default": "<p>Your customer account is active, but it does not currently have a wholesale application status.</p>"
+      }, {
+        "type": "header",
+        "content": "Pending state"
+      }, {
+        "type": "text",
+        "id": "pending_label",
+        "label": "Status label",
+        "default": "Under review"
+      }, {
+        "type": "text",
+        "id": "pending_heading",
+        "label": "Heading",
+        "default": "Your application is being reviewed"
+      }, {
+        "type": "richtext",
+        "id": "pending_text",
+        "label": "Message",
+        "default": "<p>Your retailer application has been received. Wholesale prices and purchasing will remain locked until approval.</p>"
+      }, {
+        "type": "header",
+        "content": "Approved state"
+      }, {
+        "type": "text",
+        "id": "approved_label",
+        "label": "Status label",
+        "default": "Approved"
+      }, {
+        "type": "text",
+        "id": "approved_heading",
+        "label": "Heading",
+        "default": "Your wholesale account is active"
+      }, {
+        "type": "richtext",
+        "id": "approved_text",
+        "label": "Message",
+        "default": "<p>You can now view wholesale pricing, purchase individual products, and build complete collection bundles.</p>"
+      }, {
+        "type": "header",
+        "content": "Rejected state"
+      }, {
+        "type": "text",
+        "id": "rejected_label",
+        "label": "Status label",
+        "default": "Not approved"
+      }, {
+        "type": "text",
+        "id": "rejected_heading",
+        "label": "Heading",
+        "default": "Your application was not approved"
+      }, {
+        "type": "richtext",
+        "id": "rejected_text",
+        "label": "Message",
+        "default": "<p>Please contact the wholesale team if you have questions or need to update your retailer information.</p>"
+      }, {
+        "type": "header",
+        "content": "Actions"
+      }, {
+        "type": "url",
+        "id": "shop_url",
+        "label": "Approved customer shopping link"
+      }, {
+        "type": "text",
+        "id": "shop_label",
+        "label": "Shopping button label",
+        "default": "Shop wholesale collections"
+      }, {
+        "type": "text",
+        "id": "account_label",
+        "label": "Account button label",
+        "default": "Open account"
+      }, {
+        "type": "text",
+        "id": "orders_label",
+        "label": "Orders button label",
+        "default": "View orders"
+      }, {
+        "type": "url",
+        "id": "contact_url",
+        "label": "Wholesale contact link"
+      }, {
+        "type": "text",
+        "id": "contact_label",
+        "label": "Contact button label",
+        "default": "Contact wholesale support"
+      }, {
+        "type": "text",
+        "id": "reapply_label",
+        "label": "Reapply button label",
+        "default": "Update application"
+      }, {
+        "type": "header",
+        "content": "Application process"
+      }, {
+        "type": "text",
+        "id": "process_heading",
+        "label": "Process heading",
+        "default": "How wholesale approval works"
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Border",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "card_background_color",
+        "label": "Card background",
+        "default": "#f7f4f1"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Primary button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Primary button text",
+        "default": "#ffffff"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 64
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 80
+      }
+    ],
+    "blocks": [
+      {
+        "type": "step",
+        "name": "Application step",
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading",
+            "default": "Submit your application"
+          }, {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Provide your business and retailer information.</p>"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

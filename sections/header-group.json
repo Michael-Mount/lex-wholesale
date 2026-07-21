@@ -28,6 +28,7 @@
         "menu": "main-menu",
         "dropdown_columns": "3",
         "show_view_all_link": true,
+        "customer_account_menu": "customer-account-main-menu",
         "view_all_label": "View all",
         "mobile_menu_label": "Menu",
         "show_account_link": true,

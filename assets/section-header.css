@@ -436,3 +436,28 @@
     transition: none;
   }
 }
+
+.site-header__account {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header__account shopify-account {
+  --shopify-account-signed-in-avatar-size: 2.5rem;
+  --shopify-account-signed-in-avatar-color-background: var(--header-text);
+  --shopify-account-signed-in-avatar-color-text: var(--header-background);
+}
+
+.site-header__account shopify-account::part(signed-out-avatar) {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.65rem;
+
+  color: inherit;
+}
+
+.site-header__account shopify-account:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}

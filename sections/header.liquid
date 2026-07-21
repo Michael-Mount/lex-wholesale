@@ -149,6 +149,16 @@
           </span>
         </a>
       {% endif %}
+      {% if section.settings.show_account_link
+  and shop.customer_accounts_enabled
+%}
+  <div class="site-header__account">
+    <shopify-account
+      menu="{{ section.settings.customer_account_menu }}"
+    >
+    </shopify-account>
+  </div>
+{% endif %}
     </div>
   </div>
 </header>
@@ -250,6 +260,11 @@
         "label": "Show account link",
         "default": true
       }, {
+  "type": "link_list",
+  "id": "customer_account_menu",
+  "label": "Customer account menu",
+  "default": "customer-account-main-menu"
+}, {
         "type": "text",
         "id": "account_label",
         "label": "Account label",

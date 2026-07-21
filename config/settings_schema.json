@@ -77,6 +77,20 @@
         "info": "Customers with this tag can view prices and purchase products."
       },
       {
+        "type": "text",
+        "id": "pending_customer_tag",
+        "label": "Pending customer tag",
+        "default": "wholesale-pending",
+        "info": "Customers with this tag are shown the pending-review state."
+      },
+      {
+        "type": "text",
+        "id": "rejected_customer_tag",
+        "label": "Rejected customer tag",
+        "default": "wholesale-rejected",
+        "info": "Customers with this tag are shown the rejected application state."
+      },
+      {
         "type": "textarea",
         "id": "locked_price_message",
         "label": "Logged-out price message",
