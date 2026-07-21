@@ -1,0 +1,179 @@
+{
+  "accessibility": {
+    "skip_to_text": "Saltar al contenido",
+    "close": "Cerrar",
+    "remove": "Eliminar",
+    "remove_filter": "Eliminar filtro"
+  },
+  "general": {
+    "actions": {
+      "apply": "Aplicar",
+      "clear_all": "Borrar todo",
+      "reset": "Restablecer",
+      "sign_in": "Iniciar sesión",
+      "view_all": "Ver todo",
+      "continue_shopping": "Seguir comprando",
+      "open_account": "Abrir cuenta"
+    }
+  },
+  "header": {
+    "search": {
+      "label": "Buscar en la tienda",
+      "placeholder": "Buscar"
+    },
+    "cart": {
+      "open": {
+        "one": "Abrir carrito, {{ count }} artículo",
+        "other": "Abrir carrito, {{ count }} artículos"
+      }
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Agregar al carrito",
+      "adding": "Agregando…",
+      "added_to_cart": "Agregado al carrito.",
+      "sold_out": "Agotado",
+      "unavailable": "No disponible",
+      "option_unavailable": "Esta combinación de opciones no está disponible.",
+      "in_stock": "Disponible",
+      "quantity": "Cantidad",
+      "sku": "SKU",
+      "product_details": "Detalles del producto"
+    },
+    "price": {
+      "regular_price": "Precio habitual",
+      "sale_price": "Precio de oferta",
+      "price": "Precio",
+      "from_price": "Desde {{ price }}"
+    }
+  },
+  "collections": {
+    "general": {
+      "product_count": {
+        "one": "{{ count }} producto",
+        "other": "{{ count }} productos"
+      },
+      "no_products": "No se encontraron productos",
+      "remove_filters": "Prueba eliminando uno o más filtros."
+    },
+    "filters": {
+      "active_filters": "Filtros activos",
+      "sort_by": "Ordenar por",
+      "from": "Desde",
+      "to": "Hasta",
+      "maximum_price": "Precio máximo: {{ price }}"
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Tu carrito",
+      "empty": "Tu carrito está vacío",
+      "item_count": {
+        "one": "{{ count }} artículo",
+        "other": "{{ count }} artículos"
+      },
+      "quantity": "Cantidad",
+      "remove": "Eliminar",
+      "update": "Actualizar carrito",
+      "view_cart": "Ver carrito",
+      "checkout": "Finalizar compra",
+      "subtotal": "Subtotal",
+      "estimated_total": "Total estimado",
+      "order_summary": "Resumen del pedido",
+      "shipping_note": "El envío y los impuestos se calculan al finalizar la compra.",
+      "order_note": "Notas del pedido",
+      "save_note": "Guardar nota"
+    },
+    "status": {
+      "updating": "Actualizando carrito…",
+      "updated": "Carrito actualizado.",
+      "removing": "Eliminando producto…",
+      "removed": "Producto eliminado del carrito.",
+      "saving_note": "Guardando nota del pedido…",
+      "note_saved": "Nota del pedido guardada."
+    }
+  },
+  "search": {
+    "general": {
+      "title": "Buscar",
+      "label": "Buscar en la tienda",
+      "button": "Buscar",
+      "results_for": "Resultados para “{{ terms }}”",
+      "result_count": {
+        "one": "{{ count }} resultado",
+        "other": "{{ count }} resultados"
+      },
+      "no_results": "No se encontraron resultados",
+      "try_again": "Prueba otro término de búsqueda o elimina uno o más filtros."
+    },
+    "predictive": {
+      "suggestions": "Sugerencias",
+      "products": "Productos",
+      "content": "Contenido",
+      "collection": "Colección",
+      "page": "Página",
+      "article": "Artículo",
+      "no_suggestions": "No se encontraron sugerencias.",
+      "view_all": "Ver todos los resultados para “{{ terms }}”"
+    }
+  },
+  "blogs": {
+    "article": {
+      "article": "Artículo",
+      "read_article": "Leer artículo",
+      "back_to_blog": "Volver al diario",
+      "by_author": "Por {{ author }}",
+      "comment_count": {
+        "one": "{{ count }} comentario",
+        "other": "{{ count }} comentarios"
+      }
+    },
+    "comments": {
+      "heading": "Comentarios",
+      "leave_comment": "Dejar un comentario",
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "comment": "Comentario",
+      "post": "Publicar comentario",
+      "published": "Tu comentario fue publicado.",
+      "moderated": "Tu comentario fue enviado y está pendiente de aprobación."
+    }
+  },
+  "contact": {
+    "form": {
+      "first_name": "Nombre",
+      "last_name": "Apellido",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "company": "Empresa",
+      "subject": "Asunto",
+      "message": "Mensaje",
+      "required": "Obligatorio",
+      "submit": "Enviar mensaje",
+      "success": "Gracias. Tu mensaje fue enviado."
+    }
+  },
+  "wholesale": {
+    "status": {
+      "account_status": "Estado de la cuenta",
+      "name": "Nombre",
+      "email": "Correo electrónico"
+    }
+  },
+  "localization": {
+    "country_label": "País o región",
+    "language_label": "Idioma",
+    "update_country": "Actualizar país",
+    "update_language": "Actualizar idioma"
+  },
+  "templates": {
+    "404": {
+      "code": "404",
+      "heading": "Página no encontrada",
+      "search_label": "Buscar en la tienda",
+      "return_home": "Volver al inicio",
+      "browse_collections": "Explorar colecciones"
+    }
+  }
+}

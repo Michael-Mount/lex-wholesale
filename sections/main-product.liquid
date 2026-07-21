@@ -87,11 +87,11 @@
             role="status"
             aria-live="polite">
             {% if selected_variant == blank %}
-              This option combination is unavailable.
+              {{ 'products.product.option_unavailable' | t }}
             {% elsif selected_variant.available %}
-              In stock
+              {{ 'products.product.in_stock' | t }}
             {% else %}
-              Sold out
+              {{ 'products.product.sold_out' | t }}
             {% endif %}
           </div>
 
@@ -139,7 +139,7 @@
                 {% endif %}>
                 <span data-add-to-cart-text>
                   {% if selected_variant == blank %}
-                    Unavailable
+                    {{ 'products.product.unavailable' | t }}
                   {% elsif selected_variant.available %}
                     {{ section.settings.add_to_cart_label | escape }}
                   {% else %}

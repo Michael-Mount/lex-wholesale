@@ -1,3 +1,13 @@
+{% liquid
+  assign locale_language_code = request.locale.iso_code | split: '-' | first
+  assign rtl_language_codes = 'ar,fa,he,ur' | split: ','
+  assign text_direction = 'ltr'
+
+  if rtl_language_codes contains locale_language_code
+    assign text_direction = 'rtl'
+  endif
+%}
+
 <!doctype html>
 
 <html lang="{{ request.locale.iso_code }}">
@@ -5,6 +15,10 @@
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        document.documentElement.classList.remove("no-js");
+        document.documentElement.classList.add("js");
+    </script>
 
     <title>
       {{ page_title }}
