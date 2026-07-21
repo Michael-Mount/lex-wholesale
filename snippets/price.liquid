@@ -1,0 +1,108 @@
+{% comment %}
+  Renders a product price or wholesale-access message.
+
+  Required:
+  - product
+{% endcomment %}
+
+{% liquid
+  assign is_approved_customer = false
+
+  if customer
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign is_approved_customer = true
+      endif
+    endif
+  endif
+
+  assign price_target = variant
+
+  if price_target == blank
+    assign price_target = product.selected_or_first_available_variant
+  endif
+%}
+
+<div class="product-price">
+  {% if is_approved_customer %}
+    {% if price_target != blank %}
+      {% liquid
+        assign current_price = price_target.price
+        assign compare_at_price = price_target.compare_at_price
+        assign is_on_sale = false
+
+        if compare_at_price != blank and compare_at_price > current_price
+          assign is_on_sale = true
+        endif
+      %}
+
+      <div class="
+          product-price__values
+
+          {% if is_on_sale %}
+            product-price__values--sale
+          {% endif %}
+        ">
+        {% if show_price_range and product.price_varies %}
+          <span class="product-price__current">
+            <span class="visually-hidden">
+              Price starts at
+            </span>
+
+            From {{ product.price_min | money }}
+          </span>
+        {% else %}
+          {% if show_compare_at_price and is_on_sale %}
+            <s class="product-price__compare">
+              <span class="visually-hidden">
+                Regular price
+              </span>
+
+              {{ compare_at_price | money }}
+            </s>
+          {% endif %}
+
+          <span class="product-price__current">
+            <span class="visually-hidden">
+              {% if is_on_sale %}
+                Sale price
+              {% else %}
+                Price
+              {% endif %}
+            </span>
+
+            {{ current_price | money }}
+          </span>
+        {% endif %}
+      </div>
+    {% else %}
+      <p class="product-price__unavailable">
+        This option combination is unavailable.
+      </p>
+    {% endif %}
+  {% else %}
+    <div class="product-price__locked">
+      <p class="product-price__locked-message">
+        {% if customer %}
+          {{ settings.unapproved_price_message | escape }}
+        {% else %}
+          {{ settings.locked_price_message | escape }}
+        {% endif %}
+      </p>
+
+      <div class="product-price__locked-actions">
+        {% unless customer %}
+          <a class="product-price__locked-link" href="{{ routes.account_login_url }}">
+            Sign in
+          </a>
+        {% endunless %}
+
+        {% if settings.wholesale_application_url != blank %}
+          <a class="product-price__locked-link" href="{{ settings.wholesale_application_url }}">
+            {{ settings.wholesale_application_label | escape }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>

@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-article",
+      "settings": {
+        "show_blog_title": true,
+        "show_author": true,
+        "show_date": true,
+        "show_comment_count": true,
+        "show_image": true,
+        "show_tags": true,
+        "back_label": "Back to journal",
+        "show_comments": true,
+        "comments_per_page": 10,
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

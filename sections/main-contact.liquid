@@ -1,0 +1,389 @@
+{{ 'section-content-pages.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign form_id = 'ContactForm-' | append: section.id
+  assign first_name_id = 'ContactFirstName-' | append: section.id
+  assign last_name_id = 'ContactLastName-' | append: section.id
+  assign email_id = 'ContactEmail-' | append: section.id
+  assign phone_id = 'ContactPhone-' | append: section.id
+  assign company_id = 'ContactCompany-' | append: section.id
+  assign subject_id = 'ContactSubject-' | append: section.id
+  assign message_id = 'ContactMessage-' | append: section.id
+%}
+
+<section class="content-section main-contact" style="
+    --content-background: {{ section.settings.background_color }};
+    --content-text: {{ section.settings.text_color }};
+    --content-border: {{ section.settings.border_color }};
+    --content-card-background: {{ section.settings.card_background_color }};
+    --content-button-background: {{ section.settings.button_background_color }};
+    --content-button-text: {{ section.settings.button_text_color }};
+    --content-padding-top: {{ section.settings.padding_top }}px;
+    --content-padding-bottom: {{ section.settings.padding_bottom }}px;
+  ">
+  <div class="page-width">
+    <header class="content-section__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="content-section__eyebrow">
+          {{ section.settings.eyebrow | escape }}
+        </p>
+      {% endif %}
+
+      <h1 class="content-section__title">
+        {{ page.title | default: section.settings.heading | escape }}
+      </h1>
+
+      {% if section.settings.introduction != blank %}
+        <div class="content-section__intro">
+          {{ section.settings.introduction }}
+        </div>
+      {% endif %}
+    </header>
+
+    <div class="main-contact__layout">
+      <aside class="main-contact__information">
+        <h2>
+          {{ section.settings.information_heading | escape }}
+        </h2>
+
+        {% if page.content != blank %}
+          <div class="rte">
+            {{ page.content }}
+          </div>
+        {% elsif section.settings.information_text != blank %}
+          <div class="rte">
+            {{ section.settings.information_text }}
+          </div>
+        {% endif %}
+
+        <dl class="main-contact__details">
+          {% if section.settings.email != blank %}
+            <div class="main-contact__detail">
+              <dt>Email</dt>
+              <dd>
+                <a href="mailto:{{ section.settings.email | escape }}">
+                  {{ section.settings.email | escape }}
+                </a>
+              </dd>
+            </div>
+          {% endif %}
+
+          {% if section.settings.phone != blank %}
+            <div class="main-contact__detail">
+              <dt>Phone</dt>
+              <dd>
+                <a href="tel:{{ section.settings.phone | remove: ' ' | escape }}">
+                  {{ section.settings.phone | escape }}
+                </a>
+              </dd>
+            </div>
+          {% endif %}
+
+          {% if section.settings.hours != blank %}
+            <div class="main-contact__detail">
+              <dt>Hours</dt>
+              <dd>{{ section.settings.hours | escape }}</dd>
+            </div>
+          {% endif %}
+        </dl>
+      </aside>
+
+      <div class="main-contact__form-wrapper">
+        <h2>
+          {{ section.settings.form_heading | escape }}
+        </h2>
+
+        {% form 'contact'
+          , id: form_id
+          , class: 'content-form'
+        %}
+          {% if form.posted_successfully? %}
+            <div
+              class="content-form__success"
+              tabindex="-1"
+              role="status">
+              {{ section.settings.success_message | escape }}
+            </div>
+          {% endif %}
+
+          {% if form.errors %}
+            <div
+              class="content-form__errors"
+              tabindex="-1"
+              role="alert">
+              {{ form.errors | default_errors }}
+            </div>
+          {% endif %}
+
+          <div class="content-form__row">
+            <div class="content-form__field">
+              <label class="content-form__label" for="{{ first_name_id }}">
+                First name
+              </label>
+
+              <input
+                id="{{ first_name_id }}"
+                class="content-form__input"
+                type="text"
+                name="contact[first_name]"
+                value="{{ form.first_name | default: customer.first_name | escape }}"
+                autocomplete="given-name">
+            </div>
+
+            <div class="content-form__field">
+              <label class="content-form__label" for="{{ last_name_id }}">
+                Last name
+              </label>
+
+              <input
+                id="{{ last_name_id }}"
+                class="content-form__input"
+                type="text"
+                name="contact[last_name]"
+                value="{{ form.last_name | default: customer.last_name | escape }}"
+                autocomplete="family-name">
+            </div>
+
+            <div class="content-form__field">
+              <label class="content-form__label" for="{{ email_id }}">
+                Email
+
+                <span class="content-form__required">
+                  Required
+                </span>
+              </label>
+
+              <input
+                id="{{ email_id }}"
+                class="content-form__input"
+                type="email"
+                name="contact[email]"
+                value="{{ form.email | default: customer.email | escape }}"
+                autocomplete="email"
+                autocorrect="off"
+                autocapitalize="off"
+                required>
+            </div>
+
+            {% if section.settings.show_phone %}
+              <div class="content-form__field">
+                <label class="content-form__label" for="{{ phone_id }}">
+                  Phone
+                </label>
+
+                <input
+                  id="{{ phone_id }}"
+                  class="content-form__input"
+                  type="tel"
+                  name="contact[phone]"
+                  value="{{ form.phone | escape }}"
+                  autocomplete="tel">
+              </div>
+            {% endif %}
+
+            {% if section.settings.show_company %}
+              <div class="content-form__field">
+                <label class="content-form__label" for="{{ company_id }}">
+                  Company
+                </label>
+
+                <input
+                  id="{{ company_id }}"
+                  class="content-form__input"
+                  type="text"
+                  name="contact[company]"
+                  value="{{ form.company | escape }}"
+                  autocomplete="organization">
+              </div>
+            {% endif %}
+
+            {% if section.settings.show_subject %}
+              <div class="content-form__field">
+                <label class="content-form__label" for="{{ subject_id }}">
+                  Subject
+                </label>
+
+                <input
+                  id="{{ subject_id }}"
+                  class="content-form__input"
+                  type="text"
+                  name="contact[subject]"
+                  value="{{ form.subject | escape }}">
+              </div>
+            {% endif %}
+
+            <div class="content-form__field content-form__field--full">
+              <label class="content-form__label" for="{{ message_id }}">
+                Message
+
+                {% if section.settings.require_message %}
+                  <span class="content-form__required">
+                    Required
+                  </span>
+                {% endif %}
+              </label>
+
+              <textarea
+                id="{{ message_id }}"
+                class="content-form__textarea"
+                name="contact[body]"
+                {% if section.settings.require_message %}
+                required
+                {% endif %}>{{ form.body | escape }}</textarea>
+            </div>
+          </div>
+
+          <button class="content-form__submit" type="submit">
+            {{ section.settings.button_label | escape }}
+          </button>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Main contact",
+    "tag": "section",
+    "class": "section-main-contact",
+    "settings": [
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow",
+        "default": "Get in touch"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Fallback heading",
+        "default": "Contact us"
+      },
+      {
+        "type": "richtext",
+        "id": "introduction",
+        "label": "Introduction",
+        "default": "<p>Send us a message and our team will respond as soon as possible.</p>"
+      },
+      {
+        "type": "header",
+        "content": "Contact information"
+      }, {
+        "type": "text",
+        "id": "information_heading",
+        "label": "Information heading",
+        "default": "Wholesale support"
+      }, {
+        "type": "richtext",
+        "id": "information_text",
+        "label": "Fallback information",
+        "default": "<p>Contact us with questions about retailer applications, products, or existing orders.</p>"
+      }, {
+        "type": "text",
+        "id": "email",
+        "label": "Email"
+      }, {
+        "type": "text",
+        "id": "phone",
+        "label": "Phone"
+      }, {
+        "type": "text",
+        "id": "hours",
+        "label": "Business hours"
+      }, {
+        "type": "header",
+        "content": "Form"
+      }, {
+        "type": "text",
+        "id": "form_heading",
+        "label": "Form heading",
+        "default": "Send a message"
+      }, {
+        "type": "checkbox",
+        "id": "show_phone",
+        "label": "Show phone field",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_company",
+        "label": "Show company field",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_subject",
+        "label": "Show subject field",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "require_message",
+        "label": "Require a message",
+        "default": true
+      }, {
+        "type": "text",
+        "id": "button_label",
+        "label": "Submit label",
+        "default": "Send message"
+      }, {
+        "type": "textarea",
+        "id": "success_message",
+        "label": "Success message",
+        "default": "Thank you. Your message has been sent."
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "card_background_color",
+        "label": "Card background",
+        "default": "#f7f4f1"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Button text",
+        "default": "#ffffff"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 64
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 80
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,40 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-search",
+      "settings": {
+        "heading": "Search",
+        "placeholder": "Search products and content",
+        "button_label": "Search",
+
+        "enable_filtering": true,
+        "enable_sorting": true,
+        "show_filter_counts": true,
+        "results_per_page": 16,
+
+        "desktop_columns": "4",
+        "mobile_columns": "1",
+        "grid_gap": 24,
+
+        "product_image_ratio": "portrait",
+        "product_image_fit": "cover",
+        "text_alignment": "left",
+        "show_vendor": false,
+        "show_sold_out_badge": true,
+        "show_price_range": true,
+        "show_compare_at_price": true,
+
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "card_background_color": "#ffffff",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

@@ -3,10 +3,11 @@
 {% if section.blocks.size > 0 %}
   <aside
     class="announcement-bar"
-    aria-label="Store announcements"
+    aria-label="{{ section.settings.accessibility_label | escape }}"
     style="
       --announcement-background: {{ section.settings.background_color }};
       --announcement-text: {{ section.settings.text_color }};
+      --announcement-border: {{ section.settings.border_color }};
     ">
     <div class="page-width">
       <ul class="announcement-bar__list">
@@ -18,9 +19,9 @@
                   {{ block.settings.text | escape }}
                 </a>
               {% else %}
-                <p class="announcement-bar__text">
+                <span class="announcement-bar__text">
                   {{ block.settings.text | escape }}
-                </p>
+                </span>
               {% endif %}
             </li>
           {% endif %}
@@ -33,20 +34,36 @@
 {% schema %}
   {
     "name": "Announcement bar",
-    "tag": "section",
+    "tag": "div",
     "class": "section-announcement-bar",
     "max_blocks": 3,
     "settings": [
       {
+        "type": "text",
+        "id": "accessibility_label",
+        "label": "Accessibility label",
+        "default": "Store announcement"
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
         "type": "color",
         "id": "background_color",
-        "label": "Background color",
+        "label": "Background",
         "default": "#2c211c"
-      }, {
+      },
+      {
         "type": "color",
         "id": "text_color",
-        "label": "Text color",
+        "label": "Text",
         "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Border",
+        "default": "#2c211c"
       }
     ],
     "blocks": [

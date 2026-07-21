@@ -1,0 +1,26 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-404",
+      "blocks": {},
+      "block_order": [],
+      "settings": {
+        "heading": "Page not found",
+        "text": "<p>The page may have moved or the address may be incorrect. Search the store or return to one of the links below.</p>",
+        "show_search": true,
+        "search_placeholder": "Search the store",
+        "search_label": "Search",
+        "home_label": "Return home",
+        "collections_label": "Browse collections",
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+        "padding_top": 96,
+        "padding_bottom": 120
+      }
+    }
+  },
+  "order": ["main"]
+}

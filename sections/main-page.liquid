@@ -1,0 +1,118 @@
+{{ 'section-content-pages.css' | asset_url | stylesheet_tag }}
+
+<section class="content-section main-page" style="
+    --content-background: {{ section.settings.background_color }};
+    --content-text: {{ section.settings.text_color }};
+    --content-border: {{ section.settings.border_color }};
+    --content-header-width: {{ section.settings.header_width }}rem;
+    --content-padding-top: {{ section.settings.padding_top }}px;
+    --content-padding-bottom: {{ section.settings.padding_bottom }}px;
+  ">
+  <div class="page-width">
+    <header class="content-section__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="content-section__eyebrow">
+          {{ section.settings.eyebrow | escape }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.show_title %}
+        <h1 class="content-section__title">
+          {{ page.title | escape }}
+        </h1>
+      {% endif %}
+    </header>
+
+    {% if page.content != blank %}
+      <div class="rte main-page__content" style="
+          max-width: {{ section.settings.content_width }}rem;
+        ">
+        {{ page.content }}
+      </div>
+    {% elsif request.design_mode %}
+      <p>
+        Add content to this page through Shopify Admin.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Main page",
+    "tag": "section",
+    "class": "section-main-page",
+    "settings": [
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_title",
+        "label": "Show page title",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "header_width",
+        "min": 32,
+        "max": 72,
+        "step": 4,
+        "unit": "rem",
+        "label": "Header width",
+        "default": 52
+      },
+      {
+        "type": "range",
+        "id": "content_width",
+        "min": 32,
+        "max": 72,
+        "step": 4,
+        "unit": "rem",
+        "label": "Content width",
+        "default": 48
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 64
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 80
+      }
+    ]
+  }
+{% endschema %}

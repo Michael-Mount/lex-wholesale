@@ -1,3 +1,13 @@
+{% liquid
+  assign locale_language_code = request.locale.iso_code | split: '-' | first
+  assign rtl_language_codes = 'ar,fa,he,ur' | split: ','
+  assign text_direction = 'ltr'
+
+  if rtl_language_codes contains locale_language_code
+    assign text_direction = 'rtl'
+  endif
+%}
+
 <!doctype html>
 
 <html lang="{{ request.locale.iso_code }}">
@@ -5,6 +15,10 @@
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        document.documentElement.classList.remove("no-js");
+        document.documentElement.classList.add("js");
+    </script>
 
     <title>
       {{ page_title }}
@@ -24,26 +38,52 @@
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
 
-    <style > :root
-    {
-      --color-background: {{ settings.background_color }};
-      --color-text: {{ settings.text_color }};
-      --page-width: {{ settings.page_width }}px;
-    }
-  </style>
-</head>
+    {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
 
-<body>
-  <a class="skip-link" href="#MainContent">
-    Skip to content
-  </a>
+    <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
 
-  {% sections 'header-group' %}
+    {{ 'component-bundle-cart-groups.css' | asset_url | stylesheet_tag
+    }}
 
-  <main
-    id="MainContent"
-    role="main"
-    tabindex="-1">
-    {{ content_for_layout }}
-  </main>
-</body></html>
+    <script src="{{ 'bundle-cart-groups.js' | asset_url }}" defer></script>
+
+    <style>
+      {{ settings.body_font | font_face: font_display: 'swap' }}{{ settings.heading_font | font_face: font_display: 'swap' }}:root {
+        --color-background: {{ settings.background_color }};
+        --color-text: {{ settings.text_color }};
+        --page-width: {{ settings.page_width }}px;
+
+        --font-body-family: {{ settings.body_font.family }}, 
+        {{ settings.body_font.fallback_families }};
+
+        --font-body-style: {{ settings.body_font.style }};
+        --font-body-weight: {{ settings.body_font.weight }};
+        --font-body-size: {{ settings.body_font_size }}px;
+
+        --font-heading-family: {{ settings.heading_font.family }}, 
+        {{ settings.heading_font.fallback_families }};
+
+        --font-heading-style: {{ settings.heading_font.style }};
+        --font-heading-weight: {{ settings.heading_font.weight }};
+      }
+    </style>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#MainContent">
+      Skip to content
+    </a>
+
+    {% sections 'header-group' %}
+
+    <main
+      id="MainContent"
+      role="main"
+      tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+    {% section 'cart-drawer' %}
+  </body>
+</html>

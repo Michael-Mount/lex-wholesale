@@ -1,0 +1,376 @@
+{% liquid
+  assign is_approved_customer = false
+  assign title_id = 'CartDrawerTitle-' | append: section.id
+  assign continue_shopping_url = section.settings.continue_shopping_url
+
+  if continue_shopping_url == blank
+    assign continue_shopping_url = routes.root_url
+  endif
+
+  if customer
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign is_approved_customer = true
+      endif
+    endif
+  endif
+%}
+
+<dialog
+  id="CartDrawer-{{ section.id }}"
+  class="cart-drawer"
+  aria-labelledby="{{ title_id }}"
+  data-cart-drawer
+  data-section-id="{{ section.id }}"
+  data-cart-count="{{ cart.item_count }}"
+  style="
+    --cart-drawer-width: {{ section.settings.drawer_width }}px;
+    --cart-drawer-background: {{ section.settings.background_color }};
+    --cart-drawer-text: {{ section.settings.text_color }};
+    --cart-drawer-border: {{ section.settings.border_color }};
+    --cart-drawer-button-background: {{ section.settings.button_background_color }};
+    --cart-drawer-button-text: {{ section.settings.button_text_color }};
+  ">
+  <div class="cart-drawer__panel">
+    <header class="cart-drawer__header">
+      <div>
+        <h2 id="{{ title_id }}" class="cart-drawer__title">
+          {{ section.settings.heading | escape }}
+        </h2>
+
+        <p class="cart-drawer__count">
+          {{ cart.item_count }}
+
+          {% if cart.item_count == 1 %}
+            item
+          {% else %}
+            items
+          {% endif %}
+        </p>
+      </div>
+
+      <button
+        class="cart-drawer__close"
+        type="button"
+        data-cart-drawer-close
+        aria-label="Close cart"
+        autofocus>
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <div class="cart-drawer__body">
+      {% if cart.empty? %}
+        <div class="cart-drawer__empty">
+          <h3 class="cart-drawer__empty-heading">
+            {{ section.settings.empty_heading | escape }}
+          </h3>
+
+          {% if section.settings.empty_text != blank %}
+            <p class="cart-drawer__empty-text">
+              {{ section.settings.empty_text | escape }}
+            </p>
+          {% endif %}
+
+          <a class="cart-drawer__secondary-button" href="{{ continue_shopping_url }}">
+            {{ section.settings.continue_shopping_label | escape }}
+          </a>
+        </div>
+      {% else %}
+        <ul
+          class="cart-drawer__items"
+          data-bundle-group-container
+          data-enable-bundle-groups="{{ settings.show_bundle_cart_groups }}"
+          data-bundle-group-label="{{ settings.bundle_group_label | escape }}"
+          data-bundle-complete-label="{{ settings.bundle_complete_label | escape }}"
+          data-bundle-incomplete-label="{{ settings.bundle_incomplete_label | escape }}"
+          data-bundle-incomplete-warning="{{ settings.bundle_incomplete_warning | escape }}"
+          data-bundle-unknown-warning="{{ settings.bundle_unknown_warning | escape }}">
+          {% for item in cart.items %}
+            <li class="cart-drawer__item" {% if is_approved_customer %}
+    {% render 'bundle-line-metadata',
+      item: item,
+      output: 'attributes'
+    %}
+  {% endif %}>
+              <a
+                class="cart-drawer__item-image-link"
+                href="{{ item.url }}"
+                tabindex="-1"
+                aria-hidden="true">
+                {% if item.image != blank %}
+                  {{
+                    item.image | image_url: width: 240 | image_tag: class: 'cart-drawer__item-image', widths: '120, 180, 240', sizes: '96px', loading: 'lazy', alt: ''
+                  }}
+                {% else %}
+                  <span class="cart-drawer__item-image-placeholder"></span>
+                {% endif %}
+              </a>
+
+              <div class="cart-drawer__item-information">
+                {% if section.settings.show_vendor and item.vendor != blank
+                %}
+                  <p class="cart-drawer__item-vendor">
+                    {{ item.vendor | escape }}
+                  </p>
+                {% endif %}
+
+                <h3 class="cart-drawer__item-title">
+                  <a class="cart-drawer__item-title-link" href="{{ item.url }}">
+                    {{ item.product.title | escape }}
+                  </a>
+                </h3>
+
+                {% if is_approved_customer %}
+  {% render 'bundle-line-metadata',
+    item: item,
+    output: 'label'
+  %}
+{% endif %}
+
+                {% unless item.product.has_only_default_variant %}
+                  <dl class="cart-drawer__options">
+                    {% for option in item.options_with_values %}
+                      <div class="cart-drawer__option">
+                        <dt>{{ option.name | escape }}:</dt>
+                        <dd>{{ option.value | escape }}</dd>
+                      </div>
+                    {% endfor %}
+                  </dl>
+                {% endunless %}
+
+                {% if section.settings.show_sku and item.sku != blank
+                %}
+                  <p class="cart-drawer__item-sku">
+                    SKU: {{ item.sku | escape }}
+                  </p>
+                {% endif %}
+
+                <p class="cart-drawer__item-quantity">
+                  Quantity: {{ item.quantity }}
+                </p>
+
+                {% if is_approved_customer %}
+                  <div class="cart-drawer__item-price">
+                    {% if item.original_line_price > item.final_line_price %}
+                      <s class="cart-drawer__item-original-price">
+                        <span class="visually-hidden">
+                          Original line price
+                        </span>
+
+                        {{ item.original_line_price | money }}
+                      </s>
+                    {% endif %}
+
+                    <strong class="cart-drawer__item-final-price">
+                      <span class="visually-hidden">
+                        Line price
+                      </span>
+
+                      {{ item.final_line_price | money }}
+                    </strong>
+                  </div>
+
+                  {% if item.line_level_discount_allocations.size > 0 %}
+                    <ul class="cart-drawer__item-discounts">
+                      {% for allocation in item.line_level_discount_allocations %}
+                        <li>
+                          {{ allocation.discount_application.title | escape }}
+
+                          <span>
+                            −{{ allocation.amount | money }}</span>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    {% unless cart.empty? %}
+      <footer class="cart-drawer__footer">
+        {% if is_approved_customer %}
+          <div class="cart-drawer__summary">
+            <div class="cart-drawer__summary-row">
+              <span>Subtotal</span>
+
+              <span>
+                {{ cart.items_subtotal_price | money }}
+              </span>
+            </div>
+
+            {% for discount_application in cart.cart_level_discount_applications %}
+              <div class="
+                  cart-drawer__summary-row
+                  cart-drawer__summary-row--discount
+                ">
+                <span>
+                  {{ discount_application.title | escape }}
+                </span>
+
+                <span>
+                  −{{ discount_application.total_allocated_amount | money }}</span>
+              </div>
+            {% endfor %}
+
+            <div class="
+                cart-drawer__summary-row
+                cart-drawer__summary-row--total
+              ">
+              <strong>Estimated total</strong>
+
+              <strong>
+                {{ cart.total_price | money }}
+              </strong>
+            </div>
+
+            <p class="cart-drawer__summary-note">
+              Shipping and taxes are calculated at checkout.
+            </p>
+          </div>
+
+          <div class="cart-drawer__actions">
+            <a class="cart-drawer__secondary-button" href="{{ routes.cart_url }}">
+              {{ section.settings.view_cart_label | escape }}
+            </a>
+
+            <form
+              class="cart-drawer__checkout-form"
+              action="{{ routes.cart_url }}"
+              method="post">
+              <button
+                class="cart-drawer__primary-button"
+                type="submit"
+                name="checkout">
+                {{ section.settings.checkout_label | escape }}
+              </button>
+            </form>
+          </div>
+        {% else %}
+          <div class="cart-drawer__gate">
+            <p class="cart-drawer__gate-message">
+              {% if customer %}
+                {{ settings.unapproved_price_message | escape }}
+              {% else %}
+                {{ settings.locked_price_message | escape }}
+              {% endif %}
+            </p>
+
+            <div class="cart-drawer__gate-actions">
+              {% unless customer %}
+                <a class="cart-drawer__secondary-button" href="{{ routes.account_login_url }}">
+                  Sign in
+                </a>
+              {% endunless %}
+
+              {% if settings.wholesale_application_url != blank %}
+                <a class="cart-drawer__secondary-button" href="{{ settings.wholesale_application_url }}">
+                  {{ settings.wholesale_application_label | escape }}
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </footer>
+    {% endunless %}
+  </div>
+</dialog>
+
+{% schema %}
+  {
+    "name": "Cart drawer",
+    "tag": "section",
+    "class": "section-cart-drawer",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Your cart"
+      },
+      {
+        "type": "text",
+        "id": "empty_heading",
+        "label": "Empty cart heading",
+        "default": "Your cart is empty"
+      },
+      {
+        "type": "textarea",
+        "id": "empty_text",
+        "label": "Empty cart text",
+        "default": "Browse the store to begin building your order."
+      },
+      {
+        "type": "url",
+        "id": "continue_shopping_url",
+        "label": "Continue shopping link"
+      }, {
+        "type": "text",
+        "id": "continue_shopping_label",
+        "label": "Continue shopping label",
+        "default": "Continue shopping"
+      }, {
+        "type": "text",
+        "id": "view_cart_label",
+        "label": "View cart label",
+        "default": "View cart"
+      }, {
+        "type": "text",
+        "id": "checkout_label",
+        "label": "Checkout label",
+        "default": "Checkout"
+      }, {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "label": "Show product vendor",
+        "default": false
+      }, {
+        "type": "checkbox",
+        "id": "show_sku",
+        "label": "Show variant SKU",
+        "default": true
+      }, {
+        "type": "range",
+        "id": "drawer_width",
+        "min": 320,
+        "max": 520,
+        "step": 20,
+        "unit": "px",
+        "label": "Drawer width",
+        "default": 440
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Primary button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Primary button text",
+        "default": "#ffffff"
+      }
+    ]
+  }
+{% endschema %}

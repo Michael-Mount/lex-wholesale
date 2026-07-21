@@ -1,0 +1,88 @@
+{% comment %}
+  Renders a product, page, or article search result.
+
+  Required:
+  - item
+  - terms
+
+  Product-card options:
+  - image_ratio
+  - image_fit
+  - text_alignment
+  - show_vendor
+  - show_sold_out_badge
+  - show_price_range
+  - show_compare_at_price
+{% endcomment %}
+
+{% case item.object_type %}
+  {% when 'product' %}
+    {% render 'product-card'
+      , product: item
+      , image_ratio: image_ratio
+      , image_fit: image_fit
+      , text_alignment: text_alignment
+      , show_vendor: show_vendor
+      , show_sold_out_badge: show_sold_out_badge
+      , show_price_range: show_price_range
+      , show_compare_at_price: show_compare_at_price
+    %}
+
+  {% when 'article' %}
+    <article class="search-result-card search-result-card--article">
+      {% if item.image != blank %}
+        <a
+          class="search-result-card__media-link"
+          href="{{ item.url }}"
+          tabindex="-1"
+          aria-hidden="true">
+          {{
+            item.image | image_url: width: 1000 | image_tag: class: 'search-result-card__image', widths: '240, 360, 480, 600, 800, 1000', sizes: '(min-width: 990px) 25vw, 50vw', loading: 'lazy', alt: ''
+          }}
+        </a>
+      {% endif %}
+
+      <div class="search-result-card__content">
+        <p class="search-result-card__type">
+          Article
+        </p>
+
+        <h2 class="search-result-card__title">
+          <a class="search-result-card__title-link" href="{{ item.url }}">
+            {{ item.title | escape | highlight: terms }}
+          </a>
+        </h2>
+
+        {% if item.content != blank %}
+          <p class="search-result-card__excerpt">
+            {{
+              item.content | strip_html | escape | truncatewords: 28 | highlight: terms
+            }}
+          </p>
+        {% endif %}
+      </div>
+    </article>
+
+  {% when 'page' %}
+    <article class="search-result-card search-result-card--page">
+      <div class="search-result-card__content">
+        <p class="search-result-card__type">
+          Page
+        </p>
+
+        <h2 class="search-result-card__title">
+          <a class="search-result-card__title-link" href="{{ item.url }}">
+            {{ item.title | escape | highlight: terms }}
+          </a>
+        </h2>
+
+        {% if item.content != blank %}
+          <p class="search-result-card__excerpt">
+            {{
+              item.content | strip_html | escape | truncatewords: 28 | highlight: terms
+            }}
+          </p>
+        {% endif %}
+      </div>
+    </article>
+{% endcase %}

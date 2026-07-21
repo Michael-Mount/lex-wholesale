@@ -1,0 +1,408 @@
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-product-card.css' | asset_url | stylesheet_tag }}
+{{ 'section-main-search.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign is_approved_customer = false
+  assign has_restricted_price_request = false
+  assign selected_sort_by = search.sort_by | default: search.default_sort_by
+  assign heading_id = 'SearchHeading-' | append: section.id
+  assign search_input_id = 'SearchInput-' | append: section.id
+
+  if customer
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign is_approved_customer = true
+      endif
+    endif
+  endif
+
+  unless is_approved_customer
+    if selected_sort_by == 'price-ascending' or selected_sort_by == 'price-descending'
+      assign has_restricted_price_request = true
+    endif
+
+    for filter in search.filters
+      if filter.type == 'price_range'
+        if filter.min_value.value != blank or filter.max_value.value != blank
+          assign has_restricted_price_request = true
+        endif
+      endif
+    endfor
+  endunless
+%}
+
+<section class="main-search" style="
+    --search-background: {{ section.settings.background_color }};
+    --search-text: {{ section.settings.text_color }};
+    --search-border: {{ section.settings.border_color }};
+    --search-card-background: {{ section.settings.card_background_color }};
+    --search-button-background: {{ section.settings.button_background_color }};
+    --search-button-text: {{ section.settings.button_text_color }};
+    --search-columns-desktop: {{ section.settings.desktop_columns }};
+    --search-columns-mobile: {{ section.settings.mobile_columns }};
+    --search-grid-gap: {{ section.settings.grid_gap }}px;
+    --search-padding-top: {{ section.settings.padding_top }}px;
+    --search-padding-bottom: {{ section.settings.padding_bottom }}px;
+
+    --product-card-background: {{ section.settings.card_background_color }};
+    --product-card-border: {{ section.settings.border_color }};
+  ">
+  <div class="page-width">
+    <header class="main-search__header">
+      <h1 id="{{ heading_id }}" class="main-search__heading">
+        {{ section.settings.heading | escape }}
+      </h1>
+
+      <form
+        class="main-search__form"
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search">
+        <label class="visually-hidden" for="{{ search_input_id }}">
+          Search the store
+        </label>
+
+        <input
+          id="{{ search_input_id }}"
+          class="main-search__input"
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="{{ section.settings.placeholder | escape }}"
+          autocomplete="off"
+          required>
+
+        <input
+          type="hidden"
+          name="options[prefix]"
+          value="last">
+
+        <input
+          type="hidden"
+          name="type"
+          value="product,article,page">
+
+        <button class="main-search__submit" type="submit">
+          {{ section.settings.button_label | escape }}
+        </button>
+      </form>
+    </header>
+
+    {% if search.performed %}
+      <div class="main-search__summary">
+        <h2 class="main-search__results-heading">
+          Results for “{{ search.terms | escape }}”
+        </h2>
+
+        {% if has_restricted_price_request == false %}
+          <p class="main-search__results-count">
+            {{ search.results_count }}
+
+            {% if search.results_count == 1 %}
+              result
+            {% else %}
+              results
+            {% endif %}
+          </p>
+        {% endif %}
+      </div>
+
+      {% if has_restricted_price_request %}
+        <div class="main-search__restricted">
+          <h2 class="main-search__restricted-heading">
+            Wholesale approval required
+          </h2>
+
+          <p class="main-search__restricted-text">
+            Price-based search filtering and sorting are available 
+            only to approved wholesale customers.
+          </p>
+
+          {% unless customer %}
+            <a class="main-search__restricted-link" href="{{ routes.account_login_url }}">
+              Sign in
+            </a>
+          {% endunless %}
+
+          <a class="main-search__restricted-link" href="{{ routes.search_url }}?q={{ search.terms | url_encode }}&options[prefix]=last&type=product,article,page&sort_by=relevance">
+            Return to safe search results
+          </a>
+        </div>
+
+      {% elsif search.results_count > 0 %}
+        {% render 'search-filters'
+          , search: search
+          , section_id: section.id
+          , is_approved_customer: is_approved_customer
+          , show_filters: section.settings.enable_filtering
+          , show_sorting: section.settings.enable_sorting
+          , show_filter_counts: section.settings.show_filter_counts
+        %}
+
+        {% paginate search.results by section.settings.results_per_page %}
+          <div class="main-search__grid" aria-labelledby="{{ heading_id }}">
+            {% for item in search.results %}
+              {% render 'search-result-card'
+                , item: item
+                , terms: search.terms
+                , image_ratio: section.settings.product_image_ratio
+                , image_fit: section.settings.product_image_fit
+                , text_alignment: section.settings.text_alignment
+                , show_vendor: section.settings.show_vendor
+                , show_sold_out_badge: section.settings.show_sold_out_badge
+                , show_price_range: section.settings.show_price_range
+                , show_compare_at_price: section.settings.show_compare_at_price
+              %}
+            {% endfor %}
+          </div>
+
+          {% render 'pagination'
+            , paginate: paginate
+            , aria_label: 'Search pagination'
+          %}
+        {% endpaginate %}
+
+      {% else %}
+        <div class="main-search__empty">
+          <h2 class="main-search__empty-heading">
+            No results found
+          </h2>
+
+          <p class="main-search__empty-text">
+            Try a different search term or remove one or more filters.
+          </p>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="main-search__initial">
+        <p>
+          Enter a product, collection, article, or page name to begin.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Main search",
+    "tag": "section",
+    "class": "section-main-search",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Search form"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Search"
+      },
+      {
+        "type": "text",
+        "id": "placeholder",
+        "label": "Search placeholder",
+        "default": "Search products and content"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button label",
+        "default": "Search"
+      }, {
+        "type": "header",
+        "content": "Filtering and sorting"
+      }, {
+        "type": "checkbox",
+        "id": "enable_filtering",
+        "label": "Enable filtering",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "enable_sorting",
+        "label": "Enable sorting",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_filter_counts",
+        "label": "Show filter result counts",
+        "default": true
+      }, {
+        "type": "range",
+        "id": "results_per_page",
+        "min": 8,
+        "max": 48,
+        "step": 4,
+        "label": "Results per page",
+        "default": 16
+      }, {
+        "type": "header",
+        "content": "Grid"
+      }, {
+        "type": "select",
+        "id": "desktop_columns",
+        "label": "Desktop columns",
+        "options": [
+          {
+            "value": "2",
+            "label": "2 columns"
+          }, {
+            "value": "3",
+            "label": "3 columns"
+          }, {
+            "value": "4",
+            "label": "4 columns"
+          }
+        ],
+        "default": "4"
+      }, {
+        "type": "select",
+        "id": "mobile_columns",
+        "label": "Mobile columns",
+        "options": [
+          {
+            "value": "1",
+            "label": "1 column"
+          }, {
+            "value": "2",
+            "label": "2 columns"
+          }
+        ],
+        "default": "1"
+      }, {
+        "type": "range",
+        "id": "grid_gap",
+        "min": 8,
+        "max": 40,
+        "step": 4,
+        "unit": "px",
+        "label": "Grid spacing",
+        "default": 24
+      }, {
+        "type": "header",
+        "content": "Product cards"
+      }, {
+        "type": "select",
+        "id": "product_image_ratio",
+        "label": "Product image ratio",
+        "options": [
+          {
+            "value": "square",
+            "label": "Square"
+          }, {
+            "value": "portrait",
+            "label": "Portrait"
+          }, {
+            "value": "landscape",
+            "label": "Landscape"
+          }
+        ],
+        "default": "portrait"
+      }, {
+        "type": "select",
+        "id": "product_image_fit",
+        "label": "Product image fit",
+        "options": [
+          {
+            "value": "cover",
+            "label": "Crop to fill"
+          }, {
+            "value": "contain",
+            "label": "Fit entire image"
+          }
+        ],
+        "default": "cover"
+      }, {
+        "type": "select",
+        "id": "text_alignment",
+        "label": "Product text alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          }, {
+            "value": "center",
+            "label": "Center"
+          }
+        ],
+        "default": "left"
+      }, {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "label": "Show product vendor",
+        "default": false
+      }, {
+        "type": "checkbox",
+        "id": "show_sold_out_badge",
+        "label": "Show sold-out badge",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_price_range",
+        "label": "Show starting price for varying products",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_compare_at_price",
+        "label": "Show compare-at price",
+        "default": true
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "card_background_color",
+        "label": "Card background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Button text",
+        "default": "#ffffff"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 64
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 80
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,146 @@
+{% comment %}
+  Renders one required product inside a collection bundle.
+
+  Required parameters:
+  - product
+  - section_id
+  - position
+  - is_approved_customer
+
+  Optional parameters:
+  - show_vendor
+  - show_individual_price
+  - image_ratio
+  - image_fit
+  - variant_label
+{% endcomment %}
+
+{% liquid
+  assign selected_variant = product.selected_or_first_available_variant
+  assign card_image = product.featured_image
+  assign selector_id = 'BundleVariant-' | append: section_id | append: '-' | append: product.id
+%}
+
+<article
+  class="
+    bundle-product
+    {% unless product.available %}
+      bundle-product--unavailable
+    {% endunless %}
+  "
+  data-bundle-product
+  data-product-position="{{ position }}">
+  <div class="
+      bundle-product__media
+      bundle-product__media--{{ image_ratio | default: 'portrait' }}
+    " style="
+      --bundle-product-image-fit: {{ image_fit | default: 'cover' }};
+    ">
+    <a
+      class="bundle-product__image-link"
+      href="{{ product.url }}"
+      tabindex="-1"
+      aria-hidden="true">
+      {% if card_image != blank %}
+        {{
+          card_image | image_url: width: 1000 | image_tag: class: 'bundle-product__image', widths: '240, 360, 480, 600, 800, 1000', sizes: '(min-width: 990px) 25vw, 50vw', loading: 'lazy', alt: ''
+        }}
+      {% else %}
+        <span class="bundle-product__image-placeholder">
+          No image
+        </span>
+      {% endif %}
+    </a>
+
+    <span class="bundle-product__position">
+      {{ position }}
+    </span>
+
+    {% unless product.available %}
+      <span class="bundle-product__sold-out">
+        Sold out
+      </span>
+    {% endunless %}
+  </div>
+
+  <div class="bundle-product__content">
+    {% if show_vendor and product.vendor != blank %}
+      <p class="bundle-product__vendor">
+        {{ product.vendor | escape }}
+      </p>
+    {% endif %}
+
+    <h2 class="bundle-product__title">
+      <a class="bundle-product__title-link" href="{{ product.url }}">
+        {{ product.title | escape }}
+      </a>
+    </h2>
+
+    {% if is_approved_customer %}
+      {% if product.available and selected_variant != blank %}
+        {% if show_individual_price %}
+          <div class="bundle-product__individual-price">
+            <span>Individual price:</span>
+
+            <strong data-bundle-selected-price>
+              {{ selected_variant.price | money }}
+            </strong>
+          </div>
+        {% endif %}
+
+        {% if product.has_only_default_variant %}
+          <input
+            type="hidden"
+            value="{{ selected_variant.id }}"
+            data-bundle-variant
+            data-product-id="{{ product.id }}"
+            data-product-title="{{ product.title | escape }}"
+            data-variant-price="{{ selected_variant.price }}">
+
+          <p class="bundle-product__default-option">
+            Included
+          </p>
+        {% else %}
+          <div class="bundle-product__selector">
+            <label class="bundle-product__selector-label" for="{{ selector_id }}">
+              {{ variant_label | default: 'Choose an option' | escape }}
+            </label>
+
+            <select
+              id="{{ selector_id }}"
+              class="bundle-product__select"
+              data-bundle-variant
+              data-product-id="{{ product.id }}"
+              data-product-title="{{ product.title | escape }}"
+              required>
+              {% for variant in product.variants %}
+                {% if variant.available %}
+                  <option
+                    value="{{ variant.id }}"
+                    data-variant-price="{{ variant.price }}"
+                    {% if variant.id == selected_variant.id %}
+                    selected
+                    {% endif %}>
+                    {{ variant.title | escape }}
+
+                    {% if show_individual_price %}
+                      — {{ variant.price | money }}
+                    {% endif %}
+                  </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="bundle-product__unavailable-message">
+          This product currently has no available options.
+        </p>
+      {% endif %}
+    {% else %}
+      <p class="bundle-product__locked-message">
+        Available to approved wholesale customers.
+      </p>
+    {% endif %}
+  </div>
+</article>

@@ -1,0 +1,79 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-wholesale-access",
+      "blocks": {
+        "application": {
+          "type": "step",
+          "settings": {
+            "heading": "Submit your application",
+            "text": "<p>Provide your retailer and business information.</p>"
+          }
+        },
+        "review": {
+          "type": "step",
+          "settings": {
+            "heading": "Application review",
+            "text": "<p>The wholesale team reviews your business information and eligibility.</p>"
+          }
+        },
+        "approval": {
+          "type": "step",
+          "settings": {
+            "heading": "Receive wholesale access",
+            "text": "<p>Approved retailers can sign in to view prices and purchase products.</p>"
+          }
+        }
+      },
+      "block_order": ["application", "review", "approval"],
+      "settings": {
+        "eyebrow": "Retailer access",
+        "heading": "Wholesale account",
+        "introduction": "<p>Sign in to review your wholesale application and access status.</p>",
+        "show_customer_information": true,
+
+        "signed_out_label": "Signed out",
+        "signed_out_heading": "Sign in to check your access",
+        "signed_out_text": "<p>Use the email associated with your retailer account to sign in and review your wholesale status.</p>",
+        "sign_in_label": "Sign in",
+
+        "not_applied_label": "Not applied",
+        "not_applied_heading": "Apply for wholesale access",
+        "not_applied_text": "<p>Your customer account is active, but it does not currently have a wholesale application status.</p>",
+
+        "pending_label": "Under review",
+        "pending_heading": "Your application is being reviewed",
+        "pending_text": "<p>Your retailer application has been received. Wholesale prices and purchasing will remain locked until approval.</p>",
+
+        "approved_label": "Approved",
+        "approved_heading": "Your wholesale account is active",
+        "approved_text": "<p>You can now view wholesale pricing, purchase individual products, and build complete collection bundles.</p>",
+
+        "rejected_label": "Not approved",
+        "rejected_heading": "Your application was not approved",
+        "rejected_text": "<p>Please contact the wholesale team if you have questions or need to update your retailer information.</p>",
+
+        "shop_url": "",
+        "shop_label": "Shop wholesale collections",
+        "account_label": "Open account",
+        "orders_label": "View orders",
+        "contact_url": "",
+        "contact_label": "Contact wholesale support",
+        "reapply_label": "Update application",
+
+        "process_heading": "How wholesale approval works",
+
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "card_background_color": "#f7f4f1",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

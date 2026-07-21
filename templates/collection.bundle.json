@@ -1,0 +1,38 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-bundle-collection",
+      "settings": {
+        "eyebrow": "Complete collection",
+        "introduction": "<p>Select an available option for every product, then add the complete collection to your cart.</p>",
+        "show_collection_description": true,
+        "show_product_count": true,
+        "instructions": "<p>All products in this collection are required. Choose one available variant for each item.</p>",
+        "disclaimer": "The complete-collection discount is applied automatically in the cart when the order meets the configured requirements.",
+
+        "show_vendor": false,
+        "show_individual_price": true,
+        "variant_label": "Choose size and color",
+        "quantity_per_product": 1,
+        "image_ratio": "portrait",
+        "image_fit": "cover",
+        "desktop_columns": "3",
+        "mobile_columns": "1",
+        "grid_gap": 24,
+
+        "button_label": "Add complete collection",
+
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "card_background_color": "#ffffff",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

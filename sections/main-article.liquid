@@ -1,0 +1,326 @@
+{{ 'section-content-pages.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign comment_author_id = 'CommentAuthor-' | append: section.id
+  assign comment_email_id = 'CommentEmail-' | append: section.id
+  assign comment_body_id = 'CommentBody-' | append: section.id
+%}
+
+<article class="content-section main-article" style="
+    --content-background: {{ section.settings.background_color }};
+    --content-text: {{ section.settings.text_color }};
+    --content-border: {{ section.settings.border_color }};
+    --content-button-background: {{ section.settings.button_background_color }};
+    --content-button-text: {{ section.settings.button_text_color }};
+    --content-padding-top: {{ section.settings.padding_top }}px;
+    --content-padding-bottom: {{ section.settings.padding_bottom }}px;
+  ">
+  <div class="page-width">
+    <header class="main-article__header">
+      {% if section.settings.show_blog_title %}
+        <p class="content-section__eyebrow">
+          <a href="{{ blog.url }}">
+            {{ blog.title | escape }}
+          </a>
+        </p>
+      {% endif %}
+
+      <h1 class="content-section__title">
+        {{ article.title | escape }}
+      </h1>
+
+      {% if section.settings.show_author or section.settings.show_date
+      %}
+        <div class="main-article__meta">
+          {% if section.settings.show_author and article.author != blank
+          %}
+            <span>By {{ article.author | escape }}</span>
+          {% endif %}
+
+          {% if section.settings.show_date %}
+            <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+              {{ article.published_at | date: '%B %d, %Y' }}
+            </time>
+          {% endif %}
+
+          {% if section.settings.show_comment_count and article.comments_enabled?
+          %}
+            <span>
+              {{ article.comments_count }}
+              {% if article.comments_count == 1 %}
+                comment
+              {% else %}
+                comments
+              {% endif %}
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </header>
+
+    {% if section.settings.show_image and article.image != blank %}
+      <div class="main-article__image-wrapper">
+        {{
+          article.image | image_url: width: 2200 | image_tag: class: 'main-article__image', widths: '600, 900, 1200, 1500, 1800, 2200', sizes: '(min-width: 1200px) 1200px, 100vw', loading: 'eager', alt: article.image.alt
+        }}
+      </div>
+    {% endif %}
+
+    <div class="main-article__body rte">
+      {{ article.content }}
+    </div>
+
+    {% if section.settings.show_tags and article.tags.size > 0 %}
+      <ul class="main-article__tags blog-tags" aria-label="Article categories">
+        {% for tag in article.tags %}
+          {% assign tag_handle = tag | handle %}
+
+          <li>
+            <a class="blog-tags__link" href="{{ blog.url }}/tagged/{{ tag_handle }}">
+              {{ tag | escape }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <div class="main-article__back">
+      <a class="content-button" href="{{ blog.url }}">
+        {{ section.settings.back_label | escape }}
+      </a>
+    </div>
+
+    {% if section.settings.show_comments and article.comments_enabled?
+    %}
+      <section class="article-comments">
+        <h2 class="article-comments__heading">
+          Comments
+        </h2>
+
+        {% paginate article.comments by section.settings.comments_per_page %}
+          {% if article.comments_count > 0 %}
+            <ul class="article-comments__list">
+              {% for comment in article.comments %}
+                <li class="article-comment">
+                  <div class="article-comment__body rte">
+                    {{ comment.content }}
+                  </div>
+
+                  <footer class="article-comment__footer">
+                    {{ comment.author | escape }}
+
+                    ·
+
+                    <time datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">
+                      {{ comment.created_at | date: '%B %d, %Y' }}
+                    </time>
+                  </footer>
+                </li>
+              {% endfor %}
+            </ul>
+
+            {% render 'pagination'
+              , paginate: paginate
+              , aria_label: 'Comment pagination'
+            %}
+          {% endif %}
+        {% endpaginate %}
+
+        <div class="article-comment-form">
+          <h3 class="article-comment-form__heading">
+            Leave a comment
+          </h3>
+
+          {% form 'new_comment'
+            , article
+            , class: 'content-form'
+          %}
+            {% if form.posted_successfully? %}
+              <div
+                class="content-form__success"
+                role="status"
+                tabindex="-1">
+                {% if article.moderated? %}
+                  Your comment was submitted and is awaiting approval.
+                {% else %}
+                  Your comment was published.
+                {% endif %}
+              </div>
+            {% endif %}
+
+            {% if form.errors %}
+              <div
+                class="content-form__errors"
+                role="alert"
+                tabindex="-1">
+                {{ form.errors | default_errors }}
+              </div>
+            {% endif %}
+
+            <div class="content-form__row">
+              <div class="content-form__field">
+                <label class="content-form__label" for="{{ comment_author_id }}">
+                  Name
+                </label>
+
+                <input
+                  id="{{ comment_author_id }}"
+                  class="content-form__input"
+                  type="text"
+                  name="comment[author]"
+                  value="{{ form.author | default: customer.name | escape }}"
+                  autocomplete="name"
+                  required>
+              </div>
+
+              <div class="content-form__field">
+                <label class="content-form__label" for="{{ comment_email_id }}">
+                  Email
+                </label>
+
+                <input
+                  id="{{ comment_email_id }}"
+                  class="content-form__input"
+                  type="email"
+                  name="comment[email]"
+                  value="{{ form.email | default: customer.email | escape }}"
+                  autocomplete="email"
+                  required>
+              </div>
+
+              <div class="content-form__field content-form__field--full">
+                <label class="content-form__label" for="{{ comment_body_id }}">
+                  Comment
+                </label>
+
+                <textarea
+                  id="{{ comment_body_id }}"
+                  class="content-form__textarea"
+                  name="comment[body]"
+                  required>{{ form.body | escape }}</textarea>
+              </div>
+            </div>
+
+            <button class="content-form__submit" type="submit">
+              Post comment
+            </button>
+          {% endform %}
+        </div>
+      </section>
+    {% endif %}
+  </div>
+</article>
+
+{% schema %}
+  {
+    "name": "Main article",
+    "tag": "section",
+    "class": "section-main-article",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_blog_title",
+        "label": "Show blog title",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_author",
+        "label": "Show author",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_date",
+        "label": "Show published date",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_comment_count",
+        "label": "Show comment count",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_image",
+        "label": "Show featured image",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_tags",
+        "label": "Show article tags",
+        "default": true
+      }, {
+        "type": "text",
+        "id": "back_label",
+        "label": "Back-to-blog label",
+        "default": "Back to journal"
+      }, {
+        "type": "header",
+        "content": "Comments"
+      }, {
+        "type": "checkbox",
+        "id": "show_comments",
+        "label": "Show comments and comment form",
+        "default": true
+      }, {
+        "type": "range",
+        "id": "comments_per_page",
+        "min": 5,
+        "max": 50,
+        "step": 5,
+        "label": "Comments per page",
+        "default": 10
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Button text",
+        "default": "#ffffff"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 64
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 80
+      }
+    ]
+  }
+{% endschema %}

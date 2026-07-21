@@ -1,0 +1,163 @@
+{% liquid
+  assign is_approved_customer = false
+
+  if customer
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign is_approved_customer = true
+      endif
+    endif
+  endif
+
+  assign suggestion_count = predictive_search.resources.queries.size
+  assign suggestion_count = suggestion_count | plus: predictive_search.resources.collections.size
+  assign suggestion_count = suggestion_count | plus: predictive_search.resources.products.size
+  assign suggestion_count = suggestion_count | plus: predictive_search.resources.pages.size
+  assign suggestion_count = suggestion_count | plus: predictive_search.resources.articles.size
+%}
+
+{% if predictive_search.performed %}
+  <div
+    id="predictive-search-results"
+    class="predictive-search-results"
+    role="listbox">
+    {% if suggestion_count > 0 %}
+      {% if predictive_search.resources.queries.size > 0 or predictive_search.resources.collections.size > 0
+      %}
+        <section class="predictive-search-results__group">
+          <h2 class="predictive-search-results__heading">
+            Suggestions
+          </h2>
+
+          <ul class="predictive-search-results__list">
+            {% for query in predictive_search.resources.queries %}
+              <li role="option">
+                <a
+                  class="predictive-search-results__simple-link"
+                  href="{{ query.url }}"
+                  tabindex="-1">
+                  {{ query.styled_text }}
+                </a>
+              </li>
+            {% endfor %}
+
+            {% for collection in predictive_search.resources.collections %}
+              <li role="option">
+                <a
+                  class="predictive-search-results__simple-link"
+                  href="{{ collection.url }}"
+                  tabindex="-1">
+                  <span class="predictive-search-results__type">
+                    Collection
+                  </span>
+
+                  <span>{{ collection.title | escape }}</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      {% if predictive_search.resources.products.size > 0 %}
+        <section class="predictive-search-results__group">
+          <h2 class="predictive-search-results__heading">
+            Products
+          </h2>
+
+          <ul class="predictive-search-results__product-list">
+            {% for product in predictive_search.resources.products %}
+              <li role="option">
+                <a
+                  class="predictive-search-product"
+                  href="{{ product.url }}"
+                  tabindex="-1">
+                  {% if product.featured_media != blank %}
+                    {{
+                      product.featured_media | image_url: width: 160 | image_tag: class: 'predictive-search-product__image', widths: '80, 120, 160', sizes: '72px', loading: 'lazy', alt: ''
+                    }}
+                  {% else %}
+                    <span class="predictive-search-product__placeholder"></span>
+                  {% endif %}
+
+                  <span class="predictive-search-product__content">
+                    <span class="predictive-search-product__title">
+                      {{ product.title | escape }}
+                    </span>
+
+                    {% if is_approved_customer %}
+                      <span class="predictive-search-product__price">
+                        {% if product.price_varies %}
+                          From {{ product.price_min | money }}
+                        {% else %}
+                          {{ product.price | money }}
+                        {% endif %}
+                      </span>
+                    {% endif %}
+                  </span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      {% if predictive_search.resources.pages.size > 0 or predictive_search.resources.articles.size > 0
+      %}
+        <section class="predictive-search-results__group">
+          <h2 class="predictive-search-results__heading">
+            Content
+          </h2>
+
+          <ul class="predictive-search-results__list">
+            {% for page in predictive_search.resources.pages %}
+              <li role="option">
+                <a
+                  class="predictive-search-results__simple-link"
+                  href="{{ page.url }}"
+                  tabindex="-1">
+                  <span class="predictive-search-results__type">
+                    Page
+                  </span>
+
+                  <span>{{ page.title | escape }}</span>
+                </a>
+              </li>
+            {% endfor %}
+
+            {% for article in predictive_search.resources.articles %}
+              <li role="option">
+                <a
+                  class="predictive-search-results__simple-link"
+                  href="{{ article.url }}"
+                  tabindex="-1">
+                  <span class="predictive-search-results__type">
+                    Article
+                  </span>
+
+                  <span>{{ article.title | escape }}</span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+    {% else %}
+      <p class="predictive-search-results__empty">
+        No suggestions found.
+      </p>
+    {% endif %}
+
+    <a
+      class="predictive-search-results__view-all"
+      href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&options[prefix]=last&type=product,article,page"
+      tabindex="-1"
+      role="option">
+      View all results for “{{ predictive_search.terms | escape }}”
+    </a>
+  </div>
+{% endif %}
+
+{% schema %}
+  {"name": "Predictive search"}
+{% endschema %}

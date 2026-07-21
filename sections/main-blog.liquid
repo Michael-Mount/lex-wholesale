@@ -1,0 +1,279 @@
+{{ 'section-content-pages.css' | asset_url | stylesheet_tag }}
+
+<section class="content-section main-blog" style="
+    --content-background: {{ section.settings.background_color }};
+    --content-text: {{ section.settings.text_color }};
+    --content-border: {{ section.settings.border_color }};
+    --content-card-background: {{ section.settings.card_background_color }};
+    --article-columns-desktop: {{ section.settings.desktop_columns }};
+    --article-columns-mobile: {{ section.settings.mobile_columns }};
+    --article-grid-gap: {{ section.settings.grid_gap }}px;
+    --content-padding-top: {{ section.settings.padding_top }}px;
+    --content-padding-bottom: {{ section.settings.padding_bottom }}px;
+  ">
+  <div class="page-width">
+    <header class="content-section__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="content-section__eyebrow">
+          {{ section.settings.eyebrow | escape }}
+        </p>
+      {% endif %}
+
+      <h1 class="content-section__title">
+        {% if current_tags %}
+          {{ blog.title | escape }}:
+          {{ current_tags | join: ', ' | escape }}
+        {% else %}
+          {{ blog.title | escape }}
+        {% endif %}
+      </h1>
+
+      {% if section.settings.introduction != blank %}
+        <div class="content-section__intro">
+          {{ section.settings.introduction }}
+        </div>
+      {% endif %}
+    </header>
+
+    {% if section.settings.show_tags and blog.all_tags.size > 0 %}
+      <nav aria-label="Article categories">
+        <ul class="blog-tags">
+          <li>
+            <a class="
+                blog-tags__link
+
+                {% unless current_tags %}
+                  blog-tags__link--active
+                {% endunless %}
+              " href="{{ blog.url }}">
+              All
+            </a>
+          </li>
+
+          {% for tag in blog.all_tags %}
+            {% assign tag_handle = tag | handle %}
+
+            <li>
+              <a class="
+                  blog-tags__link
+
+                  {% if current_tags contains tag %}
+                    blog-tags__link--active
+                  {% endif %}
+                " href="{{ blog.url }}/tagged/{{ tag_handle }}">
+                {{ tag | escape }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+
+    {% paginate blog.articles by section.settings.articles_per_page %}
+      {% if blog.articles.size > 0 %}
+        <div class="article-grid">
+          {% for article in blog.articles %}
+            {% render 'article-card'
+              , article: article
+              , show_image: section.settings.show_image
+              , show_author: section.settings.show_author
+              , show_date: section.settings.show_date
+              , show_excerpt: section.settings.show_excerpt
+              , image_ratio: section.settings.image_ratio
+              , image_fit: section.settings.image_fit
+              , excerpt_words: section.settings.excerpt_words
+            %}
+          {% endfor %}
+        </div>
+
+        {% render 'pagination'
+          , paginate: paginate
+          , aria_label: 'Blog pagination'
+        %}
+      {% else %}
+        <div class="content-form__errors">
+          No articles were found for this category.
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Main blog",
+    "tag": "section",
+    "class": "section-main-blog",
+    "settings": [
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow",
+        "default": "Journal"
+      },
+      {
+        "type": "richtext",
+        "id": "introduction",
+        "label": "Introduction"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_tags",
+        "label": "Show article tags",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "articles_per_page",
+        "min": 4,
+        "max": 40,
+        "step": 4,
+        "label": "Articles per page",
+        "default": 12
+      }, {
+        "type": "select",
+        "id": "desktop_columns",
+        "label": "Desktop columns",
+        "options": [
+          {
+            "value": "2",
+            "label": "2 columns"
+          }, {
+            "value": "3",
+            "label": "3 columns"
+          }, {
+            "value": "4",
+            "label": "4 columns"
+          }
+        ],
+        "default": "3"
+      }, {
+        "type": "select",
+        "id": "mobile_columns",
+        "label": "Mobile columns",
+        "options": [
+          {
+            "value": "1",
+            "label": "1 column"
+          }, {
+            "value": "2",
+            "label": "2 columns"
+          }
+        ],
+        "default": "1"
+      }, {
+        "type": "range",
+        "id": "grid_gap",
+        "min": 8,
+        "max": 40,
+        "step": 4,
+        "unit": "px",
+        "label": "Grid spacing",
+        "default": 24
+      }, {
+        "type": "checkbox",
+        "id": "show_image",
+        "label": "Show featured image",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_author",
+        "label": "Show author",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_date",
+        "label": "Show published date",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_excerpt",
+        "label": "Show excerpt",
+        "default": true
+      }, {
+        "type": "range",
+        "id": "excerpt_words",
+        "min": 10,
+        "max": 50,
+        "step": 5,
+        "label": "Excerpt length",
+        "default": 25
+      }, {
+        "type": "select",
+        "id": "image_ratio",
+        "label": "Image ratio",
+        "options": [
+          {
+            "value": "square",
+            "label": "Square"
+          }, {
+            "value": "portrait",
+            "label": "Portrait"
+          }, {
+            "value": "landscape",
+            "label": "Landscape"
+          }
+        ],
+        "default": "landscape"
+      }, {
+        "type": "select",
+        "id": "image_fit",
+        "label": "Image fit",
+        "options": [
+          {
+            "value": "cover",
+            "label": "Crop to fill"
+          }, {
+            "value": "contain",
+            "label": "Fit entire image"
+          }
+        ],
+        "default": "cover"
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "card_background_color",
+        "label": "Article card background",
+        "default": "#ffffff"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 64
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 80
+      }
+    ]
+  }
+{% endschema %}

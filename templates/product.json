@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "show_vendor": false,
+        "show_sku": true,
+        "show_compare_at_price": true,
+        "show_description": true,
+        "description_heading": "Product details",
+        "add_to_cart_label": "Add to cart",
+        "show_dynamic_checkout": false,
+
+        "media_position": "left",
+        "media_layout": "slider",
+        "media_ratio": "portrait",
+        "media_fit": "contain",
+
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

@@ -1,0 +1,72 @@
+{% comment %}
+  Renders product option values.
+
+  Required:
+  - product
+  - section_id
+{% endcomment %}
+
+{% unless product.has_only_default_variant %}
+  <div
+    class="product-options"
+    data-product-options
+    data-section-id="{{ section_id }}">
+    {% for option in product.options_with_values %}
+      <fieldset class="product-options__group">
+        <legend class="product-options__legend">
+          <span>
+            {{ option.name | escape }}
+          </span>
+
+          <span class="product-options__selected-value">
+            {{ option.selected_value | escape }}
+          </span>
+        </legend>
+
+        <div class="product-options__values">
+          {% for option_value in option.values %}
+            {% assign input_id = 'ProductOption-' | append: section_id | append: '-' | append: option.position | append: '-' | append: forloop.index
+            %}
+
+            <input
+              id="{{ input_id }}"
+              class="product-options__input"
+              type="radio"
+              name="ProductOption-{{ section_id }}-{{ option.position }}"
+              value="{{ option_value | escape }}"
+              data-option-value-id="{{ option_value.id }}"
+              data-product-url="{{ option_value.product_url }}"
+              {% if option_value.selected %}
+              checked
+              {% endif %}
+              {% unless option_value.available %}
+              disabled
+              {% endunless %}>
+
+            <label class="
+                product-options__label
+
+                {% if option_value.selected %}
+                  product-options__label--selected
+                {% endif %}
+
+                {% unless option_value.available %}
+                  product-options__label--unavailable
+                {% endunless %}
+              " for="{{ input_id }}">
+              <span>
+                {{ option_value | escape }}
+              </span>
+
+              {% unless option_value.available %}
+                <span class="visually-hidden">
+                  Unavailable
+                </span>
+              {% endunless %}
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+    {% endfor %}
+  </div>
+{% endunless %}

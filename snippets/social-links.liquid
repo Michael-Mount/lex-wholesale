@@ -1,0 +1,55 @@
+{% comment %}
+  Renders configured social media links.
+
+  Parameters:
+  - instagram_url
+  - facebook_url
+  - pinterest_url
+  - linkedin_url
+  - aria_label
+{% endcomment %}
+
+{% assign has_social_links = false %}
+
+{% if instagram_url != blank or facebook_url != blank or pinterest_url != blank or linkedin_url != blank
+%}
+  {% assign has_social_links = true %}
+{% endif %}
+
+{% if has_social_links %}
+  <nav class="social-links" aria-label="{{ aria_label | default: 'Social media' | escape }}">
+    <ul class="social-links__list">
+      {% if instagram_url != blank %}
+        <li>
+          <a class="social-links__link" href="{{ instagram_url }}">
+            Instagram
+          </a>
+        </li>
+      {% endif %}
+
+      {% if facebook_url != blank %}
+        <li>
+          <a class="social-links__link" href="{{ facebook_url }}">
+            Facebook
+          </a>
+        </li>
+      {% endif %}
+
+      {% if pinterest_url != blank %}
+        <li>
+          <a class="social-links__link" href="{{ pinterest_url }}">
+            Pinterest
+          </a>
+        </li>
+      {% endif %}
+
+      {% if linkedin_url != blank %}
+        <li>
+          <a class="social-links__link" href="{{ linkedin_url }}">
+            LinkedIn
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

@@ -8,14 +8,17 @@
         "announcement1": {
           "type": "announcement",
           "settings": {
-            "text": "Wholesale ordering is now available"
+            "text": "Wholesale ordering is now available",
+            "link": ""
           }
         }
       },
       "block_order": ["announcement1"],
       "settings": {
+        "accessibility_label": "Store announcement",
         "background_color": "#2c211c",
-        "text_color": "#ffffff"
+        "text_color": "#ffffff",
+        "border_color": "#2c211c"
       }
     },
     "header": {
@@ -23,8 +26,17 @@
       "settings": {
         "logo_width": 140,
         "menu": "main-menu",
+        "dropdown_columns": "3",
+        "show_view_all_link": true,
+        "customer_account_menu": "customer-account-main-menu",
+        "view_all_label": "View all",
+        "mobile_menu_label": "Menu",
         "show_account_link": true,
+        "account_label": "Account",
+        "sign_in_label": "Sign in",
+        "wholesale_badge_label": "Wholesale",
         "show_cart_link": true,
+        "cart_label": "Cart",
         "sticky_header": false,
         "background_color": "#ffffff",
         "text_color": "#231f1c",

@@ -1,0 +1,415 @@
+{{ 'section-main-bundle-collection.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'bundle-builder.js' | asset_url }}" defer></script>
+
+{% liquid
+  assign is_approved_customer = false
+  assign bundle_is_available = true
+  assign bundle_product_count = collection.products_count
+  assign heading_id = 'BundleHeading-' | append: section.id
+  assign status_id = 'BundleStatus-' | append: section.id
+
+  if customer
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign is_approved_customer = true
+      endif
+    endif
+  endif
+
+  if collection.products_count == 0
+    assign bundle_is_available = false
+  endif
+
+  if collection.products_count > 50
+    assign bundle_is_available = false
+  endif
+%}
+
+<section
+  class="bundle-collection"
+  data-bundle-builder
+  data-section-id="{{ section.id }}"
+  data-bundle-handle="{{ collection.handle | escape }}"
+  data-bundle-title="{{ collection.title | escape }}"
+  data-bundle-quantity="{{ section.settings.quantity_per_product }}"
+  style="
+    --bundle-background: {{ section.settings.background_color }};
+    --bundle-text: {{ section.settings.text_color }};
+    --bundle-border: {{ section.settings.border_color }};
+    --bundle-card-background: {{ section.settings.card_background_color }};
+    --bundle-button-background: {{ section.settings.button_background_color }};
+    --bundle-button-text: {{ section.settings.button_text_color }};
+    --bundle-columns-desktop: {{ section.settings.desktop_columns }};
+    --bundle-columns-mobile: {{ section.settings.mobile_columns }};
+    --bundle-gap: {{ section.settings.grid_gap }}px;
+    --bundle-padding-top: {{ section.settings.padding_top }}px;
+    --bundle-padding-bottom: {{ section.settings.padding_bottom }}px;
+  ">
+  <div class="page-width">
+    <header class="bundle-collection__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="bundle-collection__eyebrow">
+          {{ section.settings.eyebrow | escape }}
+        </p>
+      {% endif %}
+
+      <h1 id="{{ heading_id }}" class="bundle-collection__heading">
+        {{ collection.title | escape }}
+      </h1>
+
+      {% if section.settings.show_collection_description and collection.description != blank
+      %}
+        <div class="bundle-collection__description">
+          {{ collection.description }}
+        </div>
+      {% elsif section.settings.introduction != blank %}
+        <div class="bundle-collection__description">
+          {{ section.settings.introduction }}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_product_count %}
+        <p class="bundle-collection__count">
+          Includes {{ bundle_product_count }}
+
+          {% if bundle_product_count == 1 %}
+            product
+          {% else %}
+            products
+          {% endif %}
+        </p>
+      {% endif %}
+    </header>
+
+    {% unless is_approved_customer %}
+      <div class="bundle-collection__gate">
+        <h2 class="bundle-collection__gate-heading">
+          Wholesale access required
+        </h2>
+
+        <p class="bundle-collection__gate-message">
+          {% if customer %}
+            {{ settings.unapproved_price_message | escape }}
+          {% else %}
+            {{ settings.locked_price_message | escape }}
+          {% endif %}
+        </p>
+
+        <div class="bundle-collection__gate-actions">
+          {% unless customer %}
+            <a class="
+                bundle-collection__button
+                bundle-collection__button--primary
+              " href="{{ routes.account_login_url }}">
+              Sign in
+            </a>
+          {% endunless %}
+
+          {% if settings.wholesale_application_url != blank %}
+            <a class="
+                bundle-collection__button
+                bundle-collection__button--secondary
+              " href="{{ settings.wholesale_application_url }}">
+              {{ settings.wholesale_application_label | escape }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endunless %}
+
+    {% paginate collection.products by 50 %}
+      {% if collection.products_count > 0 %}
+        <div class="bundle-collection__grid" aria-labelledby="{{ heading_id }}">
+          {% for product in collection.products %}
+            {% unless product.available %}
+              {% assign bundle_is_available = false %}
+            {% endunless %}
+
+            {% render 'bundle-product-selector'
+              , product: product
+              , section_id: section.id
+              , position: forloop.index
+              , is_approved_customer: is_approved_customer
+              , show_vendor: section.settings.show_vendor
+              , show_individual_price: section.settings.show_individual_price
+              , image_ratio: section.settings.image_ratio
+              , image_fit: section.settings.image_fit
+              , variant_label: section.settings.variant_label
+            %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="bundle-collection__empty">
+          <h2>No products have been added</h2>
+
+          <p>
+            Add products to this collection before using it as a bundle.
+          </p>
+        </div>
+      {% endif %}
+
+      {% if paginate.pages > 1 %}
+        <div class="bundle-collection__configuration-error">
+          <h2>Too many bundle products</h2>
+
+          <p>
+            A complete-collection bundle must contain no more than 
+            50 products so every required component can be selected
+            and added together.
+          </p>
+        </div>
+      {% endif %}
+    {% endpaginate %}
+
+    {% if is_approved_customer %}
+      <div class="bundle-collection__purchase">
+        {% if section.settings.instructions != blank %}
+          <div class="bundle-collection__instructions">
+            {{ section.settings.instructions }}
+          </div>
+        {% endif %}
+
+        <p
+          id="{{ status_id }}"
+          class="bundle-collection__status"
+          data-bundle-status
+          role="status"
+          aria-live="polite"></p>
+
+        <button
+          class="
+            bundle-collection__button
+            bundle-collection__button--primary
+            bundle-collection__submit
+          "
+          type="button"
+          data-bundle-submit
+          {% unless bundle_is_available %}
+          disabled
+          {% endunless %}>
+          <span data-bundle-submit-text>
+            {% if bundle_is_available %}
+              {{ section.settings.button_label | escape }}
+            {% else %}
+              Collection currently unavailable
+            {% endif %}
+          </span>
+        </button>
+
+        {% if section.settings.disclaimer != blank %}
+          <p class="bundle-collection__disclaimer">
+            {{ section.settings.disclaimer | escape }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Bundle collection",
+    "tag": "section",
+    "class": "section-main-bundle-collection",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Collection information"
+      },
+      {
+        "type": "text",
+        "id": "eyebrow",
+        "label": "Eyebrow",
+        "default": "Complete collection"
+      },
+      {
+        "type": "richtext",
+        "id": "introduction",
+        "label": "Fallback introduction",
+        "default": "<p>Select an available option for every product, then add the complete collection to your cart.</p>"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_collection_description",
+        "label": "Use collection description",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_product_count",
+        "label": "Show product count",
+        "default": true
+      }, {
+        "type": "richtext",
+        "id": "instructions",
+        "label": "Purchase instructions",
+        "default": "<p>All products in this collection are required. Choose one available variant for each item.</p>"
+      }, {
+        "type": "textarea",
+        "id": "disclaimer",
+        "label": "Button disclaimer",
+        "default": "The collection discount is calculated in the cart when all required products qualify."
+      }, {
+        "type": "header",
+        "content": "Product cards"
+      }, {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "label": "Show product vendor",
+        "default": false
+      }, {
+        "type": "checkbox",
+        "id": "show_individual_price",
+        "label": "Show individual product prices",
+        "default": true,
+        "info": "Prices are still rendered only for approved wholesale customers."
+      }, {
+        "type": "text",
+        "id": "variant_label",
+        "label": "Variant selector label",
+        "default": "Choose size and color"
+      }, {
+        "type": "range",
+        "id": "quantity_per_product",
+        "min": 1,
+        "max": 12,
+        "step": 1,
+        "label": "Quantity of each selected product",
+        "default": 1
+      }, {
+        "type": "select",
+        "id": "image_ratio",
+        "label": "Product image ratio",
+        "options": [
+          {
+            "value": "square",
+            "label": "Square"
+          }, {
+            "value": "portrait",
+            "label": "Portrait"
+          }, {
+            "value": "landscape",
+            "label": "Landscape"
+          }
+        ],
+        "default": "portrait"
+      }, {
+        "type": "select",
+        "id": "image_fit",
+        "label": "Product image fit",
+        "options": [
+          {
+            "value": "cover",
+            "label": "Crop to fill"
+          }, {
+            "value": "contain",
+            "label": "Fit entire image"
+          }
+        ],
+        "default": "cover"
+      }, {
+        "type": "select",
+        "id": "desktop_columns",
+        "label": "Desktop columns",
+        "options": [
+          {
+            "value": "2",
+            "label": "2 columns"
+          }, {
+            "value": "3",
+            "label": "3 columns"
+          }, {
+            "value": "4",
+            "label": "4 columns"
+          }
+        ],
+        "default": "3"
+      }, {
+        "type": "select",
+        "id": "mobile_columns",
+        "label": "Mobile columns",
+        "options": [
+          {
+            "value": "1",
+            "label": "1 column"
+          }, {
+            "value": "2",
+            "label": "2 columns"
+          }
+        ],
+        "default": "1"
+      }, {
+        "type": "range",
+        "id": "grid_gap",
+        "min": 8,
+        "max": 40,
+        "step": 4,
+        "unit": "px",
+        "label": "Grid spacing",
+        "default": 24
+      }, {
+        "type": "header",
+        "content": "Purchase button"
+      }, {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button label",
+        "default": "Add complete collection"
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "card_background_color",
+        "label": "Product card background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Primary button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Primary button text",
+        "default": "#ffffff"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 64
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 120,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 80
+      }
+    ]
+  }
+{% endschema %}

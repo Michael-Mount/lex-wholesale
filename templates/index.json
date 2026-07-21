@@ -3,7 +3,11 @@
     "main": {
       "type": "main-home",
       "settings": {}
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {}
     }
   },
-  "order": ["main"]
+  "order": ["main", "featured_collection"]
 }

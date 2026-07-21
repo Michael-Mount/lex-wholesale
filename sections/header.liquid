@@ -1,9 +1,26 @@
 {{ 'section-header.css' | asset_url | stylesheet_tag }}
 
-{% assign is_approved_customer = false %}
+{{ 'component-predictive-search.css' | asset_url | stylesheet_tag }}
 
-{% if customer and customer.tags contains settings.approved_customer_tag %}
-  {% assign is_approved_customer = true %}
+<script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
+
+{% liquid
+  assign approved_customer_tag = settings.approved_customer_tag | strip
+  assign is_approved_customer = false
+
+  if customer and approved_customer_tag != blank and customer.tags contains approved_customer_tag
+    assign is_approved_customer = true
+  endif
+%}
+
+{% if section.settings.sticky_header %}
+  <style>
+    #shopify-section-{{ section.id }} {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+  </style>
 {% endif %}
 
 <header class="
@@ -16,32 +33,17 @@
     --header-text: {{ section.settings.text_color }};
     --header-border: {{ section.settings.border_color }};
     --logo-width: {{ section.settings.logo_width }}px;
+    --dropdown-columns: {{ section.settings.dropdown_columns }};
   ">
   <div class="page-width site-header__inner">
-    {% if section.settings.menu != blank %}
-      <details class="site-header__mobile-navigation">
-        <summary class="site-header__mobile-summary">
-          Menu
-        </summary>
-
-        <nav class="site-header__mobile-panel" aria-label="Mobile navigation">
-          <ul class="site-header__mobile-list">
-            {% for link in section.settings.menu.links %}
-              <li>
-                <a class="
-                    site-header__navigation-link
-                    {% if link.active %}
-                      site-header__navigation-link--active
-                    {% endif %}
-                  " href="{{ link.url }}">
-                  {{ link.title | escape }}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </nav>
-      </details>
-    {% endif %}
+    {% render 'header-navigation'
+      , menu: section.settings.menu
+      , menu_type: 'mobile'
+      , aria_label: 'Mobile navigation'
+      , mobile_menu_label: section.settings.mobile_menu_label
+      , show_view_all_link: section.settings.show_view_all_link
+      , view_all_label: section.settings.view_all_label
+    %}
 
     <a
       class="site-header__brand"
@@ -60,53 +62,87 @@
       {% endif %}
     </a>
 
-    {% if section.settings.menu != blank %}
-      <nav class="site-header__desktop-navigation" aria-label="Primary navigation">
-        <ul class="site-header__navigation-list">
-          {% for link in section.settings.menu.links %}
-            <li>
-              <a class="
-                  site-header__navigation-link
-                  {% if link.active %}
-                    site-header__navigation-link--active
-                  {% endif %}
-                " href="{{ link.url }}">
-                {{ link.title | escape }}
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      </nav>
-    {% endif %}
+    {% render 'header-navigation'
+      , menu: section.settings.menu
+      , menu_type: 'desktop'
+      , aria_label: 'Primary navigation'
+      , mobile_menu_label: section.settings.mobile_menu_label
+      , show_view_all_link: section.settings.show_view_all_link
+      , view_all_label: section.settings.view_all_label
+    %}
 
     <div class="site-header__actions">
-      {% if section.settings.show_account_link %}
-        {% if customer %}
-          <a class="site-header__action-link" href="{{ routes.account_url }}">
-            <span class="site-header__account-text">
-              Account
-            </span>
-          </a>
+      {% if section.settings.show_search %}
+        <div class="site-header__search">
+          <predictive-search
+            class="header-search"
+            data-predictive-search-url="{{ routes.predictive_search_url }}"
+            data-predictive-search-enabled="{{ section.settings.enable_predictive_search }}">
+            <form
+              class="header-search__form"
+              action="{{ routes.search_url }}"
+              method="get"
+              role="search">
+              <label class="visually-hidden" for="HeaderSearch-{{ section.id }}">
+                Search the store
+              </label>
 
-          {% if is_approved_customer %}
-            <span class="site-header__approval-badge">
-              Wholesale
-            </span>
-          {% endif %}
-        {% else %}
-          <a class="site-header__action-link" href="{{ routes.account_login_url }}">
-            <span class="site-header__account-text">
-              Sign in
-            </span>
-          </a>
-        {% endif %}
+              <input
+                id="HeaderSearch-{{ section.id }}"
+                class="header-search__input"
+                type="search"
+                name="q"
+                placeholder="{{ section.settings.search_placeholder | escape }}"
+                autocomplete="off"
+                role="combobox"
+                aria-expanded="false"
+                aria-controls="HeaderPredictiveSearchResults-{{ section.id }}"
+                aria-haspopup="listbox"
+                aria-autocomplete="list">
+
+              <input
+                type="hidden"
+                name="options[prefix]"
+                value="last">
+
+              <input
+                type="hidden"
+                name="type"
+                value="product,article,page">
+
+              <button class="header-search__button" type="submit">
+                Search
+              </button>
+
+              <div
+                id="HeaderPredictiveSearchResults-{{ section.id }}"
+                class="header-search__results"
+                data-predictive-search-results
+                tabindex="-1"
+                hidden></div>
+            </form>
+          </predictive-search>
+        </div>
       {% endif %}
 
       {% if section.settings.show_cart_link %}
-        <a class="site-header__action-link site-header__cart-label" href="{{ routes.cart_url }}">
-          Cart{% if cart.item_count > 0 %}
-            ({{ cart.item_count }}){% endif %}
+        <a
+          class="site-header__action-link site-header__cart-link"
+          href="{{ routes.cart_url }}"
+          data-cart-drawer-open
+          aria-label="Open cart, {{ cart.item_count }} items">
+          <span>{{ section.settings.cart_label | escape }}</span>
+
+          <span class="site-header__cart-count" aria-hidden="true">
+            (<span data-cart-count>{{ cart.item_count }}</span>)
+          </span>
         </a>
+      {% endif %}
+
+      {% if section.settings.show_account_link and shop.customer_accounts_enabled %}
+        <div class="site-header__account">
+          <shopify-account menu="{{ section.settings.customer_account_menu }}"></shopify-account>
+        </div>
       {% endif %}
     </div>
   </div>
@@ -115,15 +151,38 @@
 {% schema %}
   {
     "name": "Header",
-    "tag": "section",
+    "tag": "div",
     "class": "section-header",
     "settings": [
       {
+        "type": "header",
+        "content": "Search"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_search",
+        "label": "Show search",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_predictive_search",
+        "label": "Enable predictive search",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "search_placeholder",
+        "label": "Search placeholder",
+        "default": "Search"
+      }, {
+        "type": "header",
+        "content": "Logo"
+      }, {
         "type": "image_picker",
         "id": "logo",
         "label": "Logo"
-      },
-      {
+      }, {
         "type": "range",
         "id": "logo_width",
         "min": 80,
@@ -132,23 +191,87 @@
         "unit": "px",
         "label": "Logo width",
         "default": 140
-      },
-      {
+      }, {
+        "type": "header",
+        "content": "Navigation"
+      }, {
         "type": "link_list",
         "id": "menu",
         "label": "Menu",
         "default": "main-menu"
-      },
-      {
+      }, {
+        "type": "select",
+        "id": "dropdown_columns",
+        "label": "Desktop dropdown columns",
+        "options": [
+          {
+            "value": "2",
+            "label": "2 columns"
+          }, {
+            "value": "3",
+            "label": "3 columns"
+          }, {
+            "value": "4",
+            "label": "4 columns"
+          }
+        ],
+        "default": "3"
+      }, {
+        "type": "checkbox",
+        "id": "show_view_all_link",
+        "label": "Show view-all links",
+        "default": true
+      }, {
+        "type": "text",
+        "id": "view_all_label",
+        "label": "View-all label",
+        "default": "View all"
+      }, {
+        "type": "text",
+        "id": "mobile_menu_label",
+        "label": "Mobile menu label",
+        "default": "Menu"
+      }, {
+        "type": "header",
+        "content": "Customer actions"
+      }, {
         "type": "checkbox",
         "id": "show_account_link",
         "label": "Show account link",
         "default": true
       }, {
+        "type": "link_list",
+        "id": "customer_account_menu",
+        "label": "Customer account menu",
+        "default": "customer-account-main-menu"
+      }, {
+        "type": "text",
+        "id": "account_label",
+        "label": "Account label",
+        "default": "Account"
+      }, {
+        "type": "text",
+        "id": "sign_in_label",
+        "label": "Sign-in label",
+        "default": "Sign in"
+      }, {
+        "type": "text",
+        "id": "wholesale_badge_label",
+        "label": "Approved customer badge",
+        "default": "Wholesale"
+      }, {
         "type": "checkbox",
         "id": "show_cart_link",
         "label": "Show cart link",
         "default": true
+      }, {
+        "type": "text",
+        "id": "cart_label",
+        "label": "Cart label",
+        "default": "Cart"
+      }, {
+        "type": "header",
+        "content": "Header behavior"
       }, {
         "type": "checkbox",
         "id": "sticky_header",

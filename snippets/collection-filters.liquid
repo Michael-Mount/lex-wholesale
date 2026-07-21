@@ -1,0 +1,383 @@
+{% comment %}
+  Renders collection filters, active filters, and sorting.
+
+  Required parameters:
+  - collection
+  - section_id
+  - is_approved_customer
+{% endcomment %}
+
+{% liquid
+  assign selected_sort_by = collection.sort_by | default: collection.default_sort_by
+
+  unless is_approved_customer
+    if selected_sort_by == 'price-ascending'
+      assign selected_sort_by = 'manual'
+    elsif selected_sort_by == 'price-descending'
+      assign selected_sort_by = 'manual'
+    endif
+  endunless
+
+  assign should_render_controls = false
+
+  if show_filters and collection.filters.size > 0
+    assign should_render_controls = true
+  endif
+
+  if show_sorting
+    assign should_render_controls = true
+  endif
+
+  assign active_filter_count = 0
+
+  for filter in collection.filters
+    assign can_render_filter = true
+
+    unless is_approved_customer
+      if filter.type == 'price_range'
+        assign can_render_filter = false
+      endif
+    endunless
+
+    if can_render_filter
+      assign active_filter_count = active_filter_count | plus: filter.active_values.size
+
+      if filter.type == 'price_range'
+        if filter.min_value.value != blank
+          assign active_filter_count = active_filter_count | plus: 1
+        elsif filter.max_value.value != blank
+          assign active_filter_count = active_filter_count | plus: 1
+        endif
+      endif
+    endif
+  endfor
+
+  assign form_id = 'CollectionFilters-' | append: section_id
+
+  assign clear_filters_url = collection.url | append: '?sort_by=' | append: selected_sort_by
+%}
+
+{% if should_render_controls %}
+  <div class="
+      collection-controls
+      collection-controls--{{ layout | default: 'horizontal' }}
+    ">
+    {% if active_filter_count > 0 %}
+      <div class="collection-controls__active">
+        <div class="collection-controls__active-header">
+          <p class="collection-controls__active-title">
+            Active filters
+          </p>
+
+          <a class="collection-controls__clear-link" href="{{ clear_filters_url }}">
+            Clear all
+          </a>
+        </div>
+
+        <ul class="collection-controls__active-list">
+          {% for filter in collection.filters %}
+            {% assign can_render_active_filter = true %}
+
+            {% unless is_approved_customer %}
+              {% if filter.type == 'price_range' %}
+                {% assign can_render_active_filter = false %}
+              {% endif %}
+            {% endunless %}
+
+            {% if can_render_active_filter %}
+              {% for value in filter.active_values %}
+                <li>
+                  <a class="collection-controls__active-link" href="{{ value.url_to_remove }}">
+                    {% if show_filter_group_name %}
+                      <span>
+                        {{ filter.label | escape }}:
+                      </span>
+                    {% endif %}
+
+                    <span>{{ value.label | escape }}</span>
+
+                    <span aria-hidden="true">×</span>
+
+                    <span class="visually-hidden">
+                      Remove filter
+                    </span>
+                  </a>
+                </li>
+              {% endfor %}
+
+              {% if filter.type == 'price_range' and is_approved_customer
+              %}
+                {% if filter.min_value.value != blank or filter.max_value.value != blank
+                %}
+                  <li>
+                    <a class="collection-controls__active-link" href="{{ filter.url_to_remove }}">
+                      {% if show_filter_group_name %}
+                        <span>
+                          {{ filter.label | escape }}:
+                        </span>
+                      {% endif %}
+
+                      <span>
+                        {% if filter.min_value.value != blank %}
+                          From {{ filter.min_value.value | money }}
+                        {% endif %}
+
+                        {% if filter.min_value.value != blank and filter.max_value.value != blank
+                        %}
+                          –
+                        {% endif %}
+
+                        {% if filter.max_value.value != blank %}
+                          Up to {{ filter.max_value.value | money }}
+                        {% endif %}
+                      </span>
+
+                      <span aria-hidden="true">×</span>
+
+                      <span class="visually-hidden">
+                        Remove price filter
+                      </span>
+                    </a>
+                  </li>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form
+      id="{{ form_id }}"
+      class="collection-controls__form"
+      action="{{ collection.url }}"
+      method="get">
+      {% if show_filters and collection.filters.size > 0 %}
+        <div class="collection-controls__filters">
+          {% for filter in collection.filters %}
+            {% liquid
+              assign can_render_filter = true
+              assign filter_is_active = false
+              assign filter_active_count = filter.active_values.size
+
+              unless is_approved_customer
+                if filter.type == 'price_range'
+                  assign can_render_filter = false
+                endif
+              endunless
+
+              if filter_active_count > 0
+                assign filter_is_active = true
+              endif
+
+              if filter.type == 'price_range'
+                if filter.min_value.value != blank
+                  assign filter_is_active = true
+                  assign filter_active_count = 1
+                elsif filter.max_value.value != blank
+                  assign filter_is_active = true
+                  assign filter_active_count = 1
+                endif
+              endif
+            %}
+
+            {% if can_render_filter %}
+              <details
+                class="
+                  collection-filter
+
+                  {% if filter_is_active %}
+                    collection-filter--active
+                  {% endif %}
+                "
+                {% if filter_is_active %}
+                open
+                {% endif %}>
+                <summary class="collection-filter__summary">
+                  <span>{{ filter.label | escape }}</span>
+
+                  {% if filter_active_count > 0 %}
+                    <span class="collection-filter__selected-count">
+                      {{ filter_active_count }}
+                    </span>
+                  {% endif %}
+
+                  <span class="collection-filter__chevron" aria-hidden="true">
+                    ↓
+                  </span>
+                </summary>
+
+                <div class="collection-filter__panel">
+                  <div class="collection-filter__panel-header">
+                    {% if filter.type == 'list' or filter.type == 'boolean'
+                    %}
+                      <span>
+                        {{ filter.active_values.size }} selected
+                      </span>
+                    {% endif %}
+
+                    {% if filter_is_active %}
+                      <a class="collection-filter__reset" href="{{ filter.url_to_remove }}">
+                        Reset
+                      </a>
+                    {% endif %}
+                  </div>
+
+                  {% if filter.type == 'list' or filter.type == 'boolean'
+                  %}
+                    <ul class="collection-filter__values">
+                      {% for value in filter.values %}
+                        {% assign input_id = 'Filter-' | append: section_id | append: '-' | append: forloop.parentloop.index | append: '-' | append: forloop.index
+                        %}
+
+                        <li class="collection-filter__value">
+                          <label class="
+                              collection-filter__label
+
+                              {% if value.count == 0
+                                and value.active == false
+                              %}
+                                collection-filter__label--disabled
+                              {% endif %}
+                            " for="{{ input_id }}">
+                            <input
+                              id="{{ input_id }}"
+                              class="collection-filter__checkbox"
+                              type="checkbox"
+                              name="{{ value.param_name }}"
+                              value="{{ value.value }}"
+                              {% if value.active %}
+                              checked
+                              {% endif %}
+                              {% if value.count == 0 and value.active == false %}
+                              disabled
+                              {% endif %}>
+
+                            <span class="collection-filter__checkbox-mark"></span>
+
+                            <span class="collection-filter__value-label">
+                              {{ value.label | escape }}
+                            </span>
+
+                            {% if show_filter_counts %}
+                              <span class="collection-filter__value-count">
+                                {{ value.count }}
+                              </span>
+                            {% endif %}
+                          </label>
+                        </li>
+                      {% endfor %}
+                    </ul>
+
+                  {% elsif filter.type == 'price_range' and is_approved_customer
+                  %}
+                    {% assign range_max = filter.range_max | money_without_currency | replace: ',', ''
+                    %}
+
+                    <div class="collection-filter__price-fields">
+                      <div class="collection-filter__price-field">
+                        <label for="Filter-{{ section_id }}-Price-Min">
+                          From
+                        </label>
+
+                        <input
+                          id="Filter-{{ section_id }}-Price-Min"
+                          class="collection-filter__price-input"
+                          type="number"
+                          name="{{ filter.min_value.param_name }}"
+                          min="0"
+                          max="{{ range_max }}"
+                          step="0.01"
+                          {% if filter.min_value.value != blank %}
+                          value="
+                              {{- filter.min_value.value
+                                | money_without_currency
+                                | replace: ',', ''
+                              -}}
+                            "
+                          {% endif %}>
+                      </div>
+
+                      <div class="collection-filter__price-field">
+                        <label for="Filter-{{ section_id }}-Price-Max">
+                          To
+                        </label>
+
+                        <input
+                          id="Filter-{{ section_id }}-Price-Max"
+                          class="collection-filter__price-input"
+                          type="number"
+                          name="{{ filter.max_value.param_name }}"
+                          min="0"
+                          max="{{ range_max }}"
+                          step="0.01"
+                          {% if filter.max_value.value != blank %}
+                          value="
+                              {{- filter.max_value.value
+                                | money_without_currency
+                                | replace: ',', ''
+                              -}}
+                            "
+                          {% endif %}>
+                      </div>
+                    </div>
+
+                    <p class="collection-filter__price-maximum">
+                      Maximum price: {{ filter.range_max | money }}
+                    </p>
+                  {% endif %}
+                </div>
+              </details>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if show_sorting %}
+        <div class="collection-controls__sorting">
+          <label class="collection-controls__sort-label" for="SortBy-{{ section_id }}">
+            Sort by
+          </label>
+
+          <select
+            id="SortBy-{{ section_id }}"
+            class="collection-controls__sort-select"
+            name="sort_by">
+            {% for option in collection.sort_options %}
+              {% liquid
+                assign is_price_sort = false
+                assign show_sort_option = true
+
+                if option.value == 'price-ascending'
+                  assign is_price_sort = true
+                elsif option.value == 'price-descending'
+                  assign is_price_sort = true
+                endif
+
+                unless is_approved_customer
+                  if is_price_sort
+                    assign show_sort_option = false
+                  endif
+                endunless
+              %}
+
+              {% if show_sort_option %}
+                <option
+                  value="{{ option.value }}"
+                  {% if option.value == selected_sort_by %}
+                  selected
+                  {% endif %}>
+                  {{ option.name | escape }}
+                </option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
+      <button class="collection-controls__apply" type="submit">
+        Apply
+      </button>
+    </form>
+  </div>
+{% endif %}

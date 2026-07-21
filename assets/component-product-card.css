@@ -1,0 +1,140 @@
+.product-card {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  height: 100%;
+
+  overflow: hidden;
+
+  background: var(--product-card-background);
+  border: 1px solid var(--product-card-border);
+}
+
+.product-card--align-left {
+  text-align: left;
+}
+
+.product-card--align-center {
+  text-align: center;
+}
+
+.product-card--align-center .product-price__values,
+.product-card--align-center .product-price__locked-actions {
+  justify-content: center;
+}
+
+.product-card__media {
+  position: relative;
+  overflow: hidden;
+
+  background: rgb(0 0 0 / 4%);
+}
+
+.product-card__media--square {
+  aspect-ratio: 1 / 1;
+}
+
+.product-card__media--portrait {
+  aspect-ratio: 4 / 5;
+}
+
+.product-card__media--landscape {
+  aspect-ratio: 4 / 3;
+}
+
+.product-card__image-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.product-card__image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: var(--product-card-image-fit);
+
+  transition: transform 250ms ease;
+}
+
+.product-card:hover .product-card__image {
+  transform: scale(1.025);
+}
+
+.product-card__image-placeholder {
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  font-size: 0.875rem;
+  opacity: 0.6;
+}
+
+.product-card__badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+
+  padding: 0.35rem 0.6rem;
+
+  background: var(--featured-text);
+  color: var(--featured-background);
+
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.product-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  padding: 1rem;
+}
+
+.product-card__vendor {
+  margin: 0 0 0.35rem;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.product-card__title {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.product-card__title-link {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 0.25em;
+}
+
+.product-card__title-link:hover {
+  text-decoration: underline;
+}
+
+.product-card__title-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card__image {
+    transition: none;
+  }
+
+  .product-card:hover .product-card__image {
+    transform: none;
+  }
+}

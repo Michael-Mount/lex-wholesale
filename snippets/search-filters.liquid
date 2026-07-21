@@ -1,0 +1,344 @@
+{% comment %}
+  Renders search filters, active values, and sorting.
+
+  Required:
+  - search
+  - section_id
+  - is_approved_customer
+
+  Optional:
+  - show_filters
+  - show_sorting
+  - show_filter_counts
+{% endcomment %}
+
+{% liquid
+  assign selected_sort_by = search.sort_by | default: search.default_sort_by
+  assign active_filter_count = 0
+  assign encoded_terms = search.terms | url_encode
+
+  assign clear_filters_url = routes.search_url | append: '?q=' | append: encoded_terms
+  assign clear_filters_url = clear_filters_url | append: '&options[prefix]=last'
+  assign clear_filters_url = clear_filters_url | append: '&type=product,article,page'
+  assign clear_filters_url = clear_filters_url | append: '&sort_by=' | append: selected_sort_by
+
+  for filter in search.filters
+    assign can_render_filter = true
+
+    unless is_approved_customer
+      if filter.type == 'price_range'
+        assign can_render_filter = false
+      endif
+    endunless
+
+    if can_render_filter
+      assign active_filter_count = active_filter_count | plus: filter.active_values.size
+
+      if filter.type == 'price_range'
+        if filter.min_value.value != blank or filter.max_value.value != blank
+          assign active_filter_count = active_filter_count | plus: 1
+        endif
+      endif
+    endif
+  endfor
+%}
+
+<div class="search-controls">
+  {% if active_filter_count > 0 %}
+    <div class="search-controls__active">
+      <div class="search-controls__active-header">
+        <p class="search-controls__active-title">
+          Active filters
+        </p>
+
+        <a class="search-controls__clear" href="{{ clear_filters_url }}">
+          Clear all
+        </a>
+      </div>
+
+      <ul class="search-controls__active-list">
+        {% for filter in search.filters %}
+          {% assign can_render_active_filter = true %}
+
+          {% unless is_approved_customer %}
+            {% if filter.type == 'price_range' %}
+              {% assign can_render_active_filter = false %}
+            {% endif %}
+          {% endunless %}
+
+          {% if can_render_active_filter %}
+            {% for value in filter.active_values %}
+              <li>
+                <a class="search-controls__active-filter" href="{{ value.url_to_remove }}">
+                  <span>
+                    {{ filter.label | escape }}:
+                    {{ value.label | escape }}
+                  </span>
+
+                  <span aria-hidden="true">×</span>
+
+                  <span class="visually-hidden">
+                    Remove filter
+                  </span>
+                </a>
+              </li>
+            {% endfor %}
+
+            {% if filter.type == 'price_range' and is_approved_customer
+            %}
+              {% if filter.min_value.value != blank or filter.max_value.value != blank
+              %}
+                <li>
+                  <a class="search-controls__active-filter" href="{{ filter.url_to_remove }}">
+                    <span>
+                      {{ filter.label | escape }}:
+
+                      {% if filter.min_value.value != blank %}
+                        From {{ filter.min_value.value | money }}
+                      {% endif %}
+
+                      {% if filter.min_value.value != blank and filter.max_value.value != blank
+                      %}
+                        –
+                      {% endif %}
+
+                      {% if filter.max_value.value != blank %}
+                        Up to {{ filter.max_value.value | money }}
+                      {% endif %}
+                    </span>
+
+                    <span aria-hidden="true">×</span>
+
+                    <span class="visually-hidden">
+                      Remove price filter
+                    </span>
+                  </a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form
+    class="search-controls__form"
+    action="{{ routes.search_url }}"
+    method="get">
+    <input
+      type="hidden"
+      name="q"
+      value="{{ search.terms | escape }}">
+
+    <input
+      type="hidden"
+      name="options[prefix]"
+      value="last">
+
+    <input
+      type="hidden"
+      name="type"
+      value="product,article,page">
+
+    {% if show_filters and search.filters.size > 0 %}
+      <div class="search-controls__filters">
+        {% for filter in search.filters %}
+          {% liquid
+            assign can_render_filter = true
+            assign filter_is_active = false
+            assign filter_active_count = filter.active_values.size
+
+            unless is_approved_customer
+              if filter.type == 'price_range'
+                assign can_render_filter = false
+              endif
+            endunless
+
+            if filter_active_count > 0
+              assign filter_is_active = true
+            endif
+
+            if filter.type == 'price_range'
+              if filter.min_value.value != blank or filter.max_value.value != blank
+                assign filter_is_active = true
+                assign filter_active_count = 1
+              endif
+            endif
+          %}
+
+          {% if can_render_filter %}
+            <details
+              class="
+                search-filter
+
+                {% if filter_is_active %}
+                  search-filter--active
+                {% endif %}
+              "
+              {% if filter_is_active %}
+              open
+              {% endif %}>
+              <summary class="search-filter__summary">
+                <span>{{ filter.label | escape }}</span>
+
+                {% if filter_active_count > 0 %}
+                  <span class="search-filter__count">
+                    {{ filter_active_count }}
+                  </span>
+                {% endif %}
+
+                <span class="search-filter__chevron" aria-hidden="true">
+                  ↓
+                </span>
+              </summary>
+
+              <div class="search-filter__panel">
+                {% if filter_is_active %}
+                  <div class="search-filter__panel-header">
+                    <a class="search-filter__reset" href="{{ filter.url_to_remove }}">
+                      Reset
+                    </a>
+                  </div>
+                {% endif %}
+
+                {% if filter.type == 'list' or filter.type == 'boolean'
+                %}
+                  <ul class="search-filter__values">
+                    {% for value in filter.values %}
+                      {% assign input_id = 'SearchFilter-' | append: section_id | append: '-' | append: forloop.parentloop.index | append: '-' | append: forloop.index %}
+
+                      <li>
+                        <label class="
+                            search-filter__label
+
+                            {% if value.count == 0
+                              and value.active == false
+                            %}
+                              search-filter__label--disabled
+                            {% endif %}
+                          " for="{{ input_id }}">
+                          <input
+                            id="{{ input_id }}"
+                            class="search-filter__checkbox"
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value }}"
+                            {% if value.active %}
+                            checked
+                            {% endif %}
+
+
+                            {% if value.count == 0 and value.active == false %}
+                            disabled
+                            {% endif %}>
+
+                          <span class="search-filter__checkbox-mark"></span>
+
+                          <span>
+                            {{ value.label | escape }}
+                          </span>
+
+                          {% if show_filter_counts %}
+                            <span class="search-filter__value-count">
+                              {{ value.count }}
+                            </span>
+                          {% endif %}
+                        </label>
+                      </li>
+                    {% endfor %}
+                  </ul>
+
+                {% elsif filter.type == 'price_range' and is_approved_customer
+                %}
+                  {% assign range_max = filter.range_max | money_without_currency | replace: ',', '' %}
+
+                  <div class="search-filter__price-fields">
+                    <div class="search-filter__price-field">
+                      <label for="SearchPriceMin-{{ section_id }}">
+                        From
+                      </label>
+
+                      <input
+                        id="SearchPriceMin-{{ section_id }}"
+                        class="search-filter__price-input"
+                        type="number"
+                        name="{{ filter.min_value.param_name }}"
+                        min="0"
+                        max="{{ range_max }}"
+                        step="0.01"
+                        {% if filter.min_value.value != blank %}
+                        value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                        {% endif %}>
+                    </div>
+
+                    <div class="search-filter__price-field">
+                      <label for="SearchPriceMax-{{ section_id }}">
+                        To
+                      </label>
+
+                      <input
+                        id="SearchPriceMax-{{ section_id }}"
+                        class="search-filter__price-input"
+                        type="number"
+                        name="{{ filter.max_value.param_name }}"
+                        min="0"
+                        max="{{ range_max }}"
+                        step="0.01"
+                        {% if filter.max_value.value != blank %}
+                        value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                        {% endif %}>
+                    </div>
+                  </div>
+
+                  <p class="search-filter__maximum">
+                    Maximum price: {{ filter.range_max | money }}
+                  </p>
+                {% endif %}
+              </div>
+            </details>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if show_sorting %}
+      <div class="search-controls__sorting">
+        <label class="search-controls__sort-label" for="SearchSortBy-{{ section_id }}">
+          Sort by
+        </label>
+
+        <select
+          id="SearchSortBy-{{ section_id }}"
+          class="search-controls__sort-select"
+          name="sort_by">
+          {% for option in search.sort_options %}
+            {% liquid
+              assign show_sort_option = true
+
+              unless is_approved_customer
+                if option.value == 'price-ascending' or option.value == 'price-descending'
+                  assign show_sort_option = false
+                endif
+              endunless
+            %}
+
+            {% if show_sort_option %}
+              <option
+                value="{{ option.value }}"
+                {% if option.value == selected_sort_by %}
+                selected
+                {% endif %}>
+                {{ option.name | escape }}
+              </option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+
+    <button class="search-controls__apply" type="submit">
+      Apply
+    </button>
+  </form>
+</div>

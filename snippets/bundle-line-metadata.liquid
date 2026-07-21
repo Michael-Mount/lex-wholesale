@@ -1,0 +1,85 @@
+{% comment %}
+  Reads private collection-bundle properties from a cart line.
+
+  Required:
+  - item: Shopify line_item
+  - output: attributes or label
+
+  The attributes output is intended for use inside a cart line's
+  opening HTML tag.
+{% endcomment %}
+
+{% liquid
+  assign bundle_id = blank
+  assign bundle_handle = blank
+  assign bundle_title = blank
+  assign bundle_position = blank
+  assign bundle_component_count = blank
+  assign bundle_quantity_per_product = blank
+  assign bundle_schema_version = blank
+
+  for property in item.properties
+    case property.first
+      when '_bundle_id'
+        assign bundle_id = property.last
+
+      when '_bundle_handle'
+        assign bundle_handle = property.last
+
+      when '_bundle_title'
+        assign bundle_title = property.last
+
+      when '_bundle_component_position'
+        assign bundle_position = property.last
+
+      when '_bundle_component_count'
+        assign bundle_component_count = property.last
+
+      when '_bundle_quantity_per_product'
+        assign bundle_quantity_per_product = property.last
+
+      when '_bundle_schema_version'
+        assign bundle_schema_version = property.last
+    endcase
+  endfor
+
+  if bundle_title == blank
+    assign bundle_title = 'Complete collection'
+  endif
+
+  if bundle_quantity_per_product == blank
+    assign bundle_quantity_per_product = 1
+  endif
+%}
+
+{% if bundle_id != blank %}
+  {% case output %}
+    {% when 'attributes' %}
+      data-bundle-line 
+      data-bundle-id="{{ bundle_id | escape }}" 
+      data-bundle-handle="{{ bundle_handle | escape }}" 
+      data-bundle-title="{{ bundle_title | escape }}" 
+      data-bundle-position="{{ bundle_position | escape }}" 
+      data-bundle-expected-count="{{ bundle_component_count | escape }}" 
+      data-bundle-expected-quantity="{{ bundle_quantity_per_product | escape }}" 
+      data-bundle-current-quantity="{{ item.quantity }}" 
+      data-bundle-schema-version="{{ bundle_schema_version | escape }}"
+
+    {% when 'label' %}
+      <p class="bundle-line__fallback-label">
+        <span class="bundle-line__fallback-prefix">
+          {{ settings.bundle_group_label | escape }}:
+        </span>
+
+        <span>{{ bundle_title | escape }}</span>
+
+        {% if bundle_position != blank and bundle_component_count != blank
+        %}
+          <span>
+            — item {{ bundle_position | escape }}
+            of {{ bundle_component_count | escape }}
+          </span>
+        {% endif %}
+      </p>
+  {% endcase %}
+{% endif %}

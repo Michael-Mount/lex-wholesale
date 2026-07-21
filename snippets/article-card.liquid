@@ -1,0 +1,66 @@
+{% comment %}
+  Required:
+  - article
+
+  Optional:
+  - show_image
+  - show_author
+  - show_date
+  - show_excerpt
+  - image_ratio
+  - image_fit
+  - excerpt_words
+{% endcomment %}
+
+<article class="article-card" style="
+    --article-image-fit: {{ image_fit | default: 'cover' }};
+  ">
+  {% if show_image and article.image != blank %}
+    <a
+      class="
+        article-card__media-link
+        article-card__media-link--{{ image_ratio | default: 'landscape' }}
+      "
+      href="{{ article.url }}"
+      tabindex="-1"
+      aria-hidden="true">
+      {{
+        article.image | image_url: width: 1200 | image_tag: class: 'article-card__image', widths: '300, 450, 600, 800, 1000, 1200', sizes: '(min-width: 990px) 33vw, 100vw', loading: 'lazy', alt: ''
+      }}
+    </a>
+  {% endif %}
+
+  <div class="article-card__content">
+    {% if show_author or show_date %}
+      <p class="article-card__meta">
+        {% if show_author and article.author != blank %}
+          <span>{{ article.author | escape }}</span>
+        {% endif %}
+
+        {% if show_date %}
+          <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+            {{ article.published_at | date: '%B %d, %Y' }}
+          </time>
+        {% endif %}
+      </p>
+    {% endif %}
+
+    <h2 class="article-card__title">
+      <a class="article-card__title-link" href="{{ article.url }}">
+        {{ article.title | escape }}
+      </a>
+    </h2>
+
+    {% if show_excerpt %}
+      <p class="article-card__excerpt">
+        {{
+          article.excerpt_or_content | strip_html | truncatewords: excerpt_words | escape
+        }}
+      </p>
+    {% endif %}
+
+    <a class="article-card__read-more" href="{{ article.url }}">
+      Read article
+    </a>
+  </div>
+</article>
