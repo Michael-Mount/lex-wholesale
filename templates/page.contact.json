@@ -1,0 +1,33 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-contact",
+      "settings": {
+        "eyebrow": "Get in touch",
+        "heading": "Contact us",
+        "introduction": "<p>Send us a message and our team will respond as soon as possible.</p>",
+        "information_heading": "Wholesale support",
+        "information_text": "<p>Contact us with questions about retailer applications, products, or existing orders.</p>",
+        "email": "",
+        "phone": "",
+        "hours": "",
+        "form_heading": "Send a message",
+        "show_phone": true,
+        "show_company": true,
+        "show_subject": true,
+        "require_message": true,
+        "button_label": "Send message",
+        "success_message": "Thank you. Your message has been sent.",
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "card_background_color": "#f7f4f1",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

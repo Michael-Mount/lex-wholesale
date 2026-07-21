@@ -1,0 +1,19 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "eyebrow": "",
+        "show_title": true,
+        "header_width": 52,
+        "content_width": 48,
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

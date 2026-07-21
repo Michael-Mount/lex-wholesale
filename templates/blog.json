@@ -1,0 +1,30 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-blog",
+      "settings": {
+        "eyebrow": "Journal",
+        "introduction": "",
+        "show_tags": true,
+        "articles_per_page": 12,
+        "desktop_columns": "3",
+        "mobile_columns": "1",
+        "grid_gap": 24,
+        "show_image": true,
+        "show_author": true,
+        "show_date": true,
+        "show_excerpt": true,
+        "excerpt_words": 25,
+        "image_ratio": "landscape",
+        "image_fit": "cover",
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "card_background_color": "#ffffff",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}

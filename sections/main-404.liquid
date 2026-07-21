@@ -1,0 +1,201 @@
+{{ 'section-content-pages.css' | asset_url | stylesheet_tag }}
+
+<section class="content-section main-404" style="
+    --content-background: {{ section.settings.background_color }};
+    --content-text: {{ section.settings.text_color }};
+    --content-border: {{ section.settings.border_color }};
+    --content-button-background: {{ section.settings.button_background_color }};
+    --content-button-text: {{ section.settings.button_text_color }};
+    --content-padding-top: {{ section.settings.padding_top }}px;
+    --content-padding-bottom: {{ section.settings.padding_bottom }}px;
+  ">
+  <div class="page-width">
+    <div class="main-404__inner">
+      <p class="main-404__code" aria-hidden="true">
+        404
+      </p>
+
+      <h1 class="main-404__title">
+        {{ section.settings.heading | escape }}
+      </h1>
+
+      {% if section.settings.text != blank %}
+        <div class="main-404__text rte">
+          {{ section.settings.text }}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_search %}
+        <form
+          class="main-404__search"
+          action="{{ routes.search_url }}"
+          method="get"
+          role="search">
+          <label class="visually-hidden" for="Search404-{{ section.id }}">
+            Search the store
+          </label>
+
+          <input
+            id="Search404-{{ section.id }}"
+            class="content-form__input"
+            type="search"
+            name="q"
+            placeholder="{{ section.settings.search_placeholder | escape }}"
+            required>
+
+          <input
+            type="hidden"
+            name="options[prefix]"
+            value="last">
+
+          <input
+            type="hidden"
+            name="type"
+            value="product,article,page">
+
+          <button class="content-form__submit" type="submit">
+            {{ section.settings.search_label | escape }}
+          </button>
+        </form>
+      {% endif %}
+
+      <div class="main-404__links">
+        <a class="content-button content-button--primary" href="{{ routes.root_url }}">
+          {{ section.settings.home_label | escape }}
+        </a>
+
+        <a class="content-button" href="{{ routes.collections_url }}">
+          {{ section.settings.collections_label | escape }}
+        </a>
+
+        {% for block in section.blocks %}
+          {% if block.settings.link != blank %}
+            <a
+              class="content-button"
+              href="{{ block.settings.link }}"
+              {{ block.shopify_attributes }}>
+              {{ block.settings.label | escape }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Main 404",
+    "tag": "section",
+    "class": "section-main-404",
+    "max_blocks": 4,
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Page not found"
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Message",
+        "default": "<p>The page may have moved or the address may be incorrect. Search the store or return to one of the links below.</p>"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_search",
+        "label": "Show search form",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "search_placeholder",
+        "label": "Search placeholder",
+        "default": "Search the store"
+      }, {
+        "type": "text",
+        "id": "search_label",
+        "label": "Search button label",
+        "default": "Search"
+      }, {
+        "type": "text",
+        "id": "home_label",
+        "label": "Home link label",
+        "default": "Return home"
+      }, {
+        "type": "text",
+        "id": "collections_label",
+        "label": "Collections link label",
+        "default": "Browse collections"
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Borders",
+        "default": "#ded8d3"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Primary button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Primary button text",
+        "default": "#ffffff"
+      }, {
+        "type": "header",
+        "content": "Spacing"
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 160,
+        "step": 8,
+        "unit": "px",
+        "label": "Top padding",
+        "default": 96
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 160,
+        "step": 8,
+        "unit": "px",
+        "label": "Bottom padding",
+        "default": 120
+      }
+    ],
+    "blocks": [
+      {
+        "type": "link",
+        "name": "Additional link",
+        "settings": [
+          {
+            "type": "text",
+            "id": "label",
+            "label": "Label",
+            "default": "Contact us"
+          }, {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
