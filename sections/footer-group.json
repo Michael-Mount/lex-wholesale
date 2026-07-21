@@ -1,0 +1,54 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "newsletter": {
+      "type": "footer-newsletter",
+      "settings": {
+        "heading": "Join our wholesale newsletter",
+        "text": "<p>Receive collection launches, restock notices, and retailer updates.</p>",
+        "email_placeholder": "Email address",
+        "button_label": "Subscribe",
+        "success_message": "Thank you for subscribing.",
+        "background_color": "#e9e2dc",
+        "text_color": "#231f1c",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff"
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "shopmenu": {
+          "type": "menu",
+          "settings": {
+            "heading": "Shop",
+            "menu": "main-menu"
+          }
+        },
+        "information": {
+          "type": "text",
+          "settings": {
+            "heading": "Wholesale",
+            "text": "<p>Approved retailers can sign in to view wholesale pricing and place orders.</p>"
+          }
+        }
+      },
+      "block_order": ["shopmenu", "information"],
+      "settings": {
+        "description": "<p>Wholesale clothing collections created for independent retailers.</p>",
+        "legal_menu": "",
+        "desktop_columns": "3",
+        "show_social_links": true,
+        "instagram_url": "",
+        "facebook_url": "",
+        "pinterest_url": "",
+        "linkedin_url": "",
+        "background_color": "#2c211c",
+        "text_color": "#ffffff",
+        "border_color": "#62544d"
+      }
+    }
+  },
+  "order": ["newsletter", "footer"]
+}
