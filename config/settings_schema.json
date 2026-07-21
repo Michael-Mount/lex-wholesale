@@ -73,8 +73,31 @@
         "type": "text",
         "id": "approved_customer_tag",
         "label": "Approved customer tag",
-        "info": "Customers with this Shopify customer tag are treated as approved wholesale customers.",
-        "default": "approved-wholesale"
+        "default": "wholesale-approved",
+        "info": "Customers with this tag can view prices and purchase products."
+      },
+      {
+        "type": "textarea",
+        "id": "locked_price_message",
+        "label": "Logged-out price message",
+        "default": "Sign in with an approved wholesale account to view pricing."
+      },
+      {
+        "type": "textarea",
+        "id": "unapproved_price_message",
+        "label": "Unapproved account message",
+        "default": "Your account has not been approved for wholesale pricing."
+      },
+      {
+        "type": "url",
+        "id": "wholesale_application_url",
+        "label": "Wholesale application link"
+      },
+      {
+        "type": "text",
+        "id": "wholesale_application_label",
+        "label": "Wholesale application label",
+        "default": "Apply for wholesale access"
       }
     ]
   }
