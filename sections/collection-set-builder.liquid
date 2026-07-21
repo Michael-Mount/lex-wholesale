@@ -1,0 +1,167 @@
+{{ 'section-collection-set-builder.css' | asset_url | stylesheet_tag }}
+
+<section
+  id="CollectionSet-{{ section.id }}"
+  class="collection-set"
+  data-collection-set>
+  <div class="page-width">
+    <header class="collection-set__header">
+      {% if section.settings.heading != blank %}
+        <h1 class="collection-set__heading">
+          {{ section.settings.heading | escape }}
+        </h1>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <div class="collection-set__description">
+          {{ section.settings.description }}
+        </div>
+      {% endif %}
+    </header>
+
+    <div class="collection-set__products">
+      {% for block in section.blocks %}
+        {% assign bundle_product = block.settings.product %}
+
+        {% if bundle_product != blank %}
+          {% assign selected_variant = bundle_product.selected_or_first_available_variant %}
+
+          <article
+            class="collection-set__product"
+            data-collection-set-product
+            {{ block.shopify_attributes }}>
+            <a class="collection-set__image-link" href="{{ bundle_product.url }}">
+              {% if bundle_product.featured_image != blank %}
+                {{
+                  bundle_product.featured_image | image_url: width: 900 | image_tag: class: 'collection-set__image', loading: 'lazy', widths: '300, 450, 600, 750, 900', sizes: '(min-width: 750px) 33vw, 100vw', alt: bundle_product.featured_image.alt
+                }}
+              {% endif %}
+            </a>
+
+            <div class="collection-set__product-content">
+              <h2 class="collection-set__product-title">
+                <a href="{{ bundle_product.url }}">
+                  {{ bundle_product.title | escape }}
+                </a>
+              </h2>
+
+              <p class="collection-set__product-price">
+                {{ selected_variant.price | money }}
+              </p>
+
+              {% unless bundle_product.has_only_default_variant %}
+                <div class="collection-set__field">
+                  <label for="CollectionSetVariant-{{ section.id }}-{{ block.id }}" class="collection-set__label">
+                    Choose size
+                  </label>
+
+                  <select
+                    id="CollectionSetVariant-{{ section.id }}-{{ block.id }}"
+                    class="collection-set__select"
+                    data-collection-set-variant
+                    required>
+                    {% for variant in bundle_product.variants %}
+                      <option
+                        value="{{ variant.id }}"
+                        data-variant-price="{{ variant.price }}"
+                        {% if variant.id == selected_variant.id %}
+                        selected
+                        {% endif %}
+                        {% unless variant.available %}
+                        disabled
+                        {% endunless %}>
+                        {{ variant.title | escape }}
+
+                        {% unless variant.available %}
+                          — Sold out
+                        {% endunless %}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              {% else %}
+                <input
+                  type="hidden"
+                  value="{{ selected_variant.id }}"
+                  data-collection-set-variant>
+              {% endunless %}
+            </div>
+          </article>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if section.blocks.size > 0 %}
+      <div class="collection-set__footer">
+        <button
+          type="button"
+          class="collection-set__submit"
+          data-collection-set-submit>
+          {{ section.settings.button_text | escape }}
+        </button>
+
+        <p
+          class="collection-set__message"
+          data-collection-set-message
+          role="status"
+          aria-live="polite"></p>
+      </div>
+    {% elsif request.design_mode %}
+      <p>Add product blocks to build this collection set.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Collection set builder",
+    "tag": "section",
+    "class": "section-collection-set-builder",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Shop the complete collection"
+      }, {
+        "type": "richtext",
+        "id": "description",
+        "label": "Description",
+        "default": "<p>Choose a size for every item and purchase the complete collection at a discounted price.</p>"
+      }, {
+        "type": "text",
+        "id": "button_text",
+        "label": "Button text",
+        "default": "Add complete collection"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "product",
+        "name": "Collection product",
+        "settings": [
+          {
+            "type": "product",
+            "id": "product",
+            "label": "Product"
+          }
+        ]
+      }
+    ],
+    "max_blocks": 12,
+    "presets": [
+      {
+        "name": "Collection set builder",
+        "blocks": [
+          {
+            "type": "product"
+          }, {
+            "type": "product"
+          }, {
+            "type": "product"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
