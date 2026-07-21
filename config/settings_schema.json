@@ -8,31 +8,52 @@
     "theme_support_url": "https://support.shopify.com/"
   },
   {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "min": 800,
+        "max": 1600,
+        "step": 20,
+        "unit": "px",
+        "label": "Maximum page width",
+        "default": 1200
+      }
+    ]
+  },
+  {
     "name": "Colors",
     "settings": [
       {
         "type": "color",
-        "id": "color_background",
-        "label": "Page Background",
-        "default": "#f7f3ee"
-      },
-      {
-        "type": "color",
-        "id": "color_text",
-        "label": "Text Color",
-        "default": "#2f241d"
-      },
-      {
-        "type": "color",
-        "id": "color_button_background",
-        "label": "Button Background Color",
-        "default": "#2f241d"
-      },
-      {
-        "type": "color",
-        "id": "color_button_text",
-        "label": "Button Text Color",
+        "id": "background_color",
+        "label": "Background",
         "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }
+    ]
+  },
+  {
+    "name": "Wholesale access",
+    "settings": [
+      {
+        "type": "text",
+        "id": "approved_customer_tag",
+        "label": "Approved customer tag",
+        "default": "wholesale-approved",
+        "info": "Customers with this tag can view prices and purchase products."
+      },
+      {
+        "type": "textarea",
+        "id": "locked_price_message",
+        "label": "Hidden price message",
+        "default": "Sign in with an approved wholesale account to view pricing."
       }
     ]
   }
