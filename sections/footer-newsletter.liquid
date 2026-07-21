@@ -1,0 +1,159 @@
+{{ 'section-footer-newsletter.css' | asset_url | stylesheet_tag }}
+
+{% assign form_id = 'FooterNewsletter-' | append: section.id %}
+{% assign email_id = 'FooterNewsletterEmail-' | append: section.id %}
+{% assign error_id = 'FooterNewsletterError-' | append: section.id %}
+{% assign success_id = 'FooterNewsletterSuccess-' | append: section.id %}
+
+<section class="footer-newsletter" style="
+    --newsletter-background: {{ section.settings.background_color }};
+    --newsletter-text: {{ section.settings.text_color }};
+    --newsletter-button-background: {{ section.settings.button_background_color }};
+    --newsletter-button-text: {{ section.settings.button_text_color }};
+  ">
+  <div class="page-width footer-newsletter__inner">
+    <div class="footer-newsletter__content">
+      {% if section.settings.heading != blank %}
+        <h2 class="footer-newsletter__heading">
+          {{ section.settings.heading | escape }}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.text != blank %}
+        <div class="footer-newsletter__text">
+          {{ section.settings.text }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="footer-newsletter__form-wrapper">
+      {% form 'customer'
+        , id: form_id
+        , class: 'footer-newsletter__form'
+      %}
+        <input
+          type="hidden"
+          name="contact[tags]"
+          value="newsletter">
+
+        <div class="footer-newsletter__fields">
+          <label class="visually-hidden" for="{{ email_id }}">
+            Email address
+          </label>
+
+          <input
+            id="{{ email_id }}"
+            class="footer-newsletter__input"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            placeholder="{{ section.settings.email_placeholder | escape }}"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            aria-required="true"
+            required
+            {% if form.errors %}
+            aria-invalid="true"
+            aria-describedby="{{ error_id }}"
+            {% endif %}
+            {% if form.posted_successfully? %}
+            aria-describedby="{{ success_id }}"
+            {% endif %}>
+
+          <button class="footer-newsletter__button" type="submit">
+            {{ section.settings.button_label | escape }}
+          </button>
+        </div>
+
+        {% if form.errors %}
+          <div
+            id="{{ error_id }}"
+            class="footer-newsletter__message"
+            role="alert">
+            {{ form.errors | default_errors }}
+          </div>
+        {% endif %}
+
+        {% if form.posted_successfully? %}
+          <p
+            id="{{ success_id }}"
+            class="footer-newsletter__message"
+            role="status">
+            {{ section.settings.success_message | escape }}
+          </p>
+        {% endif %}
+      {% endform %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Footer newsletter",
+    "tag": "section",
+    "class": "section-footer-newsletter",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Join our wholesale newsletter"
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text",
+        "default": "<p>Receive collection launches, restock notices, and retailer updates.</p>"
+      },
+      {
+        "type": "text",
+        "id": "email_placeholder",
+        "label": "Email placeholder",
+        "default": "Email address"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button label",
+        "default": "Subscribe"
+      }, {
+        "type": "text",
+        "id": "success_message",
+        "label": "Success message",
+        "default": "Thank you for subscribing."
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#e9e2dc"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_background_color",
+        "label": "Button background",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Button text",
+        "default": "#ffffff"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Footer newsletter"
+      }
+    ],
+    "enabled_on": {
+      "groups": ["footer"]
+    }
+  }
+{% endschema %}
