@@ -1,0 +1,186 @@
+{{ 'section-header.css' | asset_url | stylesheet_tag }}
+
+{% assign is_approved_customer = false %}
+
+{% if customer and customer.tags contains settings.approved_customer_tag %}
+  {% assign is_approved_customer = true %}
+{% endif %}
+
+<header class="
+    site-header
+    {% if section.settings.sticky_header %}
+      site-header--sticky
+    {% endif %}
+  " style="
+    --header-background: {{ section.settings.background_color }};
+    --header-text: {{ section.settings.text_color }};
+    --header-border: {{ section.settings.border_color }};
+    --logo-width: {{ section.settings.logo_width }}px;
+  ">
+  <div class="page-width site-header__inner">
+    {% if section.settings.menu != blank %}
+      <details class="site-header__mobile-navigation">
+        <summary class="site-header__mobile-summary">
+          Menu
+        </summary>
+
+        <nav class="site-header__mobile-panel" aria-label="Mobile navigation">
+          <ul class="site-header__mobile-list">
+            {% for link in section.settings.menu.links %}
+              <li>
+                <a class="
+                    site-header__navigation-link
+                    {% if link.active %}
+                      site-header__navigation-link--active
+                    {% endif %}
+                  " href="{{ link.url }}">
+                  {{ link.title | escape }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </details>
+    {% endif %}
+
+    <a
+      class="site-header__brand"
+      href="{{ routes.root_url }}"
+      aria-label="{{ shop.name | escape }}">
+      {% if section.settings.logo != blank %}
+        {% assign logo_alt = section.settings.logo.alt | default: shop.name %}
+
+        {{
+          section.settings.logo | image_url: width: 600 | image_tag: class: 'site-header__logo', widths: '120, 180, 240, 360, 480, 600', width: section.settings.logo_width, alt: logo_alt, loading: 'eager'
+        }}
+      {% else %}
+        <span class="site-header__store-name">
+          {{ shop.name | escape }}
+        </span>
+      {% endif %}
+    </a>
+
+    {% if section.settings.menu != blank %}
+      <nav class="site-header__desktop-navigation" aria-label="Primary navigation">
+        <ul class="site-header__navigation-list">
+          {% for link in section.settings.menu.links %}
+            <li>
+              <a class="
+                  site-header__navigation-link
+                  {% if link.active %}
+                    site-header__navigation-link--active
+                  {% endif %}
+                " href="{{ link.url }}">
+                {{ link.title | escape }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+
+    <div class="site-header__actions">
+      {% if section.settings.show_account_link %}
+        {% if customer %}
+          <a class="site-header__action-link" href="{{ routes.account_url }}">
+            <span class="site-header__account-text">
+              Account
+            </span>
+          </a>
+
+          {% if is_approved_customer %}
+            <span class="site-header__approval-badge">
+              Wholesale
+            </span>
+          {% endif %}
+        {% else %}
+          <a class="site-header__action-link" href="{{ routes.account_login_url }}">
+            <span class="site-header__account-text">
+              Sign in
+            </span>
+          </a>
+        {% endif %}
+      {% endif %}
+
+      {% if section.settings.show_cart_link %}
+        <a class="site-header__action-link site-header__cart-label" href="{{ routes.cart_url }}">
+          Cart{% if cart.item_count > 0 %}
+            ({{ cart.item_count }}){% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% schema %}
+  {
+    "name": "Header",
+    "tag": "section",
+    "class": "section-header",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 80,
+        "max": 300,
+        "step": 10,
+        "unit": "px",
+        "label": "Logo width",
+        "default": 140
+      },
+      {
+        "type": "link_list",
+        "id": "menu",
+        "label": "Menu",
+        "default": "main-menu"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_account_link",
+        "label": "Show account link",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "show_cart_link",
+        "label": "Show cart link",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "sticky_header",
+        "label": "Enable sticky header",
+        "default": false
+      }, {
+        "type": "header",
+        "content": "Colors"
+      }, {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#ffffff"
+      }, {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#231f1c"
+      }, {
+        "type": "color",
+        "id": "border_color",
+        "label": "Border",
+        "default": "#ded8d3"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Header"
+      }
+    ],
+    "enabled_on": {
+      "groups": ["header"]
+    }
+  }
+{% endschema %}
