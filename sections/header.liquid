@@ -1,5 +1,9 @@
 {{ 'section-header.css' | asset_url | stylesheet_tag }}
 
+{{ 'component-predictive-search.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
+
 {% liquid
   assign approved_customer_tag = settings.approved_customer_tag | strip
   assign is_approved_customer = false
@@ -67,24 +71,70 @@
       , view_all_label: section.settings.view_all_label
     %}
 
-    <div class="site-header__actions">
-      {% if section.settings.show_account_link %}
-        {% if customer %}
-          <a class="site-header__action-link" href="{{ routes.account_url }}">
-            {{ section.settings.account_label | escape }}
-          </a>
+   {% if section.settings.show_search %}
+  <div class="site-header__search">
+    <predictive-search
+      class="header-search"
+      data-predictive-search-url="{{ routes.predictive_search_url }}"
+      data-predictive-search-enabled="{{ section.settings.enable_predictive_search }}"
+    >
+      <form
+        class="header-search__form"
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search"
+      >
+        <label
+          class="visually-hidden"
+          for="HeaderSearch-{{ section.id }}"
+        >
+          Search the store
+        </label>
 
-          {% if is_approved_customer %}
-            <span class="site-header__approval-badge">
-              {{ section.settings.wholesale_badge_label | escape }}
-            </span>
-          {% endif %}
-        {% else %}
-          <a class="site-header__action-link" href="{{ routes.account_login_url }}">
-            {{ section.settings.sign_in_label | escape }}
-          </a>
-        {% endif %}
-      {% endif %}
+        <input
+          id="HeaderSearch-{{ section.id }}"
+          class="header-search__input"
+          type="search"
+          name="q"
+          placeholder="{{ section.settings.search_placeholder | escape }}"
+          autocomplete="off"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="HeaderPredictiveSearchResults-{{ section.id }}"
+          aria-haspopup="listbox"
+          aria-autocomplete="list"
+        >
+
+        <input
+          type="hidden"
+          name="options[prefix]"
+          value="last"
+        >
+
+        <input
+          type="hidden"
+          name="type"
+          value="product,article,page"
+        >
+
+        <button
+          class="header-search__button"
+          type="submit"
+        >
+          Search
+        </button>
+
+        <div
+          id="HeaderPredictiveSearchResults-{{ section.id }}"
+          class="header-search__results"
+          data-predictive-search-results
+          tabindex="-1"
+          hidden
+        ></div>
+      </form>
+    </predictive-search>
+  </div>
+{% endif %}
 
       {% if section.settings.show_cart_link %}
         <a
@@ -110,6 +160,28 @@
     "class": "section-header",
     "settings": [
       {
+  "type": "header",
+  "content": "Search"
+},
+{
+  "type": "checkbox",
+  "id": "show_search",
+  "label": "Show search",
+  "default": true
+},
+{
+  "type": "checkbox",
+  "id": "enable_predictive_search",
+  "label": "Enable predictive search",
+  "default": true
+},
+{
+  "type": "text",
+  "id": "search_placeholder",
+  "label": "Search placeholder",
+  "default": "Search"
+},
+      {
         "type": "header",
         "content": "Logo"
       },
@@ -128,6 +200,7 @@
         "label": "Logo width",
         "default": 140
       },
+      
       {
         "type": "header",
         "content": "Navigation"
