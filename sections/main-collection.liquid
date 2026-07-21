@@ -1,5 +1,6 @@
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'component-product-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-collection-filters.css' | asset_url | stylesheet_tag }}
 {{ 'section-main-collection.css' | asset_url | stylesheet_tag }}
 
 {% liquid
@@ -22,8 +23,7 @@
     endif
   endif
 
-  assign selected_sort_by = collection.sort_by
-  | default: collection.default_sort_by
+  assign selected_sort_by = collection.sort_by | default: collection.default_sort_by
 
   unless is_approved_customer
     if selected_sort_by == 'price-ascending'
@@ -47,6 +47,7 @@
 <section class="main-collection" style="
     --collection-background: {{ section.settings.background_color }};
     --collection-text: {{ section.settings.text_color }};
+     --collection-border: {{ section.settings.card_border_color }};
 
     --collection-image-width: {{ section.settings.image_width }}%;
     --collection-image-fit: {{ section.settings.image_fit }};
@@ -134,7 +135,7 @@
             </h2>
 
             <p class="main-collection__restricted-text">
-              Price-based filtering and sorting are available only to  
+              Price-based filtering and sorting are available only to       
           approved wholesale customers.
             </p>
 
@@ -150,7 +151,7 @@
 
             {% if request.design_mode %}
               <p class="main-collection__restricted-editor-note">
-                Choose Manual, Best selling, Alphabetical, or Date as the  
+                Choose Manual, Best selling, Alphabetical, or Date as the       
             collection’s default sort order. A price-based default will
             block this collection for unapproved visitors.
               </p>

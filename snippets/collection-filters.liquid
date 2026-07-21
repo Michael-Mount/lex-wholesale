@@ -8,8 +8,7 @@
 {% endcomment %}
 
 {% liquid
-  assign selected_sort_by = collection.sort_by
-  | default: collection.default_sort_by
+  assign selected_sort_by = collection.sort_by | default: collection.default_sort_by
 
   unless is_approved_customer
     if selected_sort_by == 'price-ascending'
@@ -41,8 +40,7 @@
     endunless
 
     if can_render_filter
-      assign active_filter_count = active_filter_count
-      | plus: filter.active_values.size
+      assign active_filter_count = active_filter_count | plus: filter.active_values.size
 
       if filter.type == 'price_range'
         if filter.min_value.value != blank
@@ -56,9 +54,7 @@
 
   assign form_id = 'CollectionFilters-' | append: section_id
 
-  assign clear_filters_url = collection.url
-  | append: '?sort_by='
-  | append: selected_sort_by
+  assign clear_filters_url = collection.url | append: '?sort_by=' | append: selected_sort_by
 %}
 
 {% if should_render_controls %}
