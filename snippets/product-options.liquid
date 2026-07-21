@@ -14,7 +14,9 @@
     {% for option in product.options_with_values %}
       <fieldset class="product-options__group">
         <legend class="product-options__legend">
-          <span>{{ option.name | escape }}</span>
+          <span>
+            {{ option.name | escape }}
+          </span>
 
           <span class="product-options__selected-value">
             {{ option.selected_value | escape }}
@@ -36,7 +38,10 @@
               data-product-url="{{ option_value.product_url }}"
               {% if option_value.selected %}
               checked
-              {% endif %}>
+              {% endif %}
+              {% unless option_value.available %}
+              disabled
+              {% endunless %}>
 
             <label class="
                 product-options__label
@@ -49,7 +54,9 @@
                   product-options__label--unavailable
                 {% endunless %}
               " for="{{ input_id }}">
-              <span>{{ option_value | escape }}</span>
+              <span>
+                {{ option_value | escape }}
+              </span>
 
               {% unless option_value.available %}
                 <span class="visually-hidden">

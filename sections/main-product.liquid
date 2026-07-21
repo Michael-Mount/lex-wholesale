@@ -5,16 +5,16 @@
 
 {% liquid
   assign is_approved_customer = false
+  assign approved_customer_tag = settings.approved_customer_tag | strip
+
   assign selected_variant = product.selected_or_first_available_variant
   assign product_form_id = 'ProductForm-' | append: section.id
   assign quantity_input_id = 'ProductQuantity-' | append: section.id
   assign title_id = 'ProductTitle-' | append: section.id
 
-  if customer
-    if settings.approved_customer_tag != blank
-      if customer.tags contains settings.approved_customer_tag
-        assign is_approved_customer = true
-      endif
+  if customer and approved_customer_tag != blank
+    if customer.tags contains approved_customer_tag
+      assign is_approved_customer = true
     endif
   endif
 %}
@@ -42,6 +42,7 @@
       <div class="main-product__media">
         {% render 'product-media'
           , product: product
+          , section_id: section.id
           , media_layout: section.settings.media_layout
           , image_fit: section.settings.media_fit
           , image_ratio: section.settings.media_ratio
@@ -50,8 +51,7 @@
 
       <div class="main-product__information">
         <div class="main-product__information-inner">
-          {% if section.settings.show_vendor and product.vendor != blank
-          %}
+          {% if section.settings.show_vendor and product.vendor != blank %}
             <p class="main-product__vendor">
               {{ product.vendor | escape }}
             </p>
@@ -74,8 +74,7 @@
                 SKU:
               </span>
 
-              {% if selected_variant != blank and selected_variant.sku != blank
-              %}
+              {% if selected_variant != blank and selected_variant.sku != blank %}
                 {{ selected_variant.sku | escape }}
               {% else %}
                 Not available
@@ -135,8 +134,6 @@
               <button
                 class="main-product__submit"
                 type="submit"
-
-
                 {% if selected_variant == blank or selected_variant.available == false %}
                 disabled
                 {% endif %}>
@@ -167,7 +164,7 @@
                   {{ settings.locked_price_message | escape }}
                 </p>
 
-                <a class="main-product__gate-link" href="{{ routes.account_login_url }}">
+                <a class="main-product__gate-link" href="{{ routes.storefront_login_url }}">
                   Sign in
                 </a>
               {% endif %}
@@ -180,8 +177,7 @@
             </div>
           {% endif %}
 
-          {% if section.settings.show_description and product.description != blank
-          %}
+          {% if section.settings.show_description and product.description != blank %}
             <div class="main-product__description">
               <h2 class="main-product__description-heading">
                 {{ section.settings.description_heading | escape }}
@@ -268,6 +264,9 @@
         "label": "Media layout",
         "options": [
           {
+            "value": "slider",
+            "label": "Gallery with thumbnails"
+          }, {
             "value": "grid",
             "label": "Two-column grid"
           }, {
@@ -275,7 +274,7 @@
             "label": "Single column"
           }
         ],
-        "default": "grid"
+        "default": "slider"
       }, {
         "type": "select",
         "id": "media_ratio",
@@ -292,7 +291,7 @@
             "label": "Portrait"
           }
         ],
-        "default": "natural"
+        "default": "portrait"
       }, {
         "type": "select",
         "id": "media_fit",
@@ -306,7 +305,7 @@
             "label": "Fit entire image"
           }
         ],
-        "default": "cover"
+        "default": "contain"
       }, {
         "type": "header",
         "content": "Colors"

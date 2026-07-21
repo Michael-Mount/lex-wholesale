@@ -12,9 +12,9 @@
         "show_dynamic_checkout": false,
 
         "media_position": "left",
-        "media_layout": "grid",
-        "media_ratio": "natural",
-        "media_fit": "cover",
+        "media_layout": "slider",
+        "media_ratio": "portrait",
+        "media_fit": "contain",
 
         "background_color": "#ffffff",
         "text_color": "#231f1c",

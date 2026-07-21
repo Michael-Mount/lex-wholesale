@@ -1,70 +1,93 @@
 {% comment %}
-  Renders all product media.
+  Renders product media.
 
   Required:
   - product
+  - section_id
 
   Optional:
-  - media_layout: stacked or grid
+  - media_layout: slider, grid, or stacked
+  - image_ratio: natural, square, or portrait
   - image_fit: cover or contain
-  - image_ratio: natural, square, portrait
 {% endcomment %}
 
-<div class="
+{% liquid
+  assign resolved_layout = media_layout | default: 'slider'
+  assign resolved_ratio = image_ratio | default: 'portrait'
+  assign resolved_fit = image_fit | default: 'contain'
+%}
+
+<div
+  class="
     product-media
-    product-media--{{ media_layout | default: 'grid' }}
-  " style="
-    --product-media-fit: {{ image_fit | default: 'cover' }};
+    product-media--{{ resolved_layout }}
+  "
+  data-product-media
+  style="
+    --product-media-fit: {{ resolved_fit }};
   ">
   {% if product.media.size > 0 %}
-    <div class="product-media__list">
-      {% for media in product.media %}
-        <div
-          id="ProductMedia-{{ section.id }}-{{ media.id }}"
-          class="
-            product-media__item
-            product-media__item--{{ media.media_type }}
-            product-media__item--{{ image_ratio | default: 'natural' }}
-          "
-          data-media-id="{{ media.id }}">
-          {% case media.media_type %}
-            {% when 'image' %}
-              {% assign media_alt = media.alt | default: product.title %}
+    <div class="product-media__viewport">
+      <div class="product-media__list">
+        {% for media in product.media %}
+          {% liquid
+            assign media_alt = media.alt | default: product.title
+            assign image_loading = 'lazy'
 
-              {{
-                media.preview_image | image_url: width: 1800 | image_tag: class: 'product-media__image', widths: '400, 600, 800, 1000, 1200, 1500, 1800', sizes: '(min-width: 990px) 55vw, 100vw', loading: 'lazy', alt: media_alt
-              }}
+            if forloop.first
+              assign image_loading = 'eager'
+            endif
+          %}
 
-            {% when 'video' %}
-              {{
-                media | video_tag: class: 'product-media__video', controls: true, preload: 'metadata', image_size: '1200x'
-              }}
+          <div
+            id="ProductMedia-{{ section_id }}-{{ media.id }}"
+            class="
+              product-media__item
+              product-media__item--{{ media.media_type }}
+              product-media__item--{{ resolved_ratio }}
+            "
+            data-media-id="{{ media.id }}"
+            tabindex="-1">
+            {% case media.media_type %}
+              {% when 'image' %}
+                {{
+                  media.preview_image | image_url: width: 1800 | image_tag: class: 'product-media__image', widths: '400, 600, 800, 1000, 1200, 1500, 1800', sizes: '(min-width: 990px) 55vw, 100vw', loading: image_loading, alt: media_alt
+                }}
 
-            {% when 'external_video' %}
-              {{
-                media | external_video_tag: class: 'product-media__external-video'
-              }}
+              {% when 'video' %}
+                {{
+                  media | video_tag: class: 'product-media__video', controls: true, preload: 'metadata', image_size: '1200x'
+                }}
 
-            {% when 'model' %}
-              {{
-                media | model_viewer_tag: class: 'product-media__model', reveal: 'interaction', toggleable: true
-              }}
-          {% endcase %}
-        </div>
-      {% endfor %}
+              {% when 'external_video' %}
+                {{
+                  media | external_video_tag: class: 'product-media__external-video'
+                }}
+
+              {% when 'model' %}
+                {{
+                  media | model_viewer_tag: class: 'product-media__model', reveal: 'interaction', toggleable: true
+                }}
+            {% endcase %}
+          </div>
+        {% endfor %}
+      </div>
     </div>
 
     {% if product.media.size > 1 %}
       <nav class="product-media__thumbnails" aria-label="Product media">
         <ul class="product-media__thumbnail-list">
           {% for media in product.media %}
-            <li>
+            <li class="product-media__thumbnail-item">
               <a
                 class="product-media__thumbnail"
-                href="#ProductMedia-{{ section.id }}-{{ media.id }}"
-                aria-label="View media {{ forloop.index }} of {{ product.media.size }}">
+                href="#ProductMedia-{{ section_id }}-{{ media.id }}"
+                aria-label="
+                  View media {{ forloop.index }}
+                  of {{ product.media.size }}
+                ">
                 {{
-                  media.preview_image | image_url: width: 160 | image_tag: class: 'product-media__thumbnail-image', widths: '80, 120, 160', sizes: '80px', loading: 'lazy', alt: ''
+                  media.preview_image | image_url: width: 200 | image_tag: class: 'product-media__thumbnail-image', widths: '80, 120, 160, 200', sizes: '80px', loading: 'lazy', alt: ''
                 }}
 
                 {% unless media.media_type == 'image' %}
