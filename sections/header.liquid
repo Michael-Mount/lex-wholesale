@@ -88,26 +88,15 @@
 
       {% if section.settings.show_cart_link %}
         <a
-          class="site-header__action-link site-header__cart-link"
+          class="site-header__action-link site-header__cart-label"
           href="{{ routes.cart_url }}"
-          aria-label="
-            {{ section.settings.cart_label | escape }},
-            {{ cart.item_count }}
-            {% if cart.item_count == 1 %}
-              item
-            {% else %}
-              items
-            {% endif %}
-          ">
-          <span>
-            {{ section.settings.cart_label | escape }}
-          </span>
+          data-cart-drawer-open
+          aria-label="Open cart, {{ cart.item_count }} items">
+          <span>Cart</span>
 
-          {% if cart.item_count > 0 %}
-            <span class="site-header__cart-count" aria-live="polite">
-              ({{ cart.item_count }})
-            </span>
-          {% endif %}
+          <span class="site-header__cart-count" aria-hidden="true">
+            (<span data-cart-count>{{ cart.item_count }}</span>)
+          </span>
         </a>
       {% endif %}
     </div>
