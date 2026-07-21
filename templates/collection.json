@@ -9,10 +9,18 @@
         "image_width": 40,
         "collection_image_ratio": "landscape",
         "image_fit": "cover",
+
+        "enable_filtering": true,
+        "enable_sorting": true,
+        "filter_layout": "horizontal",
+        "show_filter_counts": true,
+        "show_filter_group_name": false,
+
         "products_per_page": 16,
         "desktop_columns": "4",
         "mobile_columns": "2",
         "grid_gap": 24,
+
         "product_image_ratio": "portrait",
         "product_image_fit": "cover",
         "text_alignment": "left",
@@ -20,10 +28,12 @@
         "show_sold_out_badge": true,
         "show_price_range": true,
         "show_compare_at_price": true,
+
         "background_color": "#ffffff",
         "text_color": "#231f1c",
         "card_background_color": "#ffffff",
         "card_border_color": "#ded8d3",
+
         "padding_top": 64,
         "padding_bottom": 64
       }
