@@ -1,0 +1,36 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-cart",
+      "settings": {
+        "heading": "Your cart",
+        "empty_heading": "Your cart is empty",
+        "empty_text": "Browse our collections to begin building your wholesale order.",
+        "continue_shopping_url": "",
+        "continue_shopping_label": "Continue shopping",
+
+        "show_vendor": false,
+        "show_sku": true,
+        "show_line_properties": true,
+        "image_width": 140,
+        "update_cart_label": "Update cart",
+
+        "show_order_note": true,
+        "order_note_label": "Order notes",
+        "order_note_placeholder": "Add delivery instructions or other information for this order.",
+        "save_note_label": "Save note",
+        "checkout_label": "Proceed to checkout",
+
+        "background_color": "#ffffff",
+        "text_color": "#231f1c",
+        "border_color": "#ded8d3",
+        "button_background_color": "#231f1c",
+        "button_text_color": "#ffffff",
+
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}
