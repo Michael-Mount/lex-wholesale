@@ -24,26 +24,40 @@
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
 
-    <style > :root
-    {
-      --color-background: {{ settings.background_color }};
-      --color-text: {{ settings.text_color }};
-      --page-width: {{ settings.page_width }}px;
-    }
-  </style>
-</head>
+    <style>
+      {{ settings.body_font | font_face: font_display: 'swap' }}{{ settings.heading_font | font_face: font_display: 'swap' }}:root {
+        --color-background: {{ settings.background_color }};
+        --color-text: {{ settings.text_color }};
+        --page-width: {{ settings.page_width }}px;
 
-<body>
-  <a class="skip-link" href="#MainContent">
-    Skip to content
-  </a>
+        --font-body-family: {{ settings.body_font.family }}, 
+        {{ settings.body_font.fallback_families }};
 
-  {% sections 'header-group' %}
+        --font-body-style: {{ settings.body_font.style }};
+        --font-body-weight: {{ settings.body_font.weight }};
+        --font-body-size: {{ settings.body_font_size }}px;
 
-  <main
-    id="MainContent"
-    role="main"
-    tabindex="-1">
-    {{ content_for_layout }}
-  </main>
-</body></html>
+        --font-heading-family: {{ settings.heading_font.family }}, 
+        {{ settings.heading_font.fallback_families }};
+
+        --font-heading-style: {{ settings.heading_font.style }};
+        --font-heading-weight: {{ settings.heading_font.weight }};
+      }
+    </style>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#MainContent">
+      Skip to content
+    </a>
+
+    {% sections 'header-group' %}
+
+    <main
+      id="MainContent"
+      role="main"
+      tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+  </body>
+</html>

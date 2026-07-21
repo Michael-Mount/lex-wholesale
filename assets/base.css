@@ -10,19 +10,46 @@ html {
 
 body {
   margin: 0;
+
   background: var(--color-background);
   color: var(--color-text);
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+
+  font-family: var(--font-body-family);
+  font-size: var(--font-body-size);
+  font-style: var(--font-body-style);
+  font-weight: var(--font-body-weight);
   line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+  line-height: 1.15;
 }
 
 a {
   color: inherit;
+}
+
+.visually-hidden {
+  position: absolute !important;
+
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+
+  border: 0;
 }
 
 .page-width {
