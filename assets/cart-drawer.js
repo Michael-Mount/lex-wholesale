@@ -1,145 +1,85 @@
-(() => {
-  let returnFocusElement = null;
+document.addEventListener("DOMContentLoaded", () => {
+  const drawer = document.querySelector("[data-cart-drawer]");
 
-  function getDrawer() {
-    return document.querySelector("[data-cart-drawer]");
+  if (!(drawer instanceof HTMLDialogElement)) {
+    console.warn("Cart drawer dialog was not found.");
+    return;
   }
 
-  function updateCartTriggers(drawer = getDrawer()) {
-    const parsedCount = Number.parseInt(drawer?.dataset.cartCount ?? "0", 10);
+  function openDrawer(trigger) {
+    try {
+      if (!drawer.open) {
+        drawer.showModal();
+      }
 
-    const itemCount = Number.isNaN(parsedCount) ? 0 : parsedCount;
+      document.documentElement.classList.add("cart-drawer-open");
 
-    document.querySelectorAll("[data-cart-count]").forEach((element) => {
-      element.textContent = String(itemCount);
-    });
+      const closeButton = drawer.querySelector("[data-cart-drawer-close]");
 
-    document.querySelectorAll("[data-cart-drawer-open]").forEach((trigger) => {
-      trigger.setAttribute(
-        "aria-label",
-        `Open cart, ${itemCount} ${itemCount === 1 ? "item" : "items"}`,
-      );
-    });
-  }
+      if (closeButton instanceof HTMLElement) {
+        closeButton.focus();
+      }
 
-  function openDrawer(drawer = getDrawer(), focusReturnTarget = null) {
-    if (!drawer || typeof drawer.showModal !== "function") {
+      return true;
+    } catch (error) {
+      console.error("The cart drawer could not be opened.", error);
+
+      // Allow the visitor to use the normal cart page instead.
+      if (trigger instanceof HTMLAnchorElement) {
+        window.location.href = trigger.href;
+      }
+
       return false;
     }
-
-    if (focusReturnTarget instanceof HTMLElement) {
-      returnFocusElement = focusReturnTarget;
-    } else if (document.activeElement instanceof HTMLElement) {
-      returnFocusElement = document.activeElement;
-    }
-
-    if (!drawer.open) {
-      drawer.showModal();
-    }
-
-    document.documentElement.classList.add("cart-drawer-open");
-
-    return true;
   }
 
-  function closeDrawer(drawer = getDrawer()) {
-    if (!drawer?.open) {
-      return;
+  function closeDrawer() {
+    if (drawer.open) {
+      drawer.close();
     }
 
-    drawer.close();
+    document.documentElement.classList.remove("cart-drawer-open");
   }
-
-  function replaceDrawerSection({ sectionId, html, open = false }) {
-    if (!sectionId || !html) {
-      return;
-    }
-
-    const wrapperId = `shopify-section-${sectionId}`;
-    const currentWrapper = document.getElementById(wrapperId);
-
-    const parsedDocument = new DOMParser().parseFromString(html, "text/html");
-
-    const updatedWrapper = parsedDocument.getElementById(wrapperId);
-
-    if (!currentWrapper || !updatedWrapper) {
-      console.error("The updated cart drawer section was not found.");
-      return;
-    }
-
-    const previousDrawer = currentWrapper.querySelector("[data-cart-drawer]");
-
-    const wasOpen = Boolean(previousDrawer?.open);
-
-    const previousFocus =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-
-    currentWrapper.replaceWith(updatedWrapper);
-
-    const updatedDrawer = getDrawer();
-
-    updateCartTriggers(updatedDrawer);
-
-    if (open || wasOpen) {
-      openDrawer(updatedDrawer, previousFocus);
-    }
-  }
-
-  document.addEventListener("cart:updated", (event) => {
-    replaceDrawerSection(event.detail);
-  });
 
   document.addEventListener("click", (event) => {
-    const openTrigger = event.target.closest("[data-cart-drawer-open]");
+    const target = event.target;
 
-    if (openTrigger) {
-      const didOpen = openDrawer(getDrawer(), openTrigger);
+    if (!(target instanceof Element)) {
+      return;
+    }
 
-      if (didOpen) {
+    const openButton = target.closest("[data-cart-drawer-open]");
+
+    if (openButton) {
+      const opened = openDrawer(openButton);
+
+      // Only cancel the /cart navigation when the drawer opened.
+      if (opened) {
         event.preventDefault();
       }
 
       return;
     }
 
-    const closeTrigger = event.target.closest("[data-cart-drawer-close]");
+    const closeButton = target.closest("[data-cart-drawer-close]");
 
-    if (closeTrigger) {
+    if (closeButton) {
+      event.preventDefault();
       closeDrawer();
       return;
     }
 
-    const drawer = getDrawer();
-
-    if (drawer && event.target === drawer) {
-      closeDrawer(drawer);
+    // Clicking the dialog backdrop closes it.
+    if (target === drawer) {
+      closeDrawer();
     }
   });
 
-  document.addEventListener(
-    "close",
-    (event) => {
-      if (!event.target.matches("[data-cart-drawer]")) {
-        return;
-      }
-
-      document.documentElement.classList.remove("cart-drawer-open");
-
-      if (
-        returnFocusElement instanceof HTMLElement &&
-        returnFocusElement.isConnected
-      ) {
-        returnFocusElement.focus();
-      }
-
-      returnFocusElement = null;
-    },
-    true,
-  );
-
-  document.addEventListener("DOMContentLoaded", () => {
-    updateCartTriggers();
+  drawer.addEventListener("cancel", () => {
+    document.documentElement.classList.remove("cart-drawer-open");
   });
-})();
+
+  drawer.addEventListener("close", () => {
+    document.documentElement.classList.remove("cart-drawer-open");
+  });
+});

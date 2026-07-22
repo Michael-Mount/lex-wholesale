@@ -1,3 +1,8 @@
+{{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
+{{ 'component-bundle-cart-groups.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
+
 {% liquid
   assign is_approved_customer = false
   assign title_id = 'CartDrawerTitle-' | append: section.id

@@ -5,8 +5,11 @@ html.cart-drawer-open {
 .cart-drawer {
   position: fixed;
   inset: 0 0 0 auto;
+  z-index: 1000;
 
-  width: min(var(--cart-drawer-width), 100%);
+  display: none;
+
+  width: min(var(--cart-drawer-width, 440px), 100%);
   max-width: 100%;
   height: 100dvh;
   max-height: none;
@@ -18,7 +21,11 @@ html.cart-drawer-open {
   border: 0;
 
   background: transparent;
-  color: var(--cart-drawer-text);
+  color: var(--cart-drawer-text, #231f1c);
+}
+
+.cart-drawer[open] {
+  display: block;
 }
 
 .cart-drawer::backdrop {
@@ -32,12 +39,11 @@ html.cart-drawer-open {
   width: 100%;
   height: 100%;
 
-  background: var(--cart-drawer-background);
+  background: var(--cart-drawer-background, #ffffff);
   box-shadow: -1rem 0 2.5rem rgb(0 0 0 / 15%);
 
   animation: cart-drawer-enter 220ms ease;
 }
-
 @keyframes cart-drawer-enter {
   from {
     transform: translateX(100%);
