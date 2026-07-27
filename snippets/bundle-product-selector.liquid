@@ -1,77 +1,75 @@
 {% comment %}
-  Renders one required product inside a collection bundle.
+  Displays one product inside the collection-wide Add All interface.
 
-  Required parameters:
+  Required:
   - product
   - section_id
   - position
   - is_approved_customer
 
-  Optional parameters:
+  Optional:
   - show_vendor
   - show_individual_price
   - image_ratio
   - image_fit
   - variant_label
+  - locked_message
 {% endcomment %}
 
 {% liquid
   assign selected_variant = product.selected_or_first_available_variant
-  assign card_image = product.featured_image
-  assign selector_id = 'BundleVariant-' | append: section_id | append: '-' | append: product.id
+  assign selector_id = 'CollectionVariant-' | append: section_id | append: '-' | append: product.id
+  assign image_ratio_value = image_ratio | default: 'portrait'
+  assign image_fit_value = image_fit | default: 'cover'
+  assign locked_text = locked_message | default: 'Sign in with an approved wholesale account to view pricing.'
+  assign selected_variant_is_on_sale = false
+
+  if selected_variant.compare_at_price > selected_variant.price
+    assign selected_variant_is_on_sale = true
+  endif
 %}
 
 <article
-  class="
-    bundle-product
-    {% unless product.available %}
-      bundle-product--unavailable
-    {% endunless %}
-  "
-  data-bundle-product
+  class="collection-product{% unless product.available %} collection-product--unavailable{% endunless %}"
+  data-collection-product
   data-product-position="{{ position }}">
-  <div class="
-      bundle-product__media
-      bundle-product__media--{{ image_ratio | default: 'portrait' }}
-    " style="
-      --bundle-product-image-fit: {{ image_fit | default: 'cover' }};
-    ">
+  <div class="collection-product__media collection-product__media--{{ image_ratio_value }}" style="--collection-product-image-fit: {{ image_fit_value }};">
     <a
-      class="bundle-product__image-link"
+      class="collection-product__image-link"
       href="{{ product.url }}"
       tabindex="-1"
       aria-hidden="true">
-      {% if card_image != blank %}
+      {% if product.featured_image != blank %}
         {{
-          card_image | image_url: width: 1000 | image_tag: class: 'bundle-product__image', widths: '240, 360, 480, 600, 800, 1000', sizes: '(min-width: 990px) 25vw, 50vw', loading: 'lazy', alt: ''
+          product.featured_image | image_url: width: 1000 | image_tag: class: 'collection-product__image', widths: '240, 360, 480, 600, 800, 1000', sizes: '(min-width: 990px) 33vw, 100vw', loading: 'lazy', alt: ''
         }}
       {% else %}
-        <span class="bundle-product__image-placeholder">
+        <span class="collection-product__placeholder">
           No image
         </span>
       {% endif %}
     </a>
 
-    <span class="bundle-product__position">
+    <span class="collection-product__position" aria-hidden="true">
       {{ position }}
     </span>
 
     {% unless product.available %}
-      <span class="bundle-product__sold-out">
+      <span class="collection-product__sold-out">
         Sold out
       </span>
     {% endunless %}
   </div>
 
-  <div class="bundle-product__content">
+  <div class="collection-product__content">
     {% if show_vendor and product.vendor != blank %}
-      <p class="bundle-product__vendor">
+      <p class="collection-product__vendor">
         {{ product.vendor | escape }}
       </p>
     {% endif %}
 
-    <h2 class="bundle-product__title">
-      <a class="bundle-product__title-link" href="{{ product.url }}">
+    <h2 class="collection-product__title">
+      <a class="collection-product__title-link" href="{{ product.url }}">
         {{ product.title | escape }}
       </a>
     </h2>
@@ -79,12 +77,20 @@
     {% if is_approved_customer %}
       {% if product.available and selected_variant != blank %}
         {% if show_individual_price %}
-          <div class="bundle-product__individual-price">
-            <span>Individual price:</span>
+          <div class="collection-product__price" data-collection-price-wrapper>
+            <s
+              class="collection-product__compare-price"
+              data-collection-compare-price
+              {% unless selected_variant_is_on_sale %}
+              hidden{% endunless %}>
+              {% if selected_variant.compare_at_price != blank %}
+                {{ selected_variant.compare_at_price | money }}
+              {% endif %}
+            </s>
 
-            <strong data-bundle-selected-price>
+            <span class="collection-product__current-price" data-collection-current-price>
               {{ selected_variant.price | money }}
-            </strong>
+            </span>
           </div>
         {% endif %}
 
@@ -92,24 +98,27 @@
           <input
             type="hidden"
             value="{{ selected_variant.id }}"
-            data-bundle-variant
+            data-collection-variant
             data-product-id="{{ product.id }}"
             data-product-title="{{ product.title | escape }}"
-            data-variant-price="{{ selected_variant.price }}">
+            data-price-text="{{ selected_variant.price | money | escape }}"
+            data-compare-at-text="{{ selected_variant.compare_at_price | money | escape }}"
+            data-price-cents="{{ selected_variant.price }}"
+            data-compare-at-cents="{{ selected_variant.compare_at_price | default: 0 }}">
 
-          <p class="bundle-product__default-option">
+          <p class="collection-product__included">
             Included
           </p>
         {% else %}
-          <div class="bundle-product__selector">
-            <label class="bundle-product__selector-label" for="{{ selector_id }}">
+          <div class="collection-product__selector">
+            <label class="collection-product__selector-label" for="{{ selector_id }}">
               {{ variant_label | default: 'Choose an option' | escape }}
             </label>
 
             <select
               id="{{ selector_id }}"
-              class="bundle-product__select"
-              data-bundle-variant
+              class="collection-product__select"
+              data-collection-variant
               data-product-id="{{ product.id }}"
               data-product-title="{{ product.title | escape }}"
               required>
@@ -117,15 +126,13 @@
                 {% if variant.available %}
                   <option
                     value="{{ variant.id }}"
-                    data-variant-price="{{ variant.price }}"
+                    data-price-text="{{ variant.price | money | escape }}"
+                    data-compare-at-text="{{ variant.compare_at_price | money | escape }}"
+                    data-price-cents="{{ variant.price }}"
+                    data-compare-at-cents="{{ variant.compare_at_price | default: 0 }}"
                     {% if variant.id == selected_variant.id %}
-                    selected
-                    {% endif %}>
+                    selected{% endif %}>
                     {{ variant.title | escape }}
-
-                    {% if show_individual_price %}
-                      — {{ variant.price | money }}
-                    {% endif %}
                   </option>
                 {% endif %}
               {% endfor %}
@@ -133,13 +140,13 @@
           </div>
         {% endif %}
       {% else %}
-        <p class="bundle-product__unavailable-message">
+        <p class="collection-product__unavailable-message">
           This product currently has no available options.
         </p>
       {% endif %}
     {% else %}
-      <p class="bundle-product__locked-message">
-        Available to approved wholesale customers.
+      <p class="collection-product__locked-message">
+        {{ locked_text | escape }}
       </p>
     {% endif %}
   </div>
