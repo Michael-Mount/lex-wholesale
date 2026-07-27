@@ -12,6 +12,12 @@ document.addEventListener("DOMContentLoaded", () => {
         drawer.showModal();
       }
 
+      window.requestAnimationFrame(() => {
+        const closeButton = drawer.querySelector("[data-cart-drawer-close]");
+
+        closeButton?.focus();
+      });
+
       document.documentElement.classList.add("cart-drawer-open");
 
       const closeButton = drawer.querySelector("[data-cart-drawer-close]");
