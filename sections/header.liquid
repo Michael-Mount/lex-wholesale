@@ -4,14 +4,6 @@
 
 <script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
 
-{% liquid
-  assign approved_customer_tag = settings.approved_customer_tag | strip
-  assign is_approved_customer = false
-
-  if customer and approved_customer_tag != blank and customer.tags contains approved_customer_tag
-    assign is_approved_customer = true
-  endif
-%}
 
 {% if section.settings.sticky_header %}
   <style>
