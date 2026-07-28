@@ -1,0 +1,440 @@
+{{ 'section-collection-promo.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign featured_collection = section.settings.collection
+  assign promo_image = section.settings.promo_image
+  assign promo_heading = section.settings.heading
+  assign promo_description = section.settings.description
+  assign bundle_url = blank
+
+  if featured_collection != blank
+    assign bundle_url = featured_collection.url | append: '?view=bundle'
+
+    if promo_image == blank and featured_collection.image != blank
+      assign promo_image = featured_collection.image
+    endif
+
+    if promo_heading == blank
+      assign promo_heading = featured_collection.title
+    endif
+
+    if promo_description == blank and section.settings.use_collection_description
+      assign promo_description = featured_collection.description
+    endif
+  endif
+%}
+
+<section
+  class="
+    collection-promo
+    collection-promo--image-{{ section.settings.image_position }}
+  "
+  style="
+    --collection-promo-background: {{ section.settings.background_color }};
+    --collection-promo-text: {{ section.settings.text_color }};
+    --collection-promo-muted: {{ section.settings.muted_text_color }};
+    --collection-promo-border: {{ section.settings.border_color }};
+    --collection-promo-accent: {{ section.settings.accent_color }};
+    --collection-promo-accent-text: {{ section.settings.accent_text_color }};
+    --collection-promo-image-position: {{ section.settings.image_focal_position }};
+    --collection-promo-min-height: {{ section.settings.minimum_height }}px;
+    --collection-promo-padding-top: {{ section.settings.padding_top }}px;
+    --collection-promo-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="page-width">
+    <div class="collection-promo__layout">
+      <div class="collection-promo__media">
+        {% if promo_image != blank %}
+          {% assign promo_alt = promo_image.alt | default: promo_heading | default: featured_collection.title %}
+
+          {{
+            promo_image
+            | image_url: width: 1800
+            | image_tag:
+              class: 'collection-promo__image',
+              widths: '480, 720, 960, 1200, 1500, 1800',
+              sizes: '(min-width: 990px) 50vw, 100vw',
+              loading: 'lazy',
+              alt: promo_alt
+          }}
+        {% else %}
+          <div class="collection-promo__placeholder">
+            {{ 'collection-1' | placeholder_svg_tag: 'collection-promo__placeholder-svg' }}
+          </div>
+        {% endif %}
+
+        {% if section.settings.image_badge != blank %}
+          <span class="collection-promo__image-badge">
+            {{ section.settings.image_badge | escape }}
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="collection-promo__content collection-promo__content--{{ section.settings.text_alignment }}">
+        {% if section.settings.eyebrow != blank %}
+          <p class="collection-promo__eyebrow">
+            {{ section.settings.eyebrow | escape }}
+          </p>
+        {% endif %}
+
+        {% if promo_heading != blank %}
+          <h2 class="collection-promo__heading">
+            {{ promo_heading | escape }}
+          </h2>
+        {% endif %}
+
+        {% if promo_description != blank %}
+          <div class="collection-promo__description rte">
+            {{ promo_description }}
+          </div>
+        {% endif %}
+
+        {% if featured_collection != blank and section.settings.show_product_count %}
+          <p class="collection-promo__product-count">
+            <strong>{{ featured_collection.products_count }}</strong>
+            {% if featured_collection.products_count == 1 %}
+              piece in the collection
+            {% else %}
+              pieces in the collection
+            {% endif %}
+          </p>
+        {% endif %}
+
+        {% if section.blocks.size > 0 %}
+          <ul class="collection-promo__features" role="list">
+            {% for block in section.blocks %}
+              <li class="collection-promo__feature" {{ block.shopify_attributes }}>
+                <span class="collection-promo__feature-icon" aria-hidden="true">
+                  {{ block.settings.icon | escape }}
+                </span>
+
+                <div>
+                  {% if block.settings.heading != blank %}
+                    <strong class="collection-promo__feature-heading">
+                      {{ block.settings.heading | escape }}
+                    </strong>
+                  {% endif %}
+
+                  {% if block.settings.text != blank %}
+                    <p class="collection-promo__feature-text">
+                      {{ block.settings.text | escape }}
+                    </p>
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <div class="collection-promo__actions">
+          {% if featured_collection != blank %}
+            <a class="collection-promo__button collection-promo__button--primary" href="{{ bundle_url }}">
+              {{ section.settings.button_label | escape }}
+            </a>
+
+            {% if section.settings.show_standard_collection_link %}
+              <a class="collection-promo__button collection-promo__button--secondary" href="{{ featured_collection.url }}">
+                {{ section.settings.standard_collection_label | escape }}
+              </a>
+            {% endif %}
+          {% elsif request.design_mode %}
+            <span class="collection-promo__button collection-promo__button--primary collection-promo__button--disabled">
+              Select a collection
+            </span>
+          {% endif %}
+        </div>
+
+        {% if section.settings.supporting_note != blank %}
+          <p class="collection-promo__note">
+            {{ section.settings.supporting_note | escape }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection promo",
+  "tag": "section",
+  "class": "section-collection-promo",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Promotional image",
+      "info": "Falls back to the selected collection image when left blank."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Image left"
+        },
+        {
+          "value": "right",
+          "label": "Image right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "image_focal_position",
+      "label": "Image focal position",
+      "options": [
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center top",
+          "label": "Top"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "range",
+      "id": "minimum_height",
+      "min": 420,
+      "max": 760,
+      "step": 20,
+      "unit": "px",
+      "label": "Desktop image height",
+      "default": 620
+    },
+    {
+      "type": "text",
+      "id": "image_badge",
+      "label": "Image badge",
+      "default": "Curated collection"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Shop the story"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Custom heading",
+      "info": "Leave blank to use the collection title."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Custom description"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_collection_description",
+      "label": "Use the collection description when custom description is blank",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Actions"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Bundle button label",
+      "default": "Shop the complete collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_standard_collection_link",
+      "label": "Show regular collection link",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "standard_collection_label",
+      "label": "Regular collection label",
+      "default": "Browse individual pieces"
+    },
+    {
+      "type": "text",
+      "id": "supporting_note",
+      "label": "Supporting note",
+      "default": "Choose the right size or color for every piece on the next page."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f2ece4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#241f1c"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Secondary text",
+      "default": "#6e645d"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#d6cbc0"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent and button",
+      "default": "#6b3f27"
+    },
+    {
+      "type": "color",
+      "id": "accent_text_color",
+      "label": "Accent text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Selling point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon or symbol",
+          "default": "✓"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Curated to merchandise together"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Supporting text",
+          "default": "A coordinated assortment ready for your sales floor."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection promo",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "✓",
+            "heading": "A complete merchandising story",
+            "text": "Each item is selected to complement the rest of the collection."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "✓",
+            "heading": "Choose every product option",
+            "text": "Select the right size or color before adding the set."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "✓",
+            "heading": "Collection pricing",
+            "text": "The configured offer is applied when the cart meets its requirements."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
