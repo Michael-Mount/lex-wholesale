@@ -1,0 +1,363 @@
+{{ 'section-testimonials.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="testimonials-section testimonials-section--{{ section.settings.card_style }}"
+  style="
+    --testimonials-background: {{ section.settings.background_color }};
+    --testimonials-text: {{ section.settings.text_color }};
+    --testimonials-muted-text: {{ section.settings.muted_text_color }};
+    --testimonials-border: {{ section.settings.border_color }};
+    --testimonials-card-background: {{ section.settings.card_background_color }};
+    --testimonials-accent: {{ section.settings.accent_color }};
+    --testimonials-columns-desktop: {{ section.settings.columns_desktop }};
+    --testimonials-gap: {{ section.settings.card_gap }}px;
+    --testimonials-padding-top: {{ section.settings.padding_top }}px;
+    --testimonials-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="page-width">
+    <header class="testimonials-section__header testimonials-section__header--{{ section.settings.text_alignment }}">
+      {% if section.settings.eyebrow != blank %}
+        <p class="testimonials-section__eyebrow">
+          {{ section.settings.eyebrow | escape }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.heading != blank %}
+        <h2 class="testimonials-section__heading">
+          {{ section.settings.heading | escape }}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.introduction != blank %}
+        <div class="testimonials-section__introduction rte">
+          {{ section.settings.introduction }}
+        </div>
+      {% endif %}
+    </header>
+
+    {% if section.blocks.size > 0 %}
+      <div class="testimonials-grid" role="list">
+        {% for block in section.blocks %}
+          <article class="testimonial-card" role="listitem" {{ block.shopify_attributes }}>
+            {% if section.settings.show_rating %}
+              {% assign testimonial_rating = block.settings.rating | default: 5 %}
+
+              <div
+                class="testimonial-card__rating"
+                role="img"
+                aria-label="{{ testimonial_rating }} out of 5 stars"
+              >
+                {% for star in (1..5) %}
+                  <span class="testimonial-card__star{% if star > testimonial_rating %} testimonial-card__star--empty{% endif %}" aria-hidden="true">
+                    ★
+                  </span>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <span class="testimonial-card__quote-mark" aria-hidden="true">
+              “
+            </span>
+
+            {% if block.settings.quote != blank %}
+              <blockquote class="testimonial-card__quote">
+                {{ block.settings.quote | escape }}
+              </blockquote>
+            {% endif %}
+
+            <footer class="testimonial-card__footer">
+              {% if section.settings.show_avatar and block.settings.avatar != blank %}
+                <div class="testimonial-card__avatar-wrapper">
+                  {{ block.settings.avatar | image_url: width: 160 | image_tag: class: 'testimonial-card__avatar', widths: '80, 120, 160', sizes: '56px', loading: 'lazy', alt: block.settings.name }}
+                </div>
+              {% endif %}
+
+              <div class="testimonial-card__identity">
+                {% if block.settings.name != blank %}
+                  <cite class="testimonial-card__name">
+                    {{ block.settings.name | escape }}
+                  </cite>
+                {% endif %}
+
+                {% if block.settings.role != blank or block.settings.company != blank %}
+                  <p class="testimonial-card__details">
+                    {% if block.settings.role != blank %}
+                      <span>{{ block.settings.role | escape }}</span>
+                    {% endif %}
+
+                    {% if block.settings.role != blank and block.settings.company != blank %}
+                      <span aria-hidden="true"> · </span>
+                    {% endif %}
+
+                    {% if block.settings.company != blank %}
+                      <span>{{ block.settings.company | escape }}</span>
+                    {% endif %}
+                  </p>
+                {% endif %}
+              </div>
+            </footer>
+          </article>
+        {% endfor %}
+      </div>
+    {% elsif request.design_mode %}
+      <div class="testimonials-section__empty">
+        Add testimonial blocks to populate this section.
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section-testimonials",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Retailer feedback"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Trusted by thoughtful retailers"
+    },
+    {
+      "type": "richtext",
+      "id": "introduction",
+      "label": "Introduction",
+      "default": "<p>See how retailers use our collections to merchandise faster and order with confidence.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Heading alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card style",
+      "options": [
+        {
+          "value": "outlined",
+          "label": "Outlined cards"
+        },
+        {
+          "value": "minimal",
+          "label": "Minimal dividers"
+        }
+      ],
+      "default": "outlined"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Desktop columns",
+      "options": [
+        {
+          "value": "2",
+          "label": "2 columns"
+        },
+        {
+          "value": "3",
+          "label": "3 columns"
+        }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Card spacing",
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show star ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_avatar",
+      "label": "Show customer photos",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "default": "#f7f4ef"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#241f1c"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Secondary text",
+      "default": "#6f665f"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#d9d0c6"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#6b3f27"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "Add the customer's testimonial here."
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "image_picker",
+          "id": "avatar",
+          "label": "Customer photo"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Customer name"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Role",
+          "default": "Buyer"
+        },
+        {
+          "type": "text",
+          "id": "company",
+          "label": "Company",
+          "default": "Retail company"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "The collection builder makes seasonal ordering much faster. We can review the full assortment, choose the right options, and submit one coordinated order.",
+            "rating": 5,
+            "name": "Avery Brooks",
+            "role": "Owner",
+            "company": "North & Pine"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "The presentation feels premium without getting in the way. Our buying team can understand the collection story and compare each piece clearly.",
+            "rating": 5,
+            "name": "Morgan Chen",
+            "role": "Senior Buyer",
+            "company": "Harbor House"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Ordering a coordinated assortment now takes minutes instead of going product by product. The experience is simple, polished, and easy to use.",
+            "rating": 5,
+            "name": "Riley Stone",
+            "role": "Merchandising Director",
+            "company": "Studio Row"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
