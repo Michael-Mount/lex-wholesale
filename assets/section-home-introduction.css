@@ -1,0 +1,474 @@
+.home-introduction {
+  position: relative;
+
+  min-height: var(--home-intro-height-desktop);
+  padding-top: var(--home-intro-padding-top);
+  padding-bottom: var(--home-intro-padding-bottom);
+  overflow: hidden;
+
+  background: var(--home-intro-fallback-background);
+  color: var(--home-intro-text);
+}
+
+.home-introduction__media,
+.home-introduction__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.home-introduction__media {
+  z-index: 0;
+}
+
+.home-introduction__overlay {
+  z-index: 1;
+
+  background: var(--home-intro-overlay-color);
+  opacity: var(--home-intro-overlay-opacity);
+  pointer-events: none;
+}
+
+.home-introduction__media picture {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+}
+
+.home-introduction__image,
+.home-introduction__video {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: var(--home-intro-image-position);
+}
+
+.home-introduction__inner {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+
+  min-height: var(--home-intro-height-desktop);
+  padding-top: clamp(2rem, 7vw, 6rem);
+  padding-bottom: clamp(2rem, 7vw, 6rem);
+}
+
+.home-introduction--content-top-left .home-introduction__inner,
+.home-introduction--content-top-center .home-introduction__inner,
+.home-introduction--content-top-right .home-introduction__inner {
+  align-items: flex-start;
+}
+
+.home-introduction--content-middle-left .home-introduction__inner,
+.home-introduction--content-middle-center .home-introduction__inner,
+.home-introduction--content-middle-right .home-introduction__inner {
+  align-items: center;
+}
+
+.home-introduction--content-bottom-left .home-introduction__inner,
+.home-introduction--content-bottom-center .home-introduction__inner,
+.home-introduction--content-bottom-right .home-introduction__inner {
+  align-items: flex-end;
+}
+
+.home-introduction--content-top-left .home-introduction__inner,
+.home-introduction--content-middle-left .home-introduction__inner,
+.home-introduction--content-bottom-left .home-introduction__inner {
+  justify-content: flex-start;
+}
+
+.home-introduction--content-top-center .home-introduction__inner,
+.home-introduction--content-middle-center .home-introduction__inner,
+.home-introduction--content-bottom-center .home-introduction__inner {
+  justify-content: center;
+}
+
+.home-introduction--content-top-right .home-introduction__inner,
+.home-introduction--content-middle-right .home-introduction__inner,
+.home-introduction--content-bottom-right .home-introduction__inner {
+  justify-content: flex-end;
+}
+
+.home-introduction__content {
+  width: min(100%, var(--home-intro-content-width));
+}
+
+.home-introduction--card-glass .home-introduction__content,
+.home-introduction--card-solid .home-introduction__content {
+  padding: clamp(1.4rem, 4vw, 2.5rem);
+
+  background: color-mix(
+    in srgb,
+    var(--home-intro-card-background)
+      var(--home-intro-card-opacity),
+    transparent
+  );
+  border: 1px solid color-mix(in srgb, var(--home-intro-text) 15%, transparent);
+}
+
+.home-introduction--card-glass .home-introduction__content {
+  backdrop-filter: blur(12px);
+}
+
+@supports not (background: color-mix(in srgb, white 50%, transparent)) {
+  .home-introduction--card-glass .home-introduction__content,
+  .home-introduction--card-solid .home-introduction__content {
+    background: var(--home-intro-card-background);
+  }
+}
+
+.home-introduction--card-solid .home-introduction__content {
+  backdrop-filter: none;
+}
+
+.home-introduction__content--center {
+  text-align: center;
+}
+
+.home-introduction__content--right {
+  text-align: right;
+}
+
+.home-introduction__eyebrow {
+  margin: 0 0 0.85rem;
+
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.home-introduction__heading {
+  max-width: 13ch;
+  margin: 0;
+
+  font-size: clamp(3.25rem, 8vw, 7.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+}
+
+.home-introduction__content--center .home-introduction__heading {
+  margin-inline: auto;
+}
+
+.home-introduction__content--right .home-introduction__heading {
+  margin-left: auto;
+}
+
+.home-introduction__description {
+  max-width: 38rem;
+  margin-top: 1.35rem;
+
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.65;
+}
+
+.home-introduction__content--center .home-introduction__description {
+  margin-inline: auto;
+}
+
+.home-introduction__content--right .home-introduction__description {
+  margin-left: auto;
+}
+
+.home-introduction__description > :first-child {
+  margin-top: 0;
+}
+
+.home-introduction__description > :last-child {
+  margin-bottom: 0;
+}
+
+.home-introduction__promotion {
+  display: inline-flex;
+
+  margin: 1.25rem 0 0;
+  padding: 0.5rem 0.7rem;
+
+  border: 1px solid currentColor;
+
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.home-introduction__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  margin-top: 1.75rem;
+}
+
+.home-introduction__content--center .home-introduction__actions {
+  justify-content: center;
+}
+
+.home-introduction__content--right .home-introduction__actions {
+  justify-content: flex-end;
+}
+
+.home-introduction__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 3.15rem;
+  padding: 0.75rem 1.1rem;
+
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.home-introduction__button--primary {
+  border: 1px solid var(--home-intro-button);
+
+  background: var(--home-intro-button);
+  color: var(--home-intro-button-text);
+}
+
+.home-introduction__button--secondary {
+  border: 1px solid currentColor;
+
+  color: inherit;
+}
+
+.home-introduction__button:hover {
+  opacity: 0.8;
+}
+
+.home-introduction__button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.home-introduction__note {
+  margin: 0.85rem 0 0;
+
+  color: var(--home-intro-muted-text);
+
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* CSS-generated campaign artwork */
+
+.home-introduction__ad-art {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-intro-fallback-accent) 14%, transparent),
+      transparent 46%
+    ),
+    var(--home-intro-fallback-background);
+}
+
+.home-introduction__ad-copy {
+  position: absolute;
+  inset: clamp(1.25rem, 4vw, 3rem);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr auto;
+  align-items: start;
+}
+
+.home-introduction__ad-kicker {
+  grid-column: 1;
+  grid-row: 1;
+
+  max-width: 18rem;
+
+  font-size: clamp(0.72rem, 1vw, 0.9rem);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.home-introduction__ad-headline {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  align-self: center;
+
+  max-width: 9ch;
+
+  color: var(--home-intro-fallback-accent);
+
+  font-size: clamp(6rem, 19vw, 17rem);
+  font-weight: 800;
+  line-height: 0.7;
+  letter-spacing: -0.085em;
+  text-transform: uppercase;
+}
+
+.home-introduction__ad-supporting {
+  grid-column: 1;
+  grid-row: 3;
+
+  max-width: 26rem;
+
+  font-size: clamp(0.8rem, 1.25vw, 1rem);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.home-introduction__ad-badge {
+  grid-column: 2;
+  grid-row: 1;
+
+  padding: 0.65rem 0.8rem;
+
+  background: var(--home-intro-fallback-accent);
+  color: var(--home-intro-fallback-accent-text);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-introduction__ad-orbit,
+.home-introduction__ad-line {
+  position: absolute;
+
+  pointer-events: none;
+}
+
+.home-introduction__ad-orbit {
+  border: 1px solid color-mix(
+    in srgb,
+    var(--home-intro-fallback-accent) 55%,
+    transparent
+  );
+  border-radius: 999px;
+}
+
+.home-introduction__ad-orbit--one {
+  top: -15%;
+  right: -8%;
+
+  width: min(44vw, 38rem);
+  aspect-ratio: 1 / 1;
+}
+
+.home-introduction__ad-orbit--two {
+  right: 14%;
+  bottom: -30%;
+
+  width: min(30vw, 25rem);
+  aspect-ratio: 1 / 1;
+}
+
+.home-introduction__ad-line {
+  height: 1px;
+
+  background: color-mix(
+    in srgb,
+    var(--home-intro-fallback-accent) 45%,
+    transparent
+  );
+  transform: rotate(-26deg);
+  transform-origin: center;
+}
+
+.home-introduction__ad-line--one {
+  top: 22%;
+  left: -10%;
+
+  width: 55%;
+}
+
+.home-introduction__ad-line--two {
+  right: -10%;
+  bottom: 24%;
+
+  width: 48%;
+}
+
+/*
+  On the generated advertisement, the content card remains readable without
+  requiring a dark media overlay.
+*/
+.home-introduction--advertisement .home-introduction__content {
+  position: relative;
+
+  color: var(--home-intro-text);
+}
+
+/* Media text defaults */
+
+.home-introduction--video,
+.home-introduction--image {
+  color: var(--home-intro-text);
+}
+
+@media screen and (max-width: 749px) {
+  .home-introduction,
+  .home-introduction__inner {
+    min-height: var(--home-intro-height-mobile);
+  }
+
+  .home-introduction__inner {
+    align-items: flex-end !important;
+    justify-content: center !important;
+
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .home-introduction__content {
+    width: 100%;
+  }
+
+  .home-introduction__heading {
+    font-size: clamp(3rem, 16vw, 5.4rem);
+  }
+
+  .home-introduction__actions {
+    display: grid;
+
+    width: 100%;
+  }
+
+  .home-introduction__button {
+    width: 100%;
+  }
+
+  .home-introduction__ad-copy {
+    grid-template-columns: 1fr;
+  }
+
+  .home-introduction__ad-headline {
+    max-width: 7ch;
+
+    font-size: clamp(5rem, 29vw, 9rem);
+  }
+
+  .home-introduction__ad-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .home-introduction__ad-supporting {
+    padding-right: 4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-introduction__image,
+  .home-introduction__video {
+    animation: none;
+    transition: none;
+  }
+}

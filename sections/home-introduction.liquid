@@ -1,0 +1,558 @@
+{{ 'section-home-introduction.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign has_video = false
+  assign has_image = false
+  assign media_type = 'advertisement'
+
+  if section.settings.background_video != blank
+    assign has_video = true
+    assign media_type = 'video'
+  elsif section.settings.background_image != blank
+    assign has_image = true
+    assign media_type = 'image'
+  endif
+%}
+
+<section
+  id="HomeIntroduction-{{ section.id }}"
+  class="
+    home-introduction
+    home-introduction--{{ media_type }}
+    home-introduction--content-{{ section.settings.content_position }}
+    home-introduction--card-{{ section.settings.content_card_style }}
+  "
+  style="
+    --home-intro-height-desktop: {{ section.settings.height_desktop }}px;
+    --home-intro-height-mobile: {{ section.settings.height_mobile }}px;
+    --home-intro-image-position: {{ section.settings.image_focal_position }};
+    --home-intro-overlay-color: {{ section.settings.overlay_color }};
+    --home-intro-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --home-intro-text: {{ section.settings.text_color }};
+    --home-intro-muted-text: {{ section.settings.muted_text_color }};
+    --home-intro-button: {{ section.settings.button_background_color }};
+    --home-intro-button-text: {{ section.settings.button_text_color }};
+    --home-intro-card-background: {{ section.settings.card_background_color }};
+    --home-intro-card-opacity: {{ section.settings.card_opacity }}%;
+    --home-intro-fallback-background: {{ section.settings.fallback_background_color }};
+    --home-intro-fallback-accent: {{ section.settings.fallback_accent_color }};
+    --home-intro-fallback-accent-text: {{ section.settings.fallback_accent_text_color }};
+    --home-intro-content-width: {{ section.settings.content_width }}rem;
+    --home-intro-padding-top: {{ section.settings.padding_top }}px;
+    --home-intro-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="home-introduction__media" aria-hidden="true">
+    {% if has_video %}
+      {{ section.settings.background_video | video_tag: class: 'home-introduction__video', autoplay: section.settings.autoplay_video, loop: section.settings.loop_video, muted: true, controls: false, playsinline: true, preload: 'metadata' }}
+    {% elsif has_image %}
+      <picture>
+        {% if section.settings.mobile_background_image != blank %}
+          <source
+            media="(max-width: 749px)"
+            srcset="{{ section.settings.mobile_background_image | image_url: width: 900 }}"
+          >
+        {% endif %}
+
+        {% assign background_alt = section.settings.background_image.alt | default: section.settings.heading %}
+
+        {{ section.settings.background_image | image_url: width: 2400 | image_tag: class: 'home-introduction__image', widths: '750, 1000, 1250, 1500, 1800, 2100, 2400', sizes: '100vw', loading: 'eager', preload: true, alt: background_alt }}
+      </picture>
+    {% else %}
+      <div class="home-introduction__ad-art">
+        <span class="home-introduction__ad-orbit home-introduction__ad-orbit--one"></span>
+        <span class="home-introduction__ad-orbit home-introduction__ad-orbit--two"></span>
+        <span class="home-introduction__ad-line home-introduction__ad-line--one"></span>
+        <span class="home-introduction__ad-line home-introduction__ad-line--two"></span>
+
+        <div class="home-introduction__ad-copy">
+          {% if section.settings.fallback_kicker != blank %}
+            <span class="home-introduction__ad-kicker">
+              {{ section.settings.fallback_kicker | escape }}
+            </span>
+          {% endif %}
+
+          {% if section.settings.fallback_headline != blank %}
+            <span class="home-introduction__ad-headline">
+              {{ section.settings.fallback_headline | escape }}
+            </span>
+          {% endif %}
+
+          {% if section.settings.fallback_supporting_text != blank %}
+            <span class="home-introduction__ad-supporting">
+              {{ section.settings.fallback_supporting_text | escape }}
+            </span>
+          {% endif %}
+
+          {% if section.settings.fallback_badge != blank %}
+            <span class="home-introduction__ad-badge">
+              {{ section.settings.fallback_badge | escape }}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if has_video or has_image %}
+    <span class="home-introduction__overlay" aria-hidden="true"></span>
+  {% endif %}
+
+  <div class="page-width home-introduction__inner">
+    <div class="home-introduction__content home-introduction__content--{{ section.settings.text_alignment }}">
+      {% if section.settings.eyebrow != blank %}
+        <p class="home-introduction__eyebrow">
+          {{ section.settings.eyebrow | escape }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.heading != blank %}
+        <h1 class="home-introduction__heading">
+          {{ section.settings.heading | escape }}
+        </h1>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <div class="home-introduction__description rte">
+          {{ section.settings.description }}
+        </div>
+      {% endif %}
+
+      {% if section.settings.promotion_text != blank %}
+        <p class="home-introduction__promotion">
+          {{ section.settings.promotion_text | escape }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.primary_button_label != blank or section.settings.secondary_button_label != blank %}
+        <div class="home-introduction__actions">
+          {% if section.settings.primary_button_label != blank %}
+            <a
+              class="home-introduction__button home-introduction__button--primary"
+              href="{{ section.settings.primary_button_link | default: routes.collections_url }}"
+            >
+              {{ section.settings.primary_button_label | escape }}
+            </a>
+          {% endif %}
+
+          {% if section.settings.secondary_button_label != blank and section.settings.secondary_button_link != blank %}
+            <a
+              class="home-introduction__button home-introduction__button--secondary"
+              href="{{ section.settings.secondary_button_link }}"
+            >
+              {{ section.settings.secondary_button_label | escape }}
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.supporting_note != blank %}
+        <p class="home-introduction__note">
+          {{ section.settings.supporting_note | escape }}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+
+{% if has_video and section.settings.autoplay_video %}
+  <script>
+    (() => {
+      const section = document.getElementById("HomeIntroduction-{{ section.id }}");
+      const video = section?.querySelector("video");
+
+      if (
+        video &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        video.pause();
+        video.removeAttribute("autoplay");
+      }
+    })();
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Home introduction",
+  "tag": "section",
+  "class": "section-home-introduction",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background media"
+    },
+    {
+      "type": "video",
+      "id": "background_video",
+      "label": "Background video",
+      "info": "The video takes priority when both a video and image are selected."
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay_video",
+      "label": "Autoplay background video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop_video",
+      "label": "Loop background video",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_background_image",
+      "label": "Mobile background image",
+      "info": "Optional alternate crop for phones."
+    },
+    {
+      "type": "select",
+      "id": "image_focal_position",
+      "label": "Image and video focal position",
+      "options": [
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center top",
+          "label": "Top"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "min": 440,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "label": "Desktop height",
+      "default": 720
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "min": 480,
+      "max": 860,
+      "step": 20,
+      "unit": "px",
+      "label": "Mobile height",
+      "default": 660
+    },
+    {
+      "type": "header",
+      "content": "Fallback advertisement"
+    },
+    {
+      "type": "paragraph",
+      "content": "This graphic appears automatically when no image or video is selected."
+    },
+    {
+      "type": "text",
+      "id": "fallback_kicker",
+      "label": "Advertisement kicker",
+      "default": "The wholesale edit"
+    },
+    {
+      "type": "text",
+      "id": "fallback_headline",
+      "label": "Advertisement headline",
+      "default": "Build the season"
+    },
+    {
+      "type": "text",
+      "id": "fallback_supporting_text",
+      "label": "Advertisement supporting text",
+      "default": "Curated collections. Flexible options. One confident order."
+    },
+    {
+      "type": "text",
+      "id": "fallback_badge",
+      "label": "Advertisement badge",
+      "default": "New collection"
+    },
+    {
+      "type": "color",
+      "id": "fallback_background_color",
+      "label": "Advertisement background",
+      "default": "#e8dfd4"
+    },
+    {
+      "type": "color",
+      "id": "fallback_accent_color",
+      "label": "Advertisement accent",
+      "default": "#6b3f27"
+    },
+    {
+      "type": "color",
+      "id": "fallback_accent_text_color",
+      "label": "Advertisement accent text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Introduction content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Wholesale clothing, thoughtfully curated"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Collections designed to sell together"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Discover coordinated assortments, choose the right product options, and build a confident wholesale order.</p>"
+    },
+    {
+      "type": "text",
+      "id": "promotion_text",
+      "label": "Promotional line",
+      "default": "Approved retailers receive access to wholesale pricing and complete-collection offers."
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "Top left"
+        },
+        {
+          "value": "top-center",
+          "label": "Top center"
+        },
+        {
+          "value": "top-right",
+          "label": "Top right"
+        },
+        {
+          "value": "middle-left",
+          "label": "Middle left"
+        },
+        {
+          "value": "middle-center",
+          "label": "Middle center"
+        },
+        {
+          "value": "middle-right",
+          "label": "Middle right"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom-center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "middle-left"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 24,
+      "max": 52,
+      "step": 2,
+      "unit": "rem",
+      "label": "Content width",
+      "default": 38
+    },
+    {
+      "type": "select",
+      "id": "content_card_style",
+      "label": "Content background",
+      "options": [
+        {
+          "value": "none",
+          "label": "No card"
+        },
+        {
+          "value": "glass",
+          "label": "Translucent card"
+        },
+        {
+          "value": "solid",
+          "label": "Solid card"
+        }
+      ],
+      "default": "glass"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Content card color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "card_opacity",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Content card opacity",
+      "default": 85
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "primary_button_label",
+      "label": "Primary button label",
+      "default": "Explore collections"
+    },
+    {
+      "type": "url",
+      "id": "primary_button_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_label",
+      "label": "Secondary button label",
+      "default": "Apply for wholesale access"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "text",
+      "id": "supporting_note",
+      "label": "Supporting note",
+      "default": "Sign in with an approved retailer account to view pricing."
+    },
+    {
+      "type": "header",
+      "content": "Media overlay and colors"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Media overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Media overlay opacity",
+      "default": 25
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#241f1c"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Secondary text",
+      "default": "#5f5751"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Primary button background",
+      "default": "#241f1c"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Primary button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Section spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 8,
+      "unit": "px",
+      "label": "Top outer spacing",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 8,
+      "unit": "px",
+      "label": "Bottom outer spacing",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home introduction"
+    }
+  ]
+}
+{% endschema %}
