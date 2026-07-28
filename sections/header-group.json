@@ -13,7 +13,9 @@
           }
         }
       },
-      "block_order": ["announcement1"],
+      "block_order": [
+        "announcement1"
+      ],
       "settings": {
         "accessibility_label": "Store announcement",
         "background_color": "#2c211c",
@@ -24,12 +26,15 @@
     "header": {
       "type": "header",
       "settings": {
-        "logo_width": 140,
+        "show_search": true,
+        "enable_predictive_search": true,
+        "search_placeholder": "Search products, collections, and pages",
+        "search_button_label": "Search",
+        "logo_width": 150,
         "menu": "main-menu",
         "dropdown_columns": "3",
         "show_view_all_link": true,
-        "customer_account_menu": "customer-account-main-menu",
-        "view_all_label": "View all",
+        "view_all_label": "Shop all",
         "mobile_menu_label": "Menu",
         "show_account_link": true,
         "account_label": "Account",
@@ -37,12 +42,19 @@
         "wholesale_badge_label": "Wholesale",
         "show_cart_link": true,
         "cart_label": "Cart",
-        "sticky_header": false,
+        "show_action_labels": true,
+        "sticky_header": true,
         "background_color": "#ffffff",
+        "navigation_background_color": "#faf8f5",
         "text_color": "#231f1c",
-        "border_color": "#ded8d3"
+        "border_color": "#ded8d3",
+        "accent_color": "#6b3f27",
+        "accent_text_color": "#ffffff"
       }
     }
   },
-  "order": ["announcement", "header"]
+  "order": [
+    "announcement",
+    "header"
+  ]
 }

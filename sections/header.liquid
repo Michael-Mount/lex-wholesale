@@ -1,9 +1,22 @@
 {{ 'section-header.css' | asset_url | stylesheet_tag }}
-
 {{ 'component-predictive-search.css' | asset_url | stylesheet_tag }}
 
 <script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
 
+{% liquid
+  assign is_approved_customer = false
+  assign account_action_label = section.settings.sign_in_label
+
+  if customer
+    assign account_action_label = section.settings.account_label
+
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign is_approved_customer = true
+      endif
+    endif
+  endif
+%}
 
 {% if section.settings.sticky_header %}
   <style>
@@ -15,69 +28,68 @@
   </style>
 {% endif %}
 
-<header class="
-    site-header
-    {% if section.settings.sticky_header %}
-      site-header--sticky
-    {% endif %}
-  " style="
+<header
+  class="site-header{% if section.settings.sticky_header %} site-header--sticky{% endif %}"
+  style="
     --header-background: {{ section.settings.background_color }};
     --header-text: {{ section.settings.text_color }};
     --header-border: {{ section.settings.border_color }};
+    --header-accent: {{ section.settings.accent_color }};
+    --header-accent-text: {{ section.settings.accent_text_color }};
+    --header-nav-background: {{ section.settings.navigation_background_color }};
     --logo-width: {{ section.settings.logo_width }}px;
     --dropdown-columns: {{ section.settings.dropdown_columns }};
-  ">
-  <div class="page-width site-header__inner">
-    {% render 'header-navigation'
-      , menu: section.settings.menu
-      , menu_type: 'mobile'
-      , aria_label: 'Mobile navigation'
-      , mobile_menu_label: section.settings.mobile_menu_label
-      , show_view_all_link: section.settings.show_view_all_link
-      , view_all_label: section.settings.view_all_label
-    %}
+  "
+>
+  <div class="site-header__masthead">
+    <div class="page-width site-header__masthead-inner">
+      {% render 'header-navigation',
+        menu: section.settings.menu,
+        menu_type: 'mobile',
+        aria_label: 'Mobile navigation',
+        mobile_menu_label: section.settings.mobile_menu_label,
+        show_view_all_link: section.settings.show_view_all_link,
+        view_all_label: section.settings.view_all_label
+      %}
 
-    <a
-      class="site-header__brand"
-      href="{{ routes.root_url }}"
-      aria-label="{{ shop.name | escape }}">
-      {% if section.settings.logo != blank %}
-        {% assign logo_alt = section.settings.logo.alt | default: shop.name %}
+      <a
+        class="site-header__brand"
+        href="{{ routes.root_url }}"
+        aria-label="{{ shop.name | escape }}"
+      >
+        {% if section.settings.logo != blank %}
+          {% assign logo_alt = section.settings.logo.alt | default: shop.name %}
 
-        {{
-          section.settings.logo | image_url: width: 600 | image_tag: class: 'site-header__logo', widths: '120, 180, 240, 360, 480, 600', width: section.settings.logo_width, alt: logo_alt, loading: 'eager'
-        }}
-      {% else %}
-        <span class="site-header__store-name">
-          {{ shop.name | escape }}
-        </span>
-      {% endif %}
-    </a>
+          {{ section.settings.logo | image_url: width: 700 | image_tag: class: 'site-header__logo', widths: '120, 180, 240, 360, 480, 600, 700', width: section.settings.logo_width, alt: logo_alt, loading: 'eager' }}
+        {% else %}
+          <span class="site-header__store-name">
+            {{ shop.name | escape }}
+          </span>
+        {% endif %}
+      </a>
 
-    {% render 'header-navigation'
-      , menu: section.settings.menu
-      , menu_type: 'desktop'
-      , aria_label: 'Primary navigation'
-      , mobile_menu_label: section.settings.mobile_menu_label
-      , show_view_all_link: section.settings.show_view_all_link
-      , view_all_label: section.settings.view_all_label
-    %}
-
-    <div class="site-header__actions">
       {% if section.settings.show_search %}
         <div class="site-header__search">
           <predictive-search
             class="header-search"
             data-predictive-search-url="{{ routes.predictive_search_url }}"
-            data-predictive-search-enabled="{{ section.settings.enable_predictive_search }}">
+            data-predictive-search-enabled="{{ section.settings.enable_predictive_search }}"
+          >
             <form
               class="header-search__form"
               action="{{ routes.search_url }}"
               method="get"
-              role="search">
+              role="search"
+            >
               <label class="visually-hidden" for="HeaderSearch-{{ section.id }}">
-                Search the store
+                Search products and store content
               </label>
+
+              <span class="header-search__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                  <path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                </svg>
+              </span>
 
               <input
                 id="HeaderSearch-{{ section.id }}"
@@ -90,20 +102,14 @@
                 aria-expanded="false"
                 aria-controls="HeaderPredictiveSearchResults-{{ section.id }}"
                 aria-haspopup="listbox"
-                aria-autocomplete="list">
+                aria-autocomplete="list"
+              >
 
-              <input
-                type="hidden"
-                name="options[prefix]"
-                value="last">
-
-              <input
-                type="hidden"
-                name="type"
-                value="product,article,page">
+              <input type="hidden" name="options[prefix]" value="last">
+              <input type="hidden" name="type" value="product,article,page">
 
               <button class="header-search__button" type="submit">
-                Search
+                {{ section.settings.search_button_label | escape }}
               </button>
 
               <div
@@ -111,191 +117,293 @@
                 class="header-search__results"
                 data-predictive-search-results
                 tabindex="-1"
-                hidden></div>
+                hidden
+              ></div>
             </form>
           </predictive-search>
         </div>
       {% endif %}
 
-      {% if section.settings.show_cart_link %}
-        <a
-          class="site-header__action-link site-header__cart-link"
-          href="{{ routes.cart_url }}"
-          data-cart-drawer-open
-          aria-label="Open cart, {{ cart.item_count }} items">
-          <span>{{ section.settings.cart_label | escape }}</span>
-
-          <span class="site-header__cart-count" aria-hidden="true">
-            (<span data-cart-count>{{ cart.item_count }}</span>)
+      <div class="site-header__actions">
+        {% if is_approved_customer and section.settings.wholesale_badge_label != blank %}
+          <span class="site-header__approval-badge">
+            {{ section.settings.wholesale_badge_label | escape }}
           </span>
-        </a>
-      {% endif %}
+        {% endif %}
 
-      {% if section.settings.show_account_link and shop.customer_accounts_enabled %}
-        <div class="site-header__account">
-          <shopify-account menu="{{ section.settings.customer_account_menu }}"></shopify-account>
-        </div>
-      {% endif %}
+        {% if section.settings.show_account_link and shop.customer_accounts_enabled %}
+          <a
+            class="site-header__action-link site-header__account-link"
+            href="{{ routes.account_url }}"
+          >
+            <span class="site-header__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22">
+                <circle cx="12" cy="8" r="3.25" fill="none" stroke="currentColor" stroke-width="1.7"></circle>
+                <path d="M5.5 20c.45-4.1 2.55-6.15 6.5-6.15S18.05 15.9 18.5 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+              </svg>
+            </span>
+
+            {% if section.settings.show_action_labels %}
+              <span class="site-header__action-label">
+                {{ account_action_label | escape }}
+              </span>
+            {% else %}
+              <span class="visually-hidden">
+                {{ account_action_label | escape }}
+              </span>
+            {% endif %}
+          </a>
+        {% endif %}
+
+        {% if section.settings.show_cart_link %}
+          <a
+            class="site-header__action-link site-header__cart-link"
+            href="{{ routes.cart_url }}"
+            data-cart-link
+            aria-label="View cart"
+          >
+            <span class="site-header__action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="23" height="23">
+                <path d="M3.5 4.5h2l1.65 9.15a2 2 0 0 0 1.97 1.65h7.75a2 2 0 0 0 1.95-1.55L20 8H6.15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                <circle cx="9.3" cy="19" r="1.15"></circle>
+                <circle cx="17.1" cy="19" r="1.15"></circle>
+              </svg>
+            </span>
+
+            {% if section.settings.show_action_labels %}
+              <span class="site-header__action-label">
+                {{ section.settings.cart_label | escape }}
+              </span>
+            {% endif %}
+
+            <span class="site-header__cart-count" data-cart-count>
+              {{ cart.item_count }}
+            </span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="site-header__navigation-bar">
+    <div class="page-width site-header__navigation-inner">
+      {% render 'header-navigation',
+        menu: section.settings.menu,
+        menu_type: 'desktop',
+        aria_label: 'Primary navigation',
+        mobile_menu_label: section.settings.mobile_menu_label,
+        show_view_all_link: section.settings.show_view_all_link,
+        view_all_label: section.settings.view_all_label
+      %}
     </div>
   </div>
 </header>
 
 {% schema %}
-  {
-    "name": "Header",
-    "tag": "div",
-    "class": "section-header",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Search"
-      },
-      {
-        "type": "checkbox",
-        "id": "show_search",
-        "label": "Show search",
-        "default": true
-      },
-      {
-        "type": "checkbox",
-        "id": "enable_predictive_search",
-        "label": "Enable predictive search",
-        "default": true
-      },
-      {
-        "type": "text",
-        "id": "search_placeholder",
-        "label": "Search placeholder",
-        "default": "Search"
-      }, {
-        "type": "header",
-        "content": "Logo"
-      }, {
-        "type": "image_picker",
-        "id": "logo",
-        "label": "Logo"
-      }, {
-        "type": "range",
-        "id": "logo_width",
-        "min": 80,
-        "max": 300,
-        "step": 10,
-        "unit": "px",
-        "label": "Logo width",
-        "default": 140
-      }, {
-        "type": "header",
-        "content": "Navigation"
-      }, {
-        "type": "link_list",
-        "id": "menu",
-        "label": "Menu",
-        "default": "main-menu"
-      }, {
-        "type": "select",
-        "id": "dropdown_columns",
-        "label": "Desktop dropdown columns",
-        "options": [
-          {
-            "value": "2",
-            "label": "2 columns"
-          }, {
-            "value": "3",
-            "label": "3 columns"
-          }, {
-            "value": "4",
-            "label": "4 columns"
-          }
-        ],
-        "default": "3"
-      }, {
-        "type": "checkbox",
-        "id": "show_view_all_link",
-        "label": "Show view-all links",
-        "default": true
-      }, {
-        "type": "text",
-        "id": "view_all_label",
-        "label": "View-all label",
-        "default": "View all"
-      }, {
-        "type": "text",
-        "id": "mobile_menu_label",
-        "label": "Mobile menu label",
-        "default": "Menu"
-      }, {
-        "type": "header",
-        "content": "Customer actions"
-      }, {
-        "type": "checkbox",
-        "id": "show_account_link",
-        "label": "Show account link",
-        "default": true
-      }, {
-        "type": "link_list",
-        "id": "customer_account_menu",
-        "label": "Customer account menu",
-        "default": "customer-account-main-menu"
-      }, {
-        "type": "text",
-        "id": "account_label",
-        "label": "Account label",
-        "default": "Account"
-      }, {
-        "type": "text",
-        "id": "sign_in_label",
-        "label": "Sign-in label",
-        "default": "Sign in"
-      }, {
-        "type": "text",
-        "id": "wholesale_badge_label",
-        "label": "Approved customer badge",
-        "default": "Wholesale"
-      }, {
-        "type": "checkbox",
-        "id": "show_cart_link",
-        "label": "Show cart link",
-        "default": true
-      }, {
-        "type": "text",
-        "id": "cart_label",
-        "label": "Cart label",
-        "default": "Cart"
-      }, {
-        "type": "header",
-        "content": "Header behavior"
-      }, {
-        "type": "checkbox",
-        "id": "sticky_header",
-        "label": "Enable sticky header",
-        "default": false
-      }, {
-        "type": "header",
-        "content": "Colors"
-      }, {
-        "type": "color",
-        "id": "background_color",
-        "label": "Background",
-        "default": "#ffffff"
-      }, {
-        "type": "color",
-        "id": "text_color",
-        "label": "Text",
-        "default": "#231f1c"
-      }, {
-        "type": "color",
-        "id": "border_color",
-        "label": "Border",
-        "default": "#ded8d3"
-      }
-    ],
-    "presets": [
-      {
-        "name": "Header"
-      }
-    ],
-    "enabled_on": {
-      "groups": ["header"]
+{
+  "name": "Header",
+  "tag": "div",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_predictive_search",
+      "label": "Enable predictive search",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search products, collections, and pages"
+    },
+    {
+      "type": "text",
+      "id": "search_button_label",
+      "label": "Search button label",
+      "default": "Search"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 280,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 150
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "dropdown_columns",
+      "label": "Desktop dropdown columns",
+      "options": [
+        {
+          "value": "2",
+          "label": "2 columns"
+        },
+        {
+          "value": "3",
+          "label": "3 columns"
+        },
+        {
+          "value": "4",
+          "label": "4 columns"
+        }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all_link",
+      "label": "Show view-all links",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View-all label",
+      "default": "Shop all"
+    },
+    {
+      "type": "text",
+      "id": "mobile_menu_label",
+      "label": "Mobile menu label",
+      "default": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Customer actions"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account_link",
+      "label": "Show account link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "account_label",
+      "label": "Signed-in account label",
+      "default": "Account"
+    },
+    {
+      "type": "text",
+      "id": "sign_in_label",
+      "label": "Signed-out account label",
+      "default": "Sign in"
+    },
+    {
+      "type": "text",
+      "id": "wholesale_badge_label",
+      "label": "Approved customer badge",
+      "default": "Wholesale"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_link",
+      "label": "Show cart link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Cart label",
+      "default": "Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_action_labels",
+      "label": "Show account and cart labels",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Header behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "Enable sticky header",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Header background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "navigation_background_color",
+      "label": "Navigation background",
+      "default": "#faf8f5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#231f1c"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#ded8d3"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#6b3f27"
+    },
+    {
+      "type": "color",
+      "id": "accent_text_color",
+      "label": "Accent text",
+      "default": "#ffffff"
     }
+  ],
+  "presets": [
+    {
+      "name": "Header"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
   }
+}
 {% endschema %}

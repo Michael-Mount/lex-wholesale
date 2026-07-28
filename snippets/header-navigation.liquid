@@ -1,9 +1,9 @@
 {% comment %}
-  Renders the primary header navigation.
+  Primary header navigation.
 
-  Required parameters:
-  - menu: Shopify link-list object
-  - menu_type: "desktop" or "mobile"
+  Required:
+  - menu
+  - menu_type: desktop or mobile
 {% endcomment %}
 
 {% if menu != blank %}
@@ -15,100 +15,46 @@
             <li class="site-header__menu-item">
               {% if link.links != blank %}
                 <details class="site-header__dropdown">
-                  <summary class="
-                      site-header__navigation-link
-                      site-header__dropdown-summary
+                  <summary class="site-header__navigation-link site-header__dropdown-summary{% if link.active or link.child_active %} site-header__navigation-link--active{% endif %}">
+                    <span>{{ link.title | escape }}</span>
 
-                      {% if link.active or link.child_active %}
-                        site-header__navigation-link--active
-                      {% endif %}
-                    ">
-                    <span>
-                      {{ link.title | escape }}
-                    </span>
-
-                    <span class="site-header__chevron" aria-hidden="true">
-                      ↓
-                    </span>
+                    <svg class="site-header__chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                      <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
                   </summary>
 
                   <div class="site-header__dropdown-panel">
-                    <ul class="site-header__dropdown-list">
+                    <div class="site-header__dropdown-intro">
+                      <p class="site-header__dropdown-eyebrow">Browse</p>
+                      <p class="site-header__dropdown-title">{{ link.title | escape }}</p>
+
                       {% if show_view_all_link %}
-                        <li class="site-header__dropdown-item">
-                          <a
-                            class="
-                              site-header__dropdown-link
-                              site-header__dropdown-link--view-all
-
-                              {% if link.current %}
-                                site-header__dropdown-link--active
-                              {% endif %}
-                            "
-                            href="{{ link.url }}"
-                            {% if link.current %}
-                            aria-current="page"
-                            {% endif %}>
-                            {{ view_all_label | default: 'View all' | escape }}
-                            {{ link.title | escape }}
-                          </a>
-                        </li>
+                        <a class="site-header__dropdown-view-all" href="{{ link.url }}">
+                          {{ view_all_label | default: 'Shop all' | escape }}
+                          {{ link.title | escape }}
+                        </a>
                       {% endif %}
+                    </div>
 
+                    <ul class="site-header__dropdown-list">
                       {% for child_link in link.links %}
                         <li class="site-header__dropdown-item">
                           {% if child_link.links != blank %}
-                            <div class="site-header__submenu-group">
-                              <a
-                                class="
-                                  site-header__dropdown-link
-                                  site-header__dropdown-link--heading
+                            <a class="site-header__dropdown-link site-header__dropdown-link--heading{% if child_link.active or child_link.child_active %} site-header__dropdown-link--active{% endif %}" href="{{ child_link.url }}">
+                              {{ child_link.title | escape }}
+                            </a>
 
-                                  {% if child_link.active or child_link.child_active %}
-                                    site-header__dropdown-link--active
-                                  {% endif %}
-                                "
-                                href="{{ child_link.url }}"
-                                {% if child_link.current %}
-                                aria-current="page"
-                                {% endif %}>
-                                {{ child_link.title | escape }}
-                              </a>
-
-                              <ul class="site-header__third-level-list">
-                                {% for grandchild_link in child_link.links %}
-                                  <li>
-                                    <a
-                                      class="
-                                        site-header__third-level-link
-
-                                        {% if grandchild_link.active %}
-                                          site-header__third-level-link--active
-                                        {% endif %}
-                                      "
-                                      href="{{ grandchild_link.url }}"
-                                      {% if grandchild_link.current %}
-                                      aria-current="page"
-                                      {% endif %}>
-                                      {{ grandchild_link.title | escape }}
-                                    </a>
-                                  </li>
-                                {% endfor %}
-                              </ul>
-                            </div>
+                            <ul class="site-header__third-level-list">
+                              {% for grandchild_link in child_link.links %}
+                                <li>
+                                  <a class="site-header__third-level-link{% if grandchild_link.active %} site-header__third-level-link--active{% endif %}" href="{{ grandchild_link.url }}">
+                                    {{ grandchild_link.title | escape }}
+                                  </a>
+                                </li>
+                              {% endfor %}
+                            </ul>
                           {% else %}
-                            <a
-                              class="
-                                site-header__dropdown-link
-
-                                {% if child_link.active %}
-                                  site-header__dropdown-link--active
-                                {% endif %}
-                              "
-                              href="{{ child_link.url }}"
-                              {% if child_link.current %}
-                              aria-current="page"
-                              {% endif %}>
+                            <a class="site-header__dropdown-link{% if child_link.active %} site-header__dropdown-link--active{% endif %}" href="{{ child_link.url }}">
                               {{ child_link.title | escape }}
                             </a>
                           {% endif %}
@@ -118,18 +64,7 @@
                   </div>
                 </details>
               {% else %}
-                <a
-                  class="
-                    site-header__navigation-link
-
-                    {% if link.active %}
-                      site-header__navigation-link--active
-                    {% endif %}
-                  "
-                  href="{{ link.url }}"
-                  {% if link.current %}
-                  aria-current="page"
-                  {% endif %}>
+                <a class="site-header__navigation-link{% if link.active %} site-header__navigation-link--active{% endif %}" href="{{ link.url }}" {% if link.current %}aria-current="page"{% endif %}>
                   {{ link.title | escape }}
                 </a>
               {% endif %}
@@ -142,55 +77,42 @@
       <nav class="site-header__mobile-navigation" aria-label="{{ aria_label | default: 'Mobile navigation' | escape }}">
         <details class="site-header__mobile-menu">
           <summary class="site-header__mobile-summary">
-            <span>
-              {{ mobile_menu_label | default: 'Menu' | escape }}
-            </span>
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+            </svg>
 
-            <span class="site-header__chevron" aria-hidden="true">
-              ↓
+            <span class="site-header__mobile-summary-label">
+              {{ mobile_menu_label | default: 'Menu' | escape }}
             </span>
           </summary>
 
           <div class="site-header__mobile-panel">
+            <div class="site-header__mobile-panel-header">
+              <span>Menu</span>
+
+              <span class="site-header__mobile-panel-note">
+                Browse the store
+              </span>
+            </div>
+
             <ul class="site-header__mobile-list">
               {% for link in menu.links %}
-                <li class="site-header__mobile-item">
+                <li>
                   {% if link.links != blank %}
                     <details class="site-header__mobile-dropdown">
-                      <summary class="
-                          site-header__mobile-link
-                          site-header__mobile-dropdown-summary
+                      <summary class="site-header__mobile-link site-header__mobile-dropdown-summary{% if link.active or link.child_active %} site-header__mobile-link--active{% endif %}">
+                        <span>{{ link.title | escape }}</span>
 
-                          {% if link.active or link.child_active %}
-                            site-header__mobile-link--active
-                          {% endif %}
-                        ">
-                        <span>
-                          {{ link.title | escape }}
-                        </span>
-
-                        <span class="site-header__chevron" aria-hidden="true">
-                          ↓
-                        </span>
+                        <svg class="site-header__chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                          <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
                       </summary>
 
                       <ul class="site-header__mobile-submenu">
                         {% if show_view_all_link %}
                           <li>
-                            <a
-                              class="
-                                site-header__mobile-link
-                                site-header__mobile-link--view-all
-
-                                {% if link.current %}
-                                  site-header__mobile-link--active
-                                {% endif %}
-                              "
-                              href="{{ link.url }}"
-                              {% if link.current %}
-                              aria-current="page"
-                              {% endif %}>
-                              {{ view_all_label | default: 'View all' | escape }}
+                            <a class="site-header__mobile-link site-header__mobile-link--view-all" href="{{ link.url }}">
+                              {{ view_all_label | default: 'Shop all' | escape }}
                               {{ link.title | escape }}
                             </a>
                           </li>
@@ -199,47 +121,20 @@
                         {% for child_link in link.links %}
                           <li>
                             {% if child_link.links != blank %}
-                              <details class="
-                                  site-header__mobile-dropdown
-                                  site-header__mobile-dropdown--nested
-                                ">
-                                <summary class="
-                                    site-header__mobile-link
-                                    site-header__mobile-dropdown-summary
+                              <details class="site-header__mobile-dropdown site-header__mobile-dropdown--nested">
+                                <summary class="site-header__mobile-link site-header__mobile-dropdown-summary">
+                                  <span>{{ child_link.title | escape }}</span>
 
-                                    {% if child_link.active or child_link.child_active %}
-                                      site-header__mobile-link--active
-                                    {% endif %}
-                                  ">
-                                  <span>
-                                    {{ child_link.title | escape }}
-                                  </span>
-
-                                  <span class="site-header__chevron" aria-hidden="true">
-                                    ↓
-                                  </span>
+                                  <svg class="site-header__chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                                    <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                  </svg>
                                 </summary>
 
-                                <ul class="
-                                    site-header__mobile-submenu
-                                    site-header__mobile-submenu--third
-                                  ">
+                                <ul class="site-header__mobile-submenu site-header__mobile-submenu--third">
                                   {% if show_view_all_link %}
                                     <li>
-                                      <a
-                                        class="
-                                          site-header__mobile-link
-                                          site-header__mobile-link--view-all
-
-                                          {% if child_link.current %}
-                                            site-header__mobile-link--active
-                                          {% endif %}
-                                        "
-                                        href="{{ child_link.url }}"
-                                        {% if child_link.current %}
-                                        aria-current="page"
-                                        {% endif %}>
-                                        {{ view_all_label | default: 'View all' | escape }}
+                                      <a class="site-header__mobile-link site-header__mobile-link--view-all" href="{{ child_link.url }}">
+                                        {{ view_all_label | default: 'Shop all' | escape }}
                                         {{ child_link.title | escape }}
                                       </a>
                                     </li>
@@ -247,18 +142,7 @@
 
                                   {% for grandchild_link in child_link.links %}
                                     <li>
-                                      <a
-                                        class="
-                                          site-header__mobile-link
-
-                                          {% if grandchild_link.active %}
-                                            site-header__mobile-link--active
-                                          {% endif %}
-                                        "
-                                        href="{{ grandchild_link.url }}"
-                                        {% if grandchild_link.current %}
-                                        aria-current="page"
-                                        {% endif %}>
+                                      <a class="site-header__mobile-link" href="{{ grandchild_link.url }}">
                                         {{ grandchild_link.title | escape }}
                                       </a>
                                     </li>
@@ -266,18 +150,7 @@
                                 </ul>
                               </details>
                             {% else %}
-                              <a
-                                class="
-                                  site-header__mobile-link
-
-                                  {% if child_link.active %}
-                                    site-header__mobile-link--active
-                                  {% endif %}
-                                "
-                                href="{{ child_link.url }}"
-                                {% if child_link.current %}
-                                aria-current="page"
-                                {% endif %}>
+                              <a class="site-header__mobile-link" href="{{ child_link.url }}">
                                 {{ child_link.title | escape }}
                               </a>
                             {% endif %}
@@ -286,18 +159,7 @@
                       </ul>
                     </details>
                   {% else %}
-                    <a
-                      class="
-                        site-header__mobile-link
-
-                        {% if link.active %}
-                          site-header__mobile-link--active
-                        {% endif %}
-                      "
-                      href="{{ link.url }}"
-                      {% if link.current %}
-                      aria-current="page"
-                      {% endif %}>
+                    <a class="site-header__mobile-link{% if link.active %} site-header__mobile-link--active{% endif %}" href="{{ link.url }}">
                       {{ link.title | escape }}
                     </a>
                   {% endif %}
