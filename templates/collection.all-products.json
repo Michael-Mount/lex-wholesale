@@ -1,0 +1,32 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-all-products",
+      "settings": {
+        "eyebrow": "Shop everything",
+        "heading": "All products",
+        "description": "<p>Browse the complete assortment and filter by availability, product type, vendor, or other configured Shopify filters.</p>",
+        "show_product_count": true,
+        "products_per_page": 24,
+        "columns_desktop": "4",
+        "columns_mobile": "2",
+        "grid_gap": 24,
+        "image_ratio": "portrait",
+        "image_fit": "cover",
+        "show_vendor": false,
+        "show_product_type": true,
+        "show_compare_at_price": true,
+        "background_color": "#ffffff",
+        "text_color": "#241f1c",
+        "muted_text_color": "#6e645d",
+        "border_color": "#d6cbc0",
+        "card_background_color": "#ffffff",
+        "accent_color": "#6b3f27",
+        "accent_text_color": "#ffffff",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main"]
+}
