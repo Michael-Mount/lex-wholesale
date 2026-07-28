@@ -1,19 +1,5 @@
 {% comment %}
-  Displays one product inside the collection-wide Add All interface.
-
-  Required:
-  - product
-  - section_id
-  - position
-  - is_approved_customer
-
-  Optional:
-  - show_vendor
-  - show_individual_price
-  - image_ratio
-  - image_fit
-  - variant_label
-  - locked_message
+  Product selector used by the complete-collection builder.
 {% endcomment %}
 
 {% liquid
@@ -32,25 +18,21 @@
 <article
   class="collection-product{% unless product.available %} collection-product--unavailable{% endunless %}"
   data-collection-product
-  data-product-position="{{ position }}">
+  data-product-position="{{ position }}"
+>
   <div class="collection-product__media collection-product__media--{{ image_ratio_value }}" style="--collection-product-image-fit: {{ image_fit_value }};">
-    <a
-      class="collection-product__image-link"
-      href="{{ product.url }}"
-      tabindex="-1"
-      aria-hidden="true">
+    <a class="collection-product__image-link" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
       {% if product.featured_image != blank %}
-        {{
-          product.featured_image | image_url: width: 1000 | image_tag: class: 'collection-product__image', widths: '240, 360, 480, 600, 800, 1000', sizes: '(min-width: 990px) 33vw, 100vw', loading: 'lazy', alt: ''
-        }}
+        {{ product.featured_image | image_url: width: 1200 | image_tag: class: 'collection-product__image', widths: '320, 480, 640, 800, 1000, 1200', sizes: '(min-width: 1200px) 28vw, (min-width: 750px) 45vw, 100vw', loading: 'lazy', alt: '' }}
       {% else %}
         <span class="collection-product__placeholder">
-          No image
+          {{ 'product-1' | placeholder_svg_tag: 'collection-product__placeholder-svg' }}
         </span>
       {% endif %}
     </a>
 
-    <span class="collection-product__position" aria-hidden="true">
+    <span class="collection-product__step">
+      <span class="collection-product__step-label">Step</span>
       {{ position }}
     </span>
 
@@ -62,38 +44,38 @@
   </div>
 
   <div class="collection-product__content">
-    {% if show_vendor and product.vendor != blank %}
-      <p class="collection-product__vendor">
-        {{ product.vendor | escape }}
-      </p>
-    {% endif %}
+    <div class="collection-product__heading-row">
+      <div>
+        {% if show_vendor and product.vendor != blank %}
+          <p class="collection-product__vendor">
+            {{ product.vendor | escape }}
+          </p>
+        {% endif %}
 
-    <h2 class="collection-product__title">
-      <a class="collection-product__title-link" href="{{ product.url }}">
-        {{ product.title | escape }}
-      </a>
-    </h2>
+        <h3 class="collection-product__title">
+          <a class="collection-product__title-link" href="{{ product.url }}">
+            {{ product.title | escape }}
+          </a>
+        </h3>
+      </div>
+
+      {% if is_approved_customer and product.available and selected_variant != blank and show_individual_price %}
+        <div class="collection-product__price" data-collection-price-wrapper>
+          <s class="collection-product__compare-price" data-collection-compare-price {% unless selected_variant_is_on_sale %}hidden{% endunless %}>
+            {% if selected_variant.compare_at_price != blank %}
+              {{ selected_variant.compare_at_price | money }}
+            {% endif %}
+          </s>
+
+          <span class="collection-product__current-price" data-collection-current-price>
+            {{ selected_variant.price | money }}
+          </span>
+        </div>
+      {% endif %}
+    </div>
 
     {% if is_approved_customer %}
       {% if product.available and selected_variant != blank %}
-        {% if show_individual_price %}
-          <div class="collection-product__price" data-collection-price-wrapper>
-            <s
-              class="collection-product__compare-price"
-              data-collection-compare-price
-              {% unless selected_variant_is_on_sale %}
-              hidden{% endunless %}>
-              {% if selected_variant.compare_at_price != blank %}
-                {{ selected_variant.compare_at_price | money }}
-              {% endif %}
-            </s>
-
-            <span class="collection-product__current-price" data-collection-current-price>
-              {{ selected_variant.price | money }}
-            </span>
-          </div>
-        {% endif %}
-
         {% if product.has_only_default_variant %}
           <input
             type="hidden"
@@ -104,11 +86,13 @@
             data-price-text="{{ selected_variant.price | money | escape }}"
             data-compare-at-text="{{ selected_variant.compare_at_price | money | escape }}"
             data-price-cents="{{ selected_variant.price }}"
-            data-compare-at-cents="{{ selected_variant.compare_at_price | default: 0 }}">
+            data-compare-at-cents="{{ selected_variant.compare_at_price | default: 0 }}"
+          >
 
-          <p class="collection-product__included">
-            Included
-          </p>
+          <div class="collection-product__included">
+            <span class="collection-product__included-dot" aria-hidden="true"></span>
+            Included in your set
+          </div>
         {% else %}
           <div class="collection-product__selector">
             <label class="collection-product__selector-label" for="{{ selector_id }}">
@@ -121,7 +105,8 @@
               data-collection-variant
               data-product-id="{{ product.id }}"
               data-product-title="{{ product.title | escape }}"
-              required>
+              required
+            >
               {% for variant in product.variants %}
                 {% if variant.available %}
                   <option
@@ -130,8 +115,8 @@
                     data-compare-at-text="{{ variant.compare_at_price | money | escape }}"
                     data-price-cents="{{ variant.price }}"
                     data-compare-at-cents="{{ variant.compare_at_price | default: 0 }}"
-                    {% if variant.id == selected_variant.id %}
-                    selected{% endif %}>
+                    {% if variant.id == selected_variant.id %}selected{% endif %}
+                  >
                     {{ variant.title | escape }}
                   </option>
                 {% endif %}

@@ -2,33 +2,79 @@
   "sections": {
     "main": {
       "type": "main-bundle-collection",
+      "blocks": {
+        "benefit_1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "\u2713",
+            "heading": "Designed as one story",
+            "text": "Every piece is selected to merchandise together."
+          }
+        },
+        "benefit_2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "\u2713",
+            "heading": "Choose every option",
+            "text": "Select the right size or color before adding the set."
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "\u2713",
+            "heading": "Automatic collection offer",
+            "text": "The configured discount is applied in the cart."
+          }
+        }
+      },
+      "block_order": [
+        "benefit_1",
+        "benefit_2",
+        "benefit_3"
+      ],
       "settings": {
-        "eyebrow": "Complete collection",
-        "show_description": true,
+        "promo_image": "",
+        "hero_image_position": "center center",
+        "eyebrow": "Curated wholesale set",
+        "promo_badge": "Complete the look",
+        "heading": "",
+        "introduction": "<p>A ready-to-merchandise assortment designed to work together and sell as a complete story.</p>",
+        "show_collection_description": true,
         "show_product_count": true,
+        "discount_badge": "Set pricing",
+        "hero_button_label": "Choose your options",
+        "selection_eyebrow": "Build your set",
+        "selection_heading": "Choose one option for every piece",
+        "instructions": "<p>Select an available size or color for each product. Every selected item will be added together.</p>",
         "show_vendor": false,
         "show_individual_price": true,
-        "variant_label": "Choose size and color",
+        "variant_label": "Select size and color",
         "image_ratio": "portrait",
         "image_fit": "cover",
-        "desktop_columns": "3",
+        "desktop_columns": "2",
         "mobile_columns": "1",
         "grid_gap": 24,
-        "instructions": "<p>Select an available option for each product, then add the entire collection with one button.</p>",
+        "purchase_eyebrow": "Complete collection",
+        "purchase_heading": "Add the entire set",
+        "discount_message": "<p>Your configured collection discount is applied automatically in the cart when the qualifying requirements are met.</p>",
         "quantity_per_product": 1,
         "button_label": "Add complete collection",
         "unavailable_button_label": "Collection currently unavailable",
-        "disclaimer": "Every selected product will be added to the cart in one request.",
+        "disclaimer": "Review your selected options before adding the complete collection.",
         "adding_message": "Adding complete collection\u2026",
         "added_message": "The complete collection was added to your cart.",
         "error_message": "The complete collection could not be added. Please try again.",
-        "background_color": "#ffffff",
-        "text_color": "#231f1c",
-        "border_color": "#ded8d3",
+        "background_color": "#f7f4ef",
+        "text_color": "#241f1c",
+        "border_color": "#d9d0c6",
+        "muted_background_color": "#eee7df",
         "card_background_color": "#ffffff",
-        "button_background_color": "#231f1c",
+        "accent_color": "#6b3f27",
+        "accent_text_color": "#ffffff",
+        "button_background_color": "#241f1c",
         "button_text_color": "#ffffff",
-        "padding_top": 64,
+        "padding_top": 48,
         "padding_bottom": 80
       }
     }
