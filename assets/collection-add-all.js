@@ -65,6 +65,34 @@
       );
     }
 
+    updateHeaderCount(count) {
+      document.querySelectorAll("[data-cart-count]").forEach((element) => {
+        element.textContent = String(count);
+      });
+
+      document
+        .querySelectorAll("[data-cart-drawer-open]")
+        .forEach((trigger) => {
+          const label = count === 1 ? "item" : "items";
+          trigger.setAttribute("aria-label", `Open cart, ${count} ${label}`);
+        });
+    }
+
+    async fetchCart() {
+      const response = await fetch(`${this.getLocaleRoot()}cart.js`, {
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Unable to refresh the cart: ${response.status}`);
+      }
+
+      return response.json();
+    }
+
     setSubmitting(isSubmitting) {
       this.isSubmitting = isSubmitting;
 
@@ -156,16 +184,8 @@
     getCartDrawerDetails() {
       const drawer = document.querySelector("[data-cart-drawer]");
 
-      if (!drawer) {
-        return {
-          sectionId: "",
-          drawer: null,
-        };
-      }
-
       return {
-        sectionId: drawer.dataset.sectionId || "",
-        drawer,
+        sectionId: drawer?.dataset.sectionId || "",
       };
     }
 
@@ -281,29 +301,29 @@
           );
         }
 
+        const cart = await this.fetchCart();
+        this.updateHeaderCount(cart.item_count);
+
+        const renderedDrawer =
+          sectionId && responseData.sections
+            ? responseData.sections[sectionId] || ""
+            : "";
+
+        document.dispatchEvent(
+          new CustomEvent("cart:updated", {
+            detail: {
+              sectionId,
+              html: renderedDrawer,
+              cart,
+              open: Boolean(renderedDrawer),
+            },
+          }),
+        );
+
         this.setStatus(
           this.dataset.addedMessage ||
             "The complete collection was added to your cart.",
         );
-
-        const renderedDrawer =
-          sectionId && responseData.sections
-            ? responseData.sections[sectionId]
-            : "";
-
-        if (sectionId && renderedDrawer) {
-          document.dispatchEvent(
-            new CustomEvent("cart:updated", {
-              detail: {
-                sectionId,
-                html: renderedDrawer,
-                open: true,
-              },
-            }),
-          );
-        } else {
-          window.location.assign(`${this.getLocaleRoot()}cart`);
-        }
       } catch (error) {
         console.error(error);
 

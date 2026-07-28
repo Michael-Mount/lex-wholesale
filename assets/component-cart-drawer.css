@@ -354,6 +354,26 @@ html.cart-drawer-open {
   margin: 0;
 }
 
+html.cart-drawer-open,
+html.cart-drawer-open body {
+  overflow: hidden;
+}
+
+/*
+  A closed native dialog must never intercept pointer events.
+*/
+dialog[data-cart-drawer]:not([open]) {
+  pointer-events: none;
+}
+
+/*
+  Ensure the visible panel receives pointer events while the backdrop remains
+  clickable.
+*/
+dialog[data-cart-drawer][open] {
+  pointer-events: auto;
+}
+
 @media screen and (max-width: 479px) {
   .cart-drawer {
     width: 100%;
