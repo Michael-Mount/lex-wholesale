@@ -1,0 +1,35 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-about-us",
+      "settings": {
+        "image_position": "left",
+        "image_focal_position": "center center",
+        "image_height": 620,
+        "image_caption": "",
+        "eyebrow": "Our story",
+        "heading": "Wholesale collections built with intention",
+        "introduction": "<p>We help retailers discover coordinated assortments that feel considered, cohesive, and ready for the sales floor.</p>",
+        "body": "<p>Our approach is centered on thoughtful curation and a simpler buying experience. Each collection is designed to tell a clear story while still giving retailers the flexibility to choose the right sizes, colors, and quantities for their customers.</p><p>From seasonal edits to complete collection ordering, our goal is to make wholesale purchasing feel more visual, more efficient, and easier to navigate.</p>",
+        "content_width": 38,
+        "contact_button_label": "Contact us",
+        "show_contact_panel": true,
+        "contact_eyebrow": "Start a conversation",
+        "contact_heading": "Interested in working with us?",
+        "contact_text": "<p>Reach out with questions about wholesale access, collections, ordering, or becoming a retail partner.</p>",
+        "contact_panel_button_label": "Get in touch",
+        "background_color": "#f7f4ef",
+        "text_color": "#241f1c",
+        "muted_text_color": "#6e645d",
+        "border_color": "#d6cbc0",
+        "accent_color": "#6b3f27",
+        "accent_text_color": "#ffffff",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

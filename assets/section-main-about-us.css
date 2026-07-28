@@ -1,0 +1,229 @@
+.about-page {
+  padding-top: var(--about-padding-top);
+  padding-bottom: var(--about-padding-bottom);
+
+  background: var(--about-background);
+  color: var(--about-text);
+}
+
+.about-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(24rem, 0.9fr);
+  align-items: stretch;
+
+  border: 1px solid var(--about-border);
+}
+
+.about-page--image-right .about-page__media {
+  order: 2;
+}
+
+.about-page--image-right .about-page__content {
+  order: 1;
+}
+
+.about-page__layout--text-only {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.about-page__media {
+  position: relative;
+
+  min-width: 0;
+  min-height: var(--about-image-height);
+  overflow: hidden;
+
+  background: rgb(0 0 0 / 4%);
+}
+
+.about-page__image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: var(--about-image-position);
+}
+
+.about-page__caption {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+
+  background: rgb(255 255 255 / 88%);
+  color: var(--about-text);
+
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.about-page__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  min-width: 0;
+  padding: clamp(2rem, 6vw, 5rem);
+}
+
+.about-page__layout--text-only .about-page__content {
+  width: min(100%, var(--about-content-width));
+  margin-inline: auto;
+}
+
+.about-page__eyebrow,
+.about-contact-panel__eyebrow {
+  margin: 0 0 0.8rem;
+
+  color: var(--about-accent);
+
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.about-page__heading {
+  max-width: 12ch;
+  margin: 0;
+
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+
+.about-page__introduction {
+  max-width: var(--about-content-width);
+  margin-top: 1.4rem;
+
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  line-height: 1.6;
+}
+
+.about-page__body {
+  max-width: var(--about-content-width);
+  margin-top: 1.5rem;
+
+  color: var(--about-muted);
+
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+
+.about-page__introduction > :first-child,
+.about-page__body > :first-child,
+.about-contact-panel__text > :first-child {
+  margin-top: 0;
+}
+
+.about-page__introduction > :last-child,
+.about-page__body > :last-child,
+.about-contact-panel__text > :last-child {
+  margin-bottom: 0;
+}
+
+.about-page__actions {
+  margin-top: 2rem;
+}
+
+.about-page__button,
+.about-contact-panel__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 3.15rem;
+  padding: 0.75rem 1.1rem;
+
+  border: 1px solid var(--about-accent);
+
+  background: var(--about-accent);
+  color: var(--about-accent-text);
+
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.about-page__button:hover,
+.about-contact-panel__button:hover {
+  opacity: 0.82;
+}
+
+.about-page__button:focus-visible,
+.about-contact-panel__button:focus-visible {
+  outline: 2px solid var(--about-accent);
+  outline-offset: 3px;
+}
+
+.about-contact-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+
+  margin-top: clamp(2rem, 5vw, 4rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
+
+  border: 1px solid var(--about-border);
+}
+
+.about-contact-panel__heading {
+  margin: 0;
+
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  line-height: 1;
+}
+
+.about-contact-panel__text {
+  max-width: 42rem;
+  margin-top: 0.85rem;
+
+  color: var(--about-muted);
+
+  line-height: 1.65;
+}
+
+.about-contact-panel__button {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 899px) {
+  .about-page__layout,
+  .about-contact-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .about-page--image-right .about-page__media,
+  .about-page--image-right .about-page__content {
+    order: initial;
+  }
+
+  .about-page__media {
+    min-height: min(120vw, 42rem);
+  }
+
+  .about-contact-panel {
+    justify-items: start;
+  }
+}
+
+@media screen and (max-width: 549px) {
+  .about-page__content {
+    padding: 1.5rem;
+  }
+
+  .about-page__heading {
+    font-size: clamp(2.65rem, 14vw, 4rem);
+  }
+
+  .about-page__button,
+  .about-contact-panel__button {
+    width: 100%;
+  }
+}
