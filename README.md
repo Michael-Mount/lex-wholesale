@@ -79,7 +79,7 @@ Bundle products receive private cart-line metadata:
 _bundle_id
 _bundle_handle
 _bundle_title
-_bundle_component_positio
+_bundle_component_position
 _bundle_component_count
 _bundle_quantity_per_product
 _bundle_schema_version
@@ -491,8 +491,6 @@ Key lessons included:
 **Michael Mount**
 
 Frontend and full-stack developer focused on JavaScript, TypeScript, React, Next.js, Node.js, and e-commerce development.
-
-Replace these placeholders before publishing:
 
 ```text
 Portfolio: https://michaelmount.vercel.app/
