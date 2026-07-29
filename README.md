@@ -501,6 +501,10 @@ Email: mmount.dev@gmail.com
 
 ## License
 
-This repository is currently intended as a portfolio and development project.
+The source code in this repository is available under the MIT License.
 
-Add an appropriate license before permitting reuse, redistribution, or commercial deployment.
+Client branding, logos, product photography, product descriptions, trademarks,
+and other merchant-provided content are not included in that license and remain
+the property of their respective owners.
+
+Copyright (c) 2026 Michael Mount
