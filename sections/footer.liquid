@@ -2,7 +2,8 @@
 
 {% liquid
   assign sanitized_phone = section.settings.phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' | remove: '.'
-  assign contact_url = routes.root_url
+  assign contact_url = '/pages/contact'
+  assign social_aria_label = 'Follow ' | append: shop.name
 
   if section.settings.contact_page != blank
     assign contact_url = section.settings.contact_page.url
@@ -90,7 +91,7 @@
             facebook_url: section.settings.facebook_url,
             pinterest_url: section.settings.pinterest_url,
             linkedin_url: section.settings.linkedin_url,
-            aria_label: 'Follow ' | append: shop.name
+            aria_label: social_aria_label
           %}
         {% endif %}
       </div>
