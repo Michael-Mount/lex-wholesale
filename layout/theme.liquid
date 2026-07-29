@@ -10,41 +10,29 @@
 
 <!doctype html>
 
-<html lang="{{ request.locale.iso_code }}">
+<html
+  class="no-js"
+  lang="{{ request.locale.iso_code }}"
+  dir="{{ text_direction }}">
   <head>
     <meta charset="utf-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% render 'meta-tags' %}
+    {% render 'structured-data' %}
+
     <script>
-        document.documentElement.classList.remove("no-js");
-        document.documentElement.classList.add("js");
+      document.documentElement.classList.remove("no-js");
+      document.documentElement.classList.add("js");
     </script>
-
-    <title>
-      {{ page_title }}
-
-      {% unless page_title contains shop.name %}
-        – {{ shop.name }}
-      {% endunless %}
-    </title>
-
-    {% if page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
-    {% endif %}
-
-    <link rel="canonical" href="{{ canonical_url }}">
 
     {{ content_for_header }}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'component-bundle-cart-groups.css' | asset_url | stylesheet_tag }}
+    {{ 'cart-layout-fixes.css' | asset_url | stylesheet_tag }}
 
-    {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
-
-    <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
-
-    {{ 'component-bundle-cart-groups.css' | asset_url | stylesheet_tag
-    }}
-
+    <script src="{{ 'cart-state.js' | asset_url }}" defer></script>
     <script src="{{ 'bundle-cart-groups.js' | asset_url }}" defer></script>
 
     <style>
@@ -52,17 +40,13 @@
         --color-background: {{ settings.background_color }};
         --color-text: {{ settings.text_color }};
         --page-width: {{ settings.page_width }}px;
-
         --font-body-family: {{ settings.body_font.family }}, 
         {{ settings.body_font.fallback_families }};
-
         --font-body-style: {{ settings.body_font.style }};
         --font-body-weight: {{ settings.body_font.weight }};
         --font-body-size: {{ settings.body_font_size }}px;
-
         --font-heading-family: {{ settings.heading_font.family }}, 
         {{ settings.heading_font.fallback_families }};
-
         --font-heading-style: {{ settings.heading_font.style }};
         --font-heading-weight: {{ settings.heading_font.weight }};
       }
@@ -84,6 +68,5 @@
     </main>
 
     {% sections 'footer-group' %}
-    {% section 'cart-drawer' %}
   </body>
 </html>

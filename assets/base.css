@@ -40,16 +40,17 @@ a {
 .visually-hidden {
   position: absolute !important;
 
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
 
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
+  overflow: hidden !important;
 
-  border: 0;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+
+  border: 0 !important;
 }
 
 .page-width {
@@ -58,20 +59,23 @@ a {
 }
 
 .skip-link {
-  position: absolute;
-  top: 0;
-  left: 1rem;
-  z-index: 100;
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 9999;
+
   padding: 0.75rem 1rem;
-  background: var(--color-text);
-  color: var(--color-background);
-  transform: translateY(-150%);
+
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid currentColor;
+
+  transform: translateY(-200%);
 }
 
 .skip-link:focus {
   transform: translateY(0);
 }
-
 .home-introduction {
   padding-block: 5rem;
 }

@@ -31,10 +31,11 @@
 
           <ul class="predictive-search-results__list">
             {% for query in predictive_search.resources.queries %}
-              <li role="option">
+              <li>
                 <a
                   class="predictive-search-results__simple-link"
                   href="{{ query.url }}"
+                  role="option"
                   tabindex="-1">
                   {{ query.styled_text }}
                 </a>
@@ -42,10 +43,11 @@
             {% endfor %}
 
             {% for collection in predictive_search.resources.collections %}
-              <li role="option">
+              <li>
                 <a
                   class="predictive-search-results__simple-link"
-                  href="{{ collection.url }}"
+                  href="{{ query.url }}"
+                  role="option"
                   tabindex="-1">
                   <span class="predictive-search-results__type">
                     Collection
@@ -67,10 +69,11 @@
 
           <ul class="predictive-search-results__product-list">
             {% for product in predictive_search.resources.products %}
-              <li role="option">
+              <li>
                 <a
-                  class="predictive-search-product"
-                  href="{{ product.url }}"
+                  class="predictive-search-results__simple-link"
+                  href="{{ query.url }}"
+                  role="option"
                   tabindex="-1">
                   {% if product.featured_media != blank %}
                     {{
@@ -111,10 +114,11 @@
 
           <ul class="predictive-search-results__list">
             {% for page in predictive_search.resources.pages %}
-              <li role="option">
+              <li>
                 <a
                   class="predictive-search-results__simple-link"
-                  href="{{ page.url }}"
+                  href="{{ query.url }}"
+                  role="option"
                   tabindex="-1">
                   <span class="predictive-search-results__type">
                     Page
@@ -126,10 +130,11 @@
             {% endfor %}
 
             {% for article in predictive_search.resources.articles %}
-              <li role="option">
+              <li>
                 <a
                   class="predictive-search-results__simple-link"
-                  href="{{ article.url }}"
+                  href="{{ query.url }}"
+                  role="option"
                   tabindex="-1">
                   <span class="predictive-search-results__type">
                     Article

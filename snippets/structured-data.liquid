@@ -1,0 +1,83 @@
+{% comment %}
+  Outputs structured data without exposing protected wholesale
+  offers to logged-out or unapproved visitors.
+
+  Full Shopify Product/ProductGroup structured data is rendered only
+  when:
+  - The current customer is approved, or
+  - Public structured prices are explicitly enabled.
+{% endcomment %}
+
+{% liquid
+  assign is_approved_customer = false
+
+  if customer
+    if settings.approved_customer_tag != blank
+      if customer.tags contains settings.approved_customer_tag
+        assign is_approved_customer = true
+      endif
+    endif
+  endif
+%}
+
+{% if request.page_type == 'index' %}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      "url": {{ canonical_url | json }}
+    }
+  </script>
+{% endif %}
+
+{% if request.page_type == 'article' %}
+  <script type="application/ld+json">
+    {{ article | structured_data }}
+  </script>
+{% endif %}
+
+{% if request.page_type == 'product' %}
+  {% if is_approved_customer or settings.expose_wholesale_prices_to_search_engines
+  %}
+    <script type="application/ld+json">
+      {{ product | structured_data }}
+    </script>
+  {% else %}
+    {% liquid
+      assign selected_variant = product.selected_or_first_available_variant
+      assign structured_image_url = blank
+
+      if product.featured_image != blank
+        assign structured_image_url = product.featured_image | image_url: width: 1600
+
+        unless structured_image_url contains '://'
+          assign structured_image_url = structured_image_url | prepend: 'https:'
+        endunless
+      endif
+    %}
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": {{ product.title | json }},
+        "url": {{ canonical_url | json }} {% if product.description != blank %},
+          "description": {{ product.description | strip_html | strip_newlines | json }}
+          {% endif %}
+          {% if structured_image_url != blank %},
+            "image": {{ structured_image_url | json }}
+            {% endif %}
+            {% if product.vendor != blank %},
+              "brand" : {
+                "@type": "Brand",
+                "name": {{ product.vendor | json }}
+              }
+              {% endif %}
+              {% if selected_variant != blank and selected_variant.sku != blank %},
+                "sku": {{ selected_variant.sku | json }}
+                {% endif %}
+              }
+    </script>
+  {% endif %}
+{% endif %}

@@ -155,5 +155,23 @@
         "default": "Remove and re-add this collection to refresh its bundle information."
       }
     ]
+  },
+  {
+    "name": "SEO and privacy",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "social_sharing_image",
+        "label": "Default social sharing image",
+        "info": "Used when the current page does not have its own image."
+      },
+      {
+        "type": "checkbox",
+        "id": "expose_wholesale_prices_to_search_engines",
+        "label": "Include product prices in structured data",
+        "default": false,
+        "info": "Enable only when wholesale prices are intentionally public. Product structured data containing offers can expose prices in the page source."
+      }
+    ]
   }
 ]

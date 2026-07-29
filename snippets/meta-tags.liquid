@@ -1,0 +1,97 @@
+{% comment %}
+  Renders:
+  - Document title
+  - Meta description
+  - Canonical URL
+  - Open Graph metadata
+  - Twitter card metadata
+
+  This snippet intentionally omits product price metadata.
+{% endcomment %}
+
+{% liquid
+  assign meta_title = page_title
+
+  if current_tags
+    assign joined_tags = current_tags | join: ', '
+    assign meta_title = meta_title | append: ' – ' | append: joined_tags
+  endif
+
+  if current_page != 1
+    assign meta_title = meta_title | append: ' – Page ' | append: current_page
+  endif
+
+  unless meta_title contains shop.name
+    assign meta_title = meta_title | append: ' – ' | append: shop.name
+  endunless
+
+  assign meta_description = page_description | strip_html | strip_newlines
+
+  assign meta_image = page_image
+
+  if request.page_type == 'product' and product.featured_media != blank
+    assign meta_image = product.featured_media.preview_image
+  elsif request.page_type == 'article' and article.image != blank
+    assign meta_image = article.image
+  elsif request.page_type == 'collection' and collection.image != blank
+    assign meta_image = collection.image
+  elsif meta_image == blank and settings.social_sharing_image != blank
+    assign meta_image = settings.social_sharing_image
+  endif
+
+  assign meta_image_url = blank
+
+  if meta_image != blank
+    assign meta_image_url = meta_image | image_url: width: 1200
+
+    unless meta_image_url contains '://'
+      assign meta_image_url = meta_image_url | prepend: 'https:'
+    endunless
+  endif
+
+  assign open_graph_type = 'website'
+
+  if request.page_type == 'product'
+    assign open_graph_type = 'product'
+  elsif request.page_type == 'article'
+    assign open_graph_type = 'article'
+  endif
+%}
+
+<title>{{ meta_title | escape }}</title>
+
+{% if meta_description != blank %}
+  <meta name="description" content="{{ meta_description | escape }}">
+{% endif %}
+
+<link rel="canonical" href="{{ canonical_url }}">
+
+<meta property="og:site_name" content="{{ shop.name | escape }}">
+
+<meta property="og:url" content="{{ canonical_url }}">
+
+<meta property="og:title" content="{{ meta_title | escape }}">
+
+<meta property="og:type" content="{{ open_graph_type }}">
+
+{% if meta_description != blank %}
+  <meta property="og:description" content="{{ meta_description | escape }}">
+{% endif %}
+
+{% if meta_image_url != blank %}
+  <meta property="og:image" content="{{ meta_image_url }}">
+
+  <meta property="og:image:secure_url" content="{{ meta_image_url }}">
+{% endif %}
+
+<meta name="twitter:card" content="{% if meta_image_url != blank %}summary_large_image{% else %}summary{% endif %}">
+
+<meta name="twitter:title" content="{{ meta_title | escape }}">
+
+{% if meta_description != blank %}
+  <meta name="twitter:description" content="{{ meta_description | escape }}">
+{% endif %}
+
+{% if meta_image_url != blank %}
+  <meta name="twitter:image" content="{{ meta_image_url }}">
+{% endif %}

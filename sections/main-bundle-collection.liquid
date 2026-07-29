@@ -1,415 +1,658 @@
 {{ 'section-main-bundle-collection.css' | asset_url | stylesheet_tag }}
 
-<script src="{{ 'bundle-builder.js' | asset_url }}" defer></script>
+<script src="{{ 'collection-add-all.js' | asset_url }}" defer></script>
 
 {% liquid
   assign is_approved_customer = false
-  assign bundle_is_available = true
-  assign bundle_product_count = collection.products_count
-  assign heading_id = 'BundleHeading-' | append: section.id
-  assign status_id = 'BundleStatus-' | append: section.id
+  assign collection_is_available = true
+  assign maximum_products = 50
+  assign sign_in_url = routes.storefront_login_url | default: routes.account_login_url
+  assign locked_message = settings.locked_price_message | default: 'Sign in with an approved wholesale account to view pricing.'
+  assign unapproved_message = settings.unapproved_price_message | default: 'Your account is not currently approved for wholesale purchasing.'
+  assign application_label = settings.wholesale_application_label | default: 'Apply for wholesale access'
+  assign hero_image = section.settings.promo_image
 
-  if customer
-    if settings.approved_customer_tag != blank
-      if customer.tags contains settings.approved_customer_tag
-        assign is_approved_customer = true
-      endif
+  if hero_image == blank
+    assign hero_image = collection.image
+  endif
+
+  if customer and settings.approved_customer_tag != blank
+    if customer.tags contains settings.approved_customer_tag
+      assign is_approved_customer = true
     endif
   endif
 
-  if collection.products_count == 0
-    assign bundle_is_available = false
-  endif
-
-  if collection.products_count > 50
-    assign bundle_is_available = false
+  if collection.products_count == 0 or collection.products_count > maximum_products
+    assign collection_is_available = false
   endif
 %}
 
-<section
-  class="bundle-collection"
-  data-bundle-builder
-  data-section-id="{{ section.id }}"
-  data-bundle-handle="{{ collection.handle | escape }}"
-  data-bundle-title="{{ collection.title | escape }}"
-  data-bundle-quantity="{{ section.settings.quantity_per_product }}"
+<collection-add-all
+  class="bundle-page"
+  data-collection-builder
+  data-collection-handle="{{ collection.handle | escape }}"
+  data-collection-title="{{ collection.title | escape }}"
+  data-product-count="{{ collection.products_count }}"
+  data-quantity-per-product="{{ section.settings.quantity_per_product }}"
+  data-adding-message="{{ section.settings.adding_message | escape }}"
+  data-added-message="{{ section.settings.added_message | escape }}"
+  data-error-message="{{ section.settings.error_message | escape }}"
   style="
     --bundle-background: {{ section.settings.background_color }};
     --bundle-text: {{ section.settings.text_color }};
     --bundle-border: {{ section.settings.border_color }};
+    --bundle-muted-background: {{ section.settings.muted_background_color }};
     --bundle-card-background: {{ section.settings.card_background_color }};
+    --bundle-accent: {{ section.settings.accent_color }};
+    --bundle-accent-text: {{ section.settings.accent_text_color }};
     --bundle-button-background: {{ section.settings.button_background_color }};
     --bundle-button-text: {{ section.settings.button_text_color }};
     --bundle-columns-desktop: {{ section.settings.desktop_columns }};
     --bundle-columns-mobile: {{ section.settings.mobile_columns }};
-    --bundle-gap: {{ section.settings.grid_gap }}px;
+    --bundle-grid-gap: {{ section.settings.grid_gap }}px;
     --bundle-padding-top: {{ section.settings.padding_top }}px;
     --bundle-padding-bottom: {{ section.settings.padding_bottom }}px;
-  ">
-  <div class="page-width">
-    <header class="bundle-collection__header">
-      {% if section.settings.eyebrow != blank %}
-        <p class="bundle-collection__eyebrow">
-          {{ section.settings.eyebrow | escape }}
-        </p>
-      {% endif %}
+    --bundle-hero-image-position: {{ section.settings.hero_image_position }};
+  "
+>
+  <section class="bundle-page__section">
+    <div class="page-width">
+      <div class="bundle-hero">
+        <div class="bundle-hero__media">
+          {% if hero_image != blank %}
+            {% assign hero_alt = hero_image.alt | default: collection.title %}
 
-      <h1 id="{{ heading_id }}" class="bundle-collection__heading">
-        {{ collection.title | escape }}
-      </h1>
-
-      {% if section.settings.show_collection_description and collection.description != blank
-      %}
-        <div class="bundle-collection__description">
-          {{ collection.description }}
-        </div>
-      {% elsif section.settings.introduction != blank %}
-        <div class="bundle-collection__description">
-          {{ section.settings.introduction }}
-        </div>
-      {% endif %}
-
-      {% if section.settings.show_product_count %}
-        <p class="bundle-collection__count">
-          Includes {{ bundle_product_count }}
-
-          {% if bundle_product_count == 1 %}
-            product
+            {{ hero_image | image_url: width: 1800 | image_tag: class: 'bundle-hero__image', widths: '480, 720, 960, 1200, 1500, 1800', sizes: '(min-width: 990px) 55vw, 100vw', loading: 'eager', preload: true, alt: hero_alt }}
           {% else %}
-            products
+            <div class="bundle-hero__placeholder">
+              {{ 'collection-1' | placeholder_svg_tag: 'bundle-hero__placeholder-svg' }}
+            </div>
           {% endif %}
-        </p>
-      {% endif %}
-    </header>
 
-    {% unless is_approved_customer %}
-      <div class="bundle-collection__gate">
-        <h2 class="bundle-collection__gate-heading">
-          Wholesale access required
-        </h2>
-
-        <p class="bundle-collection__gate-message">
-          {% if customer %}
-            {{ settings.unapproved_price_message | escape }}
-          {% else %}
-            {{ settings.locked_price_message | escape }}
-          {% endif %}
-        </p>
-
-        <div class="bundle-collection__gate-actions">
-          {% unless customer %}
-            <a class="
-                bundle-collection__button
-                bundle-collection__button--primary
-              " href="{{ routes.account_login_url }}">
-              Sign in
-            </a>
-          {% endunless %}
-
-          {% if settings.wholesale_application_url != blank %}
-            <a class="
-                bundle-collection__button
-                bundle-collection__button--secondary
-              " href="{{ settings.wholesale_application_url }}">
-              {{ settings.wholesale_application_label | escape }}
-            </a>
+          {% if section.settings.promo_badge != blank %}
+            <span class="bundle-hero__badge">
+              {{ section.settings.promo_badge | escape }}
+            </span>
           {% endif %}
         </div>
-      </div>
-    {% endunless %}
 
-    {% paginate collection.products by 50 %}
-      {% if collection.products_count > 0 %}
-        <div class="bundle-collection__grid" aria-labelledby="{{ heading_id }}">
-          {% for product in collection.products %}
-            {% unless product.available %}
-              {% assign bundle_is_available = false %}
-            {% endunless %}
+        <div class="bundle-hero__content">
+          {% if section.settings.eyebrow != blank %}
+            <p class="bundle-hero__eyebrow">
+              {{ section.settings.eyebrow | escape }}
+            </p>
+          {% endif %}
 
-            {% render 'bundle-product-selector'
-              , product: product
-              , section_id: section.id
-              , position: forloop.index
-              , is_approved_customer: is_approved_customer
-              , show_vendor: section.settings.show_vendor
-              , show_individual_price: section.settings.show_individual_price
-              , image_ratio: section.settings.image_ratio
-              , image_fit: section.settings.image_fit
-              , variant_label: section.settings.variant_label
-            %}
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="bundle-collection__empty">
-          <h2>No products have been added</h2>
-
-          <p>
-            Add products to this collection before using it as a bundle.
-          </p>
-        </div>
-      {% endif %}
-
-      {% if paginate.pages > 1 %}
-        <div class="bundle-collection__configuration-error">
-          <h2>Too many bundle products</h2>
-
-          <p>
-            A complete-collection bundle must contain no more than 
-            50 products so every required component can be selected
-            and added together.
-          </p>
-        </div>
-      {% endif %}
-    {% endpaginate %}
-
-    {% if is_approved_customer %}
-      <div class="bundle-collection__purchase">
-        {% if section.settings.instructions != blank %}
-          <div class="bundle-collection__instructions">
-            {{ section.settings.instructions }}
-          </div>
-        {% endif %}
-
-        <p
-          id="{{ status_id }}"
-          class="bundle-collection__status"
-          data-bundle-status
-          role="status"
-          aria-live="polite"></p>
-
-        <button
-          class="
-            bundle-collection__button
-            bundle-collection__button--primary
-            bundle-collection__submit
-          "
-          type="button"
-          data-bundle-submit
-          {% unless bundle_is_available %}
-          disabled
-          {% endunless %}>
-          <span data-bundle-submit-text>
-            {% if bundle_is_available %}
-              {{ section.settings.button_label | escape }}
+          <h1 class="bundle-hero__title">
+            {% if section.settings.heading != blank %}
+              {{ section.settings.heading | escape }}
             {% else %}
-              Collection currently unavailable
+              {{ collection.title | escape }}
             {% endif %}
-          </span>
-        </button>
+          </h1>
 
-        {% if section.settings.disclaimer != blank %}
-          <p class="bundle-collection__disclaimer">
-            {{ section.settings.disclaimer | escape }}
-          </p>
-        {% endif %}
+          {% if section.settings.introduction != blank %}
+            <div class="bundle-hero__introduction rte">
+              {{ section.settings.introduction }}
+            </div>
+          {% elsif section.settings.show_collection_description and collection.description != blank %}
+            <div class="bundle-hero__introduction rte">
+              {{ collection.description }}
+            </div>
+          {% endif %}
+
+          <div class="bundle-hero__meta">
+            {% if section.settings.show_product_count %}
+              <span class="bundle-hero__meta-item">
+                <strong>{{ collection.products_count }}</strong>
+                {% if collection.products_count == 1 %}piece{% else %}pieces{% endif %}
+              </span>
+            {% endif %}
+
+            {% if section.settings.discount_badge != blank %}
+              <span class="bundle-hero__meta-item bundle-hero__meta-item--accent">
+                {{ section.settings.discount_badge | escape }}
+              </span>
+            {% endif %}
+          </div>
+
+          {% if section.blocks.size > 0 %}
+            <ul class="bundle-benefits" role="list">
+              {% for block in section.blocks %}
+                <li class="bundle-benefits__item" {{ block.shopify_attributes }}>
+                  <span class="bundle-benefits__icon" aria-hidden="true">
+                    {{ block.settings.icon | escape }}
+                  </span>
+
+                  <div>
+                    <strong class="bundle-benefits__heading">
+                      {{ block.settings.heading | escape }}
+                    </strong>
+
+                    {% if block.settings.text != blank %}
+                      <p class="bundle-benefits__text">
+                        {{ block.settings.text | escape }}
+                      </p>
+                    {% endif %}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          <a class="bundle-hero__cta" href="#BundleProducts-{{ section.id }}">
+            {{ section.settings.hero_button_label | escape }}
+          </a>
+        </div>
       </div>
-    {% endif %}
-  </div>
-</section>
+
+      {% if collection.products_count > maximum_products %}
+        <div class="bundle-page__notice bundle-page__notice--error" role="alert">
+          <h2 class="bundle-page__notice-heading">
+            This collection is too large for one-click purchasing
+          </h2>
+
+          <p>
+            This implementation supports up to {{ maximum_products }} products in one collection.
+          </p>
+        </div>
+      {% endif %}
+
+      <div class="bundle-builder-layout">
+        <div class="bundle-builder-layout__products" id="BundleProducts-{{ section.id }}">
+          <header class="bundle-selection-header">
+            {% if section.settings.selection_eyebrow != blank %}
+              <p class="bundle-selection-header__eyebrow">
+                {{ section.settings.selection_eyebrow | escape }}
+              </p>
+            {% endif %}
+
+            <h2 class="bundle-selection-header__title">
+              {{ section.settings.selection_heading | escape }}
+            </h2>
+
+            {% if section.settings.instructions != blank %}
+              <div class="bundle-selection-header__text rte">
+                {{ section.settings.instructions }}
+              </div>
+            {% endif %}
+          </header>
+
+          {% paginate collection.products by 50 %}
+            {% if collection.products.size > 0 %}
+              <div class="bundle-product-grid">
+                {% for product in collection.products %}
+                  {% unless product.available %}
+                    {% assign collection_is_available = false %}
+                  {% endunless %}
+
+                  {% render 'bundle-product-selector',
+                    product: product,
+                    section_id: section.id,
+                    position: forloop.index,
+                    is_approved_customer: is_approved_customer,
+                    show_vendor: section.settings.show_vendor,
+                    show_individual_price: section.settings.show_individual_price,
+                    image_ratio: section.settings.image_ratio,
+                    image_fit: section.settings.image_fit,
+                    variant_label: section.settings.variant_label,
+                    locked_message: locked_message
+                  %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="bundle-page__empty">
+                <h2>No products have been added to this collection.</h2>
+              </div>
+            {% endif %}
+
+            {% if paginate.pages > 1 %}
+              {% assign collection_is_available = false %}
+            {% endif %}
+          {% endpaginate %}
+        </div>
+
+        <aside class="bundle-purchase-card" aria-label="Collection purchase summary">
+          {% if is_approved_customer %}
+            {% if section.settings.purchase_eyebrow != blank %}
+              <p class="bundle-purchase-card__eyebrow">
+                {{ section.settings.purchase_eyebrow | escape }}
+              </p>
+            {% endif %}
+
+            <h2 class="bundle-purchase-card__title">
+              {{ section.settings.purchase_heading | escape }}
+            </h2>
+
+            {% if section.settings.discount_message != blank %}
+              <div class="bundle-purchase-card__message rte">
+                {{ section.settings.discount_message }}
+              </div>
+            {% endif %}
+
+            <dl class="bundle-purchase-card__summary">
+              <div class="bundle-purchase-card__summary-row">
+                <dt>Products included</dt>
+                <dd>{{ collection.products_count }}</dd>
+              </div>
+
+              <div class="bundle-purchase-card__summary-row">
+                <dt>Quantity per product</dt>
+                <dd>{{ section.settings.quantity_per_product }}</dd>
+              </div>
+
+              {% if section.settings.discount_badge != blank %}
+                <div class="bundle-purchase-card__summary-row">
+                  <dt>Collection offer</dt>
+                  <dd>{{ section.settings.discount_badge | escape }}</dd>
+                </div>
+              {% endif %}
+            </dl>
+
+            <p class="bundle-purchase-card__status" data-collection-status role="status" aria-live="polite"></p>
+
+            <button
+              class="bundle-purchase-card__submit"
+              type="button"
+              data-collection-submit
+              {% unless collection_is_available %}disabled{% endunless %}
+            >
+              <span data-collection-submit-text>
+                {% if collection_is_available %}
+                  {{ section.settings.button_label | escape }}
+                {% else %}
+                  {{ section.settings.unavailable_button_label | escape }}
+                {% endif %}
+              </span>
+            </button>
+
+            {% if section.settings.disclaimer != blank %}
+              <p class="bundle-purchase-card__disclaimer">
+                {{ section.settings.disclaimer | escape }}
+              </p>
+            {% endif %}
+          {% else %}
+            <p class="bundle-purchase-card__eyebrow">
+              Wholesale access
+            </p>
+
+            <h2 class="bundle-purchase-card__title">
+              Sign in to build this collection
+            </h2>
+
+            <p class="bundle-purchase-card__gate-message">
+              {% if customer %}
+                {{ unapproved_message | escape }}
+              {% else %}
+                {{ locked_message | escape }}
+              {% endif %}
+            </p>
+
+            <div class="bundle-purchase-card__gate-actions">
+              {% unless customer %}
+                <a class="bundle-purchase-card__secondary-button" href="{{ sign_in_url }}">
+                  Sign in
+                </a>
+              {% endunless %}
+
+              {% if settings.wholesale_application_url != blank %}
+                <a class="bundle-purchase-card__secondary-button" href="{{ settings.wholesale_application_url }}">
+                  {{ application_label | escape }}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </aside>
+      </div>
+    </div>
+  </section>
+</collection-add-all>
 
 {% schema %}
-  {
-    "name": "Bundle collection",
-    "tag": "section",
-    "class": "section-main-bundle-collection",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Collection information"
-      },
-      {
-        "type": "text",
-        "id": "eyebrow",
-        "label": "Eyebrow",
-        "default": "Complete collection"
-      },
-      {
-        "type": "richtext",
-        "id": "introduction",
-        "label": "Fallback introduction",
-        "default": "<p>Select an available option for every product, then add the complete collection to your cart.</p>"
-      },
-      {
-        "type": "checkbox",
-        "id": "show_collection_description",
-        "label": "Use collection description",
-        "default": true
-      }, {
-        "type": "checkbox",
-        "id": "show_product_count",
-        "label": "Show product count",
-        "default": true
-      }, {
-        "type": "richtext",
-        "id": "instructions",
-        "label": "Purchase instructions",
-        "default": "<p>All products in this collection are required. Choose one available variant for each item.</p>"
-      }, {
-        "type": "textarea",
-        "id": "disclaimer",
-        "label": "Button disclaimer",
-        "default": "The collection discount is calculated in the cart when all required products qualify."
-      }, {
-        "type": "header",
-        "content": "Product cards"
-      }, {
-        "type": "checkbox",
-        "id": "show_vendor",
-        "label": "Show product vendor",
-        "default": false
-      }, {
-        "type": "checkbox",
-        "id": "show_individual_price",
-        "label": "Show individual product prices",
-        "default": true,
-        "info": "Prices are still rendered only for approved wholesale customers."
-      }, {
-        "type": "text",
-        "id": "variant_label",
-        "label": "Variant selector label",
-        "default": "Choose size and color"
-      }, {
-        "type": "range",
-        "id": "quantity_per_product",
-        "min": 1,
-        "max": 12,
-        "step": 1,
-        "label": "Quantity of each selected product",
-        "default": 1
-      }, {
-        "type": "select",
-        "id": "image_ratio",
-        "label": "Product image ratio",
-        "options": [
-          {
-            "value": "square",
-            "label": "Square"
-          }, {
-            "value": "portrait",
-            "label": "Portrait"
-          }, {
-            "value": "landscape",
-            "label": "Landscape"
-          }
-        ],
-        "default": "portrait"
-      }, {
-        "type": "select",
-        "id": "image_fit",
-        "label": "Product image fit",
-        "options": [
-          {
-            "value": "cover",
-            "label": "Crop to fill"
-          }, {
-            "value": "contain",
-            "label": "Fit entire image"
-          }
-        ],
-        "default": "cover"
-      }, {
-        "type": "select",
-        "id": "desktop_columns",
-        "label": "Desktop columns",
-        "options": [
-          {
-            "value": "2",
-            "label": "2 columns"
-          }, {
-            "value": "3",
-            "label": "3 columns"
-          }, {
-            "value": "4",
-            "label": "4 columns"
-          }
-        ],
-        "default": "3"
-      }, {
-        "type": "select",
-        "id": "mobile_columns",
-        "label": "Mobile columns",
-        "options": [
-          {
-            "value": "1",
-            "label": "1 column"
-          }, {
-            "value": "2",
-            "label": "2 columns"
-          }
-        ],
-        "default": "1"
-      }, {
-        "type": "range",
-        "id": "grid_gap",
-        "min": 8,
-        "max": 40,
-        "step": 4,
-        "unit": "px",
-        "label": "Grid spacing",
-        "default": 24
-      }, {
-        "type": "header",
-        "content": "Purchase button"
-      }, {
-        "type": "text",
-        "id": "button_label",
-        "label": "Button label",
-        "default": "Add complete collection"
-      }, {
-        "type": "header",
-        "content": "Colors"
-      }, {
-        "type": "color",
-        "id": "background_color",
-        "label": "Background",
-        "default": "#ffffff"
-      }, {
-        "type": "color",
-        "id": "text_color",
-        "label": "Text",
-        "default": "#231f1c"
-      }, {
-        "type": "color",
-        "id": "border_color",
-        "label": "Borders",
-        "default": "#ded8d3"
-      }, {
-        "type": "color",
-        "id": "card_background_color",
-        "label": "Product card background",
-        "default": "#ffffff"
-      }, {
-        "type": "color",
-        "id": "button_background_color",
-        "label": "Primary button background",
-        "default": "#231f1c"
-      }, {
-        "type": "color",
-        "id": "button_text_color",
-        "label": "Primary button text",
-        "default": "#ffffff"
-      }, {
-        "type": "header",
-        "content": "Spacing"
-      }, {
-        "type": "range",
-        "id": "padding_top",
-        "min": 0,
-        "max": 120,
-        "step": 8,
-        "unit": "px",
-        "label": "Top padding",
-        "default": 64
-      }, {
-        "type": "range",
-        "id": "padding_bottom",
-        "min": 0,
-        "max": 120,
-        "step": 8,
-        "unit": "px",
-        "label": "Bottom padding",
-        "default": 80
-      }
-    ]
-  }
+{
+  "name": "Main bundle collection",
+  "tag": "section",
+  "class": "section-main-bundle-collection",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Promotional hero"
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Promotional image",
+      "info": "Falls back to the collection image when left blank."
+    },
+    {
+      "type": "select",
+      "id": "hero_image_position",
+      "label": "Image focal position",
+      "options": [
+        { "value": "center center", "label": "Center" },
+        { "value": "center top", "label": "Top" },
+        { "value": "center bottom", "label": "Bottom" },
+        { "value": "left center", "label": "Left" },
+        { "value": "right center", "label": "Right" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Curated wholesale set"
+    },
+    {
+      "type": "text",
+      "id": "promo_badge",
+      "label": "Image badge",
+      "default": "Complete the look"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Custom heading",
+      "info": "Leave blank to use the collection title."
+    },
+    {
+      "type": "richtext",
+      "id": "introduction",
+      "label": "Promotional introduction",
+      "default": "<p>A ready-to-merchandise assortment designed to work together and sell as a complete story.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "label": "Use collection description when introduction is blank",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show number of pieces",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "discount_badge",
+      "label": "Promotional offer label",
+      "default": "Set pricing"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_label",
+      "label": "Hero button label",
+      "default": "Choose your options"
+    },
+    {
+      "type": "header",
+      "content": "Product selection"
+    },
+    {
+      "type": "text",
+      "id": "selection_eyebrow",
+      "label": "Selection eyebrow",
+      "default": "Build your set"
+    },
+    {
+      "type": "text",
+      "id": "selection_heading",
+      "label": "Selection heading",
+      "default": "Choose one option for every piece"
+    },
+    {
+      "type": "richtext",
+      "id": "instructions",
+      "label": "Instructions",
+      "default": "<p>Select an available size or color for each product. Every selected item will be added together.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show product vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_individual_price",
+      "label": "Show individual prices",
+      "default": true,
+      "info": "Prices are rendered only for approved wholesale customers."
+    },
+    {
+      "type": "text",
+      "id": "variant_label",
+      "label": "Variant selector label",
+      "default": "Select size and color"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Product image ratio",
+      "options": [
+        { "value": "square", "label": "Square" },
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "landscape", "label": "Landscape" }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Product image fit",
+      "options": [
+        { "value": "cover", "label": "Crop to fill" },
+        { "value": "contain", "label": "Fit entire image" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "desktop_columns",
+      "label": "Desktop columns",
+      "options": [
+        { "value": "2", "label": "2 columns" },
+        { "value": "3", "label": "3 columns" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Mobile columns",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 12,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Grid spacing",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Purchase panel"
+    },
+    {
+      "type": "text",
+      "id": "purchase_eyebrow",
+      "label": "Purchase eyebrow",
+      "default": "Complete collection"
+    },
+    {
+      "type": "text",
+      "id": "purchase_heading",
+      "label": "Purchase heading",
+      "default": "Add the entire set"
+    },
+    {
+      "type": "richtext",
+      "id": "discount_message",
+      "label": "Discount message",
+      "default": "<p>Your configured collection discount is applied automatically in the cart when the qualifying requirements are met.</p>"
+    },
+    {
+      "type": "range",
+      "id": "quantity_per_product",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "label": "Quantity of each product",
+      "default": 1
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Add complete collection"
+    },
+    {
+      "type": "text",
+      "id": "unavailable_button_label",
+      "label": "Unavailable button label",
+      "default": "Collection currently unavailable"
+    },
+    {
+      "type": "textarea",
+      "id": "disclaimer",
+      "label": "Disclaimer",
+      "default": "Review your selected options before adding the complete collection."
+    },
+    {
+      "type": "text",
+      "id": "adding_message",
+      "label": "Adding message",
+      "default": "Adding complete collection…"
+    },
+    {
+      "type": "text",
+      "id": "added_message",
+      "label": "Success message",
+      "default": "The complete collection was added to your cart."
+    },
+    {
+      "type": "text",
+      "id": "error_message",
+      "label": "Fallback error message",
+      "default": "The complete collection could not be added. Please try again."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Page background",
+      "default": "#f7f4ef"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#241f1c"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#d9d0c6"
+    },
+    {
+      "type": "color",
+      "id": "muted_background_color",
+      "label": "Muted background",
+      "default": "#eee7df"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Product card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#6b3f27"
+    },
+    {
+      "type": "color",
+      "id": "accent_text_color",
+      "label": "Accent text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button background",
+      "default": "#241f1c"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Selling point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon or symbol",
+          "default": "✓"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Designed as one story"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Supporting text",
+          "default": "Every piece is selected to merchandise together."
+        }
+      ]
+    }
+  ]
+}
 {% endschema %}
