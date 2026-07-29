@@ -1,0 +1,60 @@
+{% liquid
+  assign selected_variant = product.selected_or_first_available_variant
+  assign image_ratio_value = image_ratio | default: 'portrait'
+  assign image_fit_value = image_fit | default: 'cover'
+  assign is_on_sale = false
+
+  if selected_variant.compare_at_price > selected_variant.price
+    assign is_on_sale = true
+  endif
+%}
+
+<article class="all-product-card{% unless product.available %} all-product-card--sold-out{% endunless %}">
+  <a class="all-product-card__media all-product-card__media--{{ image_ratio_value }}" href="{{ product.url }}">
+    {% if product.featured_image != blank %}
+      {{ product.featured_image | image_url: width: 1000 | image_tag: class: 'all-product-card__image', widths: '240, 360, 480, 640, 800, 1000', sizes: '(min-width: 1200px) 22vw, (min-width: 750px) 33vw, 50vw', loading: 'lazy', alt: product.featured_image.alt | default: product.title, style: 'object-fit: ' | append: image_fit_value }}
+    {% else %}
+      <span class="all-product-card__placeholder">
+        {{ 'product-1' | placeholder_svg_tag: 'all-product-card__placeholder-svg' }}
+      </span>
+    {% endif %}
+
+    {% unless product.available %}
+      <span class="all-product-card__badge">Sold out</span>
+    {% endunless %}
+
+    {% if is_on_sale and is_approved_customer %}
+      <span class="all-product-card__badge all-product-card__badge--sale">Sale</span>
+    {% endif %}
+  </a>
+
+  <div class="all-product-card__content">
+    {% if show_vendor and product.vendor != blank %}
+      <p class="all-product-card__vendor">{{ product.vendor | escape }}</p>
+    {% endif %}
+
+    {% if show_product_type and product.type != blank %}
+      <p class="all-product-card__type">{{ product.type | escape }}</p>
+    {% endif %}
+
+    <h2 class="all-product-card__title">
+      <a href="{{ product.url }}">{{ product.title | escape }}</a>
+    </h2>
+
+    {% if is_approved_customer %}
+      <div class="all-product-card__price">
+        {% if show_compare_at_price and is_on_sale %}
+          <s>{{ selected_variant.compare_at_price | money }}</s>
+        {% endif %}
+
+        <span>{{ selected_variant.price | money }}</span>
+      </div>
+    {% else %}
+      <p class="all-product-card__locked-price">
+        Sign in with an approved wholesale account to view pricing.
+      </p>
+    {% endif %}
+
+    <a class="all-product-card__link" href="{{ product.url }}">View product</a>
+  </div>
+</article>

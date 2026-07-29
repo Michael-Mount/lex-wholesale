@@ -1,31 +1,97 @@
 {{ 'section-footer.css' | asset_url | stylesheet_tag }}
 
-<footer class="site-footer" style="
+{% liquid
+  assign sanitized_phone = section.settings.phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' | remove: '.'
+  assign contact_url = '/pages/contact'
+  assign social_aria_label = 'Follow ' | append: shop.name
+
+  if section.settings.contact_page != blank
+    assign contact_url = section.settings.contact_page.url
+  endif
+%}
+
+<footer
+  class="site-footer"
+  itemscope
+  itemtype="https://schema.org/Organization"
+  style="
     --footer-background: {{ section.settings.background_color }};
     --footer-text: {{ section.settings.text_color }};
+    --footer-muted: {{ section.settings.muted_text_color }};
     --footer-border: {{ section.settings.border_color }};
+    --footer-accent: {{ section.settings.accent_color }};
+    --footer-accent-text: {{ section.settings.accent_text_color }};
     --footer-columns: {{ section.settings.desktop_columns }};
-  ">
+    --footer-padding-top: {{ section.settings.padding_top }}px;
+    --footer-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <meta itemprop="name" content="{{ shop.name | escape }}">
+
   <div class="page-width">
-    <div class="site-footer__top">
-      <div class="site-footer__brand">
-        <a class="site-footer__brand-link" href="{{ routes.root_url }}">
-          {{ shop.name | escape }}
+    <div class="site-footer__main">
+      <div class="site-footer__brand-column">
+        <a
+          class="site-footer__brand-link"
+          href="{{ routes.root_url }}"
+          itemprop="url"
+          aria-label="{{ shop.name | escape }}"
+        >
+          {% if section.settings.logo != blank %}
+            {% assign footer_logo_alt = section.settings.logo.alt | default: shop.name %}
+
+            {{ section.settings.logo | image_url: width: 600 | image_tag: class: 'site-footer__logo', widths: '140, 200, 280, 400, 600', width: section.settings.logo_width, loading: 'lazy', alt: footer_logo_alt, itemprop: 'logo' }}
+          {% elsif section.settings.show_store_name %}
+            <span class="site-footer__store-name">
+              {{ shop.name | escape }}
+            </span>
+          {% endif %}
         </a>
 
         {% if section.settings.description != blank %}
-          <div class="site-footer__description">
+          <div class="site-footer__description rte" itemprop="description">
             {{ section.settings.description }}
           </div>
         {% endif %}
 
+        {% if section.settings.email != blank or section.settings.phone != blank or section.settings.address != blank %}
+          <address class="site-footer__contact">
+            {% if section.settings.email != blank %}
+              <a class="site-footer__contact-link" href="mailto:{{ section.settings.email | escape }}" itemprop="email">
+                <span class="site-footer__contact-label">Email</span>
+                <span>{{ section.settings.email | escape }}</span>
+              </a>
+            {% endif %}
+
+            {% if section.settings.phone != blank %}
+              <a class="site-footer__contact-link" href="tel:{{ sanitized_phone }}" itemprop="telephone">
+                <span class="site-footer__contact-label">Phone</span>
+                <span>{{ section.settings.phone | escape }}</span>
+              </a>
+            {% endif %}
+
+            {% if section.settings.address != blank %}
+              <div class="site-footer__address" itemprop="address">
+                <span class="site-footer__contact-label">Location</span>
+                <div class="rte">{{ section.settings.address }}</div>
+              </div>
+            {% endif %}
+          </address>
+        {% endif %}
+
+        {% if section.settings.show_contact_link and section.settings.contact_link_label != blank %}
+          <a class="site-footer__contact-button" href="{{ contact_url }}">
+            {{ section.settings.contact_link_label | escape }}
+          </a>
+        {% endif %}
+
         {% if section.settings.show_social_links %}
-          {% render 'social-links'
-            , instagram_url: section.settings.instagram_url
-            , facebook_url: section.settings.facebook_url
-            , pinterest_url: section.settings.pinterest_url
-            , linkedin_url: section.settings.linkedin_url
-            , aria_label: 'Social media'
+          {% render 'social-links',
+            instagram_url: section.settings.instagram_url,
+            facebook_url: section.settings.facebook_url,
+            pinterest_url: section.settings.pinterest_url,
+            linkedin_url: section.settings.linkedin_url,
+            aria_label: social_aria_label
           %}
         {% endif %}
       </div>
@@ -36,25 +102,39 @@
             <div class="site-footer__block" {{ block.shopify_attributes }}>
               {% case block.type %}
                 {% when 'menu' %}
-                  {% render 'footer-menu'
-                    , menu: block.settings.menu
-                    , heading: block.settings.heading
-                    , section_id: section.id
-                    , block_id: block.id
+                  {% render 'footer-menu',
+                    menu: block.settings.menu,
+                    heading: block.settings.heading,
+                    section_id: section.id,
+                    block_id: block.id
                   %}
 
                 {% when 'text' %}
-                  {% if block.settings.heading != blank %}
-                    <h2 class="site-footer__block-heading">
-                      {{ block.settings.heading | escape }}
-                    </h2>
-                  {% endif %}
+                  {% assign text_heading_id = 'FooterTextHeading-' | append: section.id | append: '-' | append: block.id %}
 
-                  {% if block.settings.text != blank %}
-                    <div class="site-footer__text">
-                      {{ block.settings.text }}
+                  <details class="site-footer__accordion" open>
+                    <summary class="site-footer__accordion-summary">
+                      <span id="{{ text_heading_id }}" class="site-footer__block-heading">
+                        {{ block.settings.heading | escape }}
+                      </span>
+
+                      <span class="site-footer__accordion-icon" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="site-footer__accordion-content">
+                      {% if block.settings.text != blank %}
+                        <div class="site-footer__text rte">
+                          {{ block.settings.text }}
+                        </div>
+                      {% endif %}
+
+                      {% if block.settings.link_label != blank and block.settings.link_url != blank %}
+                        <a class="site-footer__inline-link" href="{{ block.settings.link_url }}">
+                          {{ block.settings.link_label | escape }}
+                        </a>
+                      {% endif %}
                     </div>
-                  {% endif %}
+                  </details>
               {% endcase %}
             </div>
           {% endfor %}
@@ -62,23 +142,48 @@
       {% endif %}
     </div>
 
+    {% if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 %}
+      <div class="site-footer__payments" aria-label="Accepted payment methods">
+        <p class="site-footer__payments-label">
+          {{ section.settings.payment_heading | escape }}
+        </p>
+
+        <ul class="site-footer__payment-list" role="list">
+          {% for type in shop.enabled_payment_types %}
+            <li class="site-footer__payment-item">
+              {{ type | payment_type_svg_tag: class: 'site-footer__payment-icon' }}
+              <span class="visually-hidden">{{ type | replace: '_', ' ' }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
     <div class="site-footer__bottom">
-      <p class="site-footer__copyright">
-        &copy; {{ 'now' | date: '%Y' }}
-        {{ shop.name | escape }}
-      </p>
+      <div class="site-footer__copyright-group">
+        <p class="site-footer__copyright">
+          &copy; {{ 'now' | date: '%Y' }}
+          {{ shop.name | escape }}.
+          {{ section.settings.copyright_text | escape }}
+        </p>
+
+        {% if section.settings.show_powered_by %}
+          <p class="site-footer__powered-by">
+            {{ powered_by_link }}
+          </p>
+        {% endif %}
+      </div>
 
       {% if section.settings.legal_menu != blank %}
-        <nav aria-label="Legal navigation">
-          <ul class="site-footer__legal-list">
+        <nav class="site-footer__legal" aria-label="Legal and policy navigation">
+          <ul class="site-footer__legal-list" role="list">
             {% for link in section.settings.legal_menu.links %}
               <li>
                 <a
                   class="site-footer__link"
                   href="{{ link.url }}"
-                  {% if link.current %}
-                  aria-current="page"
-                  {% endif %}>
+                  {% if link.current %}aria-current="page"{% endif %}
+                >
                   {{ link.title | escape }}
                 </a>
               </li>
@@ -91,133 +196,298 @@
 </footer>
 
 {% schema %}
-  {
-    "name": "Footer",
-    "tag": "section",
-    "class": "section-footer",
-    "max_blocks": 6,
-    "settings": [
-      {
-        "type": "richtext",
-        "id": "description",
-        "label": "Store description",
-        "default": "<p>Wholesale clothing collections created for independent retailers.</p>"
-      },
-      {
-        "type": "link_list",
-        "id": "legal_menu",
-        "label": "Legal menu"
-      },
-      {
-        "type": "select",
-        "id": "desktop_columns",
-        "label": "Desktop block columns",
-        "options": [
-          {
-            "value": "2",
-            "label": "2 columns"
-          }, {
-            "value": "3",
-            "label": "3 columns"
-          }, {
-            "value": "4",
-            "label": "4 columns"
-          }
-        ],
-        "default": "3"
-      },
-      {
-        "type": "header",
-        "content": "Social links"
-      }, {
-        "type": "checkbox",
-        "id": "show_social_links",
-        "label": "Show social links",
-        "default": true
-      }, {
-        "type": "url",
-        "id": "instagram_url",
-        "label": "Instagram URL"
-      }, {
-        "type": "url",
-        "id": "facebook_url",
-        "label": "Facebook URL"
-      }, {
-        "type": "url",
-        "id": "pinterest_url",
-        "label": "Pinterest URL"
-      }, {
-        "type": "url",
-        "id": "linkedin_url",
-        "label": "LinkedIn URL"
-      }, {
-        "type": "header",
-        "content": "Colors"
-      }, {
-        "type": "color",
-        "id": "background_color",
-        "label": "Background",
-        "default": "#2c211c"
-      }, {
-        "type": "color",
-        "id": "text_color",
-        "label": "Text",
-        "default": "#ffffff"
-      }, {
-        "type": "color",
-        "id": "border_color",
-        "label": "Border",
-        "default": "#62544d"
-      }
-    ],
-    "blocks": [
-      {
-        "type": "menu",
-        "name": "Menu",
-        "settings": [
-          {
-            "type": "text",
-            "id": "heading",
-            "label": "Heading",
-            "default": "Quick links"
-          }, {
-            "type": "link_list",
-            "id": "menu",
-            "label": "Menu"
-          }
-        ]
-      }, {
-        "type": "text",
-        "name": "Text",
-        "settings": [
-          {
-            "type": "text",
-            "id": "heading",
-            "label": "Heading",
-            "default": "Information"
-          }, {
-            "type": "richtext",
-            "id": "text",
-            "label": "Text",
-            "default": "<p>Add store information, showroom hours, or wholesale contact details.</p>"
-          }
-        ]
-      }
-    ],
-    "presets": [
-      {
-        "name": "Footer",
-        "blocks": [
-          {
-            "type": "menu"
-          }, {
-            "type": "text"
-          }
-        ]
-      }
-    ],
-    "enabled_on": {
-      "groups": ["footer"]
+{
+  "name": "Footer",
+  "tag": "section",
+  "class": "section-footer",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 90,
+      "max": 260,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 150
+    },
+    {
+      "type": "checkbox",
+      "id": "show_store_name",
+      "label": "Show store name when no logo is selected",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Store description",
+      "default": "<p>Thoughtfully curated wholesale clothing collections for independent retailers.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Contact information"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone number"
+    },
+    {
+      "type": "richtext",
+      "id": "address",
+      "label": "Business location",
+      "info": "Use a city and region if the full street address should not be public."
+    },
+    {
+      "type": "page",
+      "id": "contact_page",
+      "label": "Contact page"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_link",
+      "label": "Show contact button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_link_label",
+      "label": "Contact button label",
+      "default": "Contact our team"
+    },
+    {
+      "type": "header",
+      "content": "Footer navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Legal and policy menu"
+    },
+    {
+      "type": "select",
+      "id": "desktop_columns",
+      "label": "Desktop block columns",
+      "options": [
+        {
+          "value": "2",
+          "label": "2 columns"
+        },
+        {
+          "value": "3",
+          "label": "3 columns"
+        },
+        {
+          "value": "4",
+          "label": "4 columns"
+        }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "header",
+      "content": "Payment methods"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show accepted payment methods",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "payment_heading",
+      "label": "Payment heading",
+      "default": "Secure payment options"
+    },
+    {
+      "type": "header",
+      "content": "Social links"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_links",
+      "label": "Show social links",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "pinterest_url",
+      "label": "Pinterest URL"
+    },
+    {
+      "type": "url",
+      "id": "linkedin_url",
+      "label": "LinkedIn URL"
+    },
+    {
+      "type": "header",
+      "content": "Copyright"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "All rights reserved."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_powered_by",
+      "label": "Show Powered by Shopify",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#211d1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Secondary text",
+      "default": "#bcb3ac"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borders",
+      "default": "#4a423d"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#d8b79a"
+    },
+    {
+      "type": "color",
+      "id": "accent_text_color",
+      "label": "Accent text",
+      "default": "#211d1a"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 32,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 24,
+      "max": 96,
+      "step": 8,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 32
     }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Explore"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Wholesale"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Approved retailers can sign in to view wholesale pricing and place coordinated orders.</p>"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer",
+      "blocks": [
+        {
+          "type": "menu"
+        },
+        {
+          "type": "text"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["footer"]
   }
+}
 {% endschema %}

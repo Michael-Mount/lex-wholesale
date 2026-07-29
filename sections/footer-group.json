@@ -5,15 +5,22 @@
     "newsletter": {
       "type": "footer-newsletter",
       "settings": {
-        "heading": "Join our wholesale newsletter",
-        "text": "<p>Receive collection launches, restock notices, and retailer updates.</p>",
-        "email_placeholder": "Email address",
-        "button_label": "Subscribe",
-        "success_message": "Thank you for subscribing.",
-        "background_color": "#e9e2dc",
+        "eyebrow": "Retailer updates",
+        "heading": "New collections, sent thoughtfully",
+        "text": "<p>Receive collection launches, restock notices, and wholesale updates for independent retailers.</p>",
+        "email_placeholder": "Your email address",
+        "button_label": "Join the list",
+        "success_message": "Thank you for joining our newsletter.",
+        "privacy_note": "By subscribing, you agree to receive marketing emails.",
+        "privacy_link_label": "Privacy policy",
+        "background_color": "#eee7df",
         "text_color": "#231f1c",
+        "muted_text_color": "#6e645d",
+        "border_color": "#cfc4b9",
         "button_background_color": "#231f1c",
-        "button_text_color": "#ffffff"
+        "button_text_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 56
       }
     },
     "footer": {
@@ -26,29 +33,61 @@
             "menu": "main-menu"
           }
         },
-        "information": {
+        "supportmenu": {
+          "type": "menu",
+          "settings": {
+            "heading": "Support",
+            "menu": ""
+          }
+        },
+        "wholesale": {
           "type": "text",
           "settings": {
             "heading": "Wholesale",
-            "text": "<p>Approved retailers can sign in to view wholesale pricing and place orders.</p>"
+            "text": "<p>Approved retailers can sign in to view wholesale pricing and place coordinated orders.</p>",
+            "link_label": "",
+            "link_url": ""
           }
         }
       },
-      "block_order": ["shopmenu", "information"],
+      "block_order": [
+        "shopmenu",
+        "supportmenu",
+        "wholesale"
+      ],
       "settings": {
-        "description": "<p>Wholesale clothing collections created for independent retailers.</p>",
+        "logo_width": 150,
+        "show_store_name": true,
+        "description": "<p>Thoughtfully curated wholesale clothing collections for independent retailers.</p>",
+        "email": "",
+        "phone": "",
+        "address": "",
+        "show_contact_link": true,
+        "contact_link_label": "Contact our team",
         "legal_menu": "",
         "desktop_columns": "3",
+        "show_payment_icons": true,
+        "payment_heading": "Secure payment options",
         "show_social_links": true,
         "instagram_url": "",
         "facebook_url": "",
         "pinterest_url": "",
         "linkedin_url": "",
-        "background_color": "#2c211c",
+        "copyright_text": "All rights reserved.",
+        "show_powered_by": false,
+        "background_color": "#211d1a",
         "text_color": "#ffffff",
-        "border_color": "#62544d"
+        "muted_text_color": "#bcb3ac",
+        "border_color": "#4a423d",
+        "accent_color": "#d8b79a",
+        "accent_text_color": "#211d1a",
+        "padding_top": 72,
+        "padding_bottom": 32
       }
     }
   },
-  "order": ["newsletter", "footer"]
+  "order": [
+    "newsletter",
+    "footer"
+  ]
 }

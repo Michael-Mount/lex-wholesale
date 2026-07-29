@@ -1,0 +1,134 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-faq",
+      "blocks": {
+        "category_accounts": {
+          "type": "category",
+          "settings": {
+            "eyebrow": "Getting started",
+            "heading": "Wholesale accounts",
+            "text": "<p>Example questions about retailer access and account approval.</p>"
+          }
+        },
+        "question_pricing": {
+          "type": "question",
+          "settings": {
+            "question": "Who can view wholesale pricing?",
+            "answer": "<p>Wholesale pricing is intended for signed-in retailer accounts that have been approved by the store. Replace this example with the client's exact approval requirements.</p>",
+            "link_label": "",
+            "link_url": ""
+          }
+        },
+        "question_apply": {
+          "type": "question",
+          "settings": {
+            "question": "How do I apply for a wholesale account?",
+            "answer": "<p>Use the store's wholesale application or contact page to submit the requested business information. Replace this example with the client's real application process and expected review time.</p>",
+            "link_label": "Contact the wholesale team",
+            "link_url": "/pages/contact"
+          }
+        },
+        "category_ordering": {
+          "type": "category",
+          "settings": {
+            "eyebrow": "Purchasing",
+            "heading": "Products and collections",
+            "text": "<p>Example questions about individual products and complete-collection ordering.</p>"
+          }
+        },
+        "question_individual": {
+          "type": "question",
+          "settings": {
+            "question": "Can I purchase products individually?",
+            "answer": "<p>Products may be available for individual purchase in addition to complete-collection ordering. Replace this answer with the client's final purchasing policy.</p>",
+            "link_label": "",
+            "link_url": ""
+          }
+        },
+        "question_bundle": {
+          "type": "question",
+          "settings": {
+            "question": "How does complete-collection ordering work?",
+            "answer": "<p>On an eligible collection page, select the available option for each product and add the complete collection to the cart in one action. Replace this wording if the final workflow changes.</p>",
+            "link_label": "",
+            "link_url": ""
+          }
+        },
+        "question_discount": {
+          "type": "question",
+          "settings": {
+            "question": "When is the collection discount applied?",
+            "answer": "<p>Eligible automatic discounts are calculated in the cart or checkout after the configured requirements are met. Replace this example with the client's actual discount terms and exclusions.</p>",
+            "link_label": "",
+            "link_url": ""
+          }
+        },
+        "category_support": {
+          "type": "category",
+          "settings": {
+            "eyebrow": "Support",
+            "heading": "Availability and help",
+            "text": ""
+          }
+        },
+        "question_sold_out": {
+          "type": "question",
+          "settings": {
+            "question": "What happens when a size or color is sold out?",
+            "answer": "<p>Unavailable variants cannot be selected for the complete collection. Contact the store for restock information or alternative product options.</p>",
+            "link_label": "",
+            "link_url": ""
+          }
+        },
+        "question_contact": {
+          "type": "question",
+          "settings": {
+            "question": "How can I contact the team?",
+            "answer": "<p>Use the Contact Us page for questions about account access, products, collections, or an existing order.</p>",
+            "link_label": "Visit the Contact Us page",
+            "link_url": "/pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "category_accounts",
+        "question_pricing",
+        "question_apply",
+        "category_ordering",
+        "question_individual",
+        "question_bundle",
+        "question_discount",
+        "category_support",
+        "question_sold_out",
+        "question_contact"
+      ],
+      "settings": {
+        "eyebrow": "Help center",
+        "heading": "Frequently asked questions",
+        "introduction": "<p>Find answers about wholesale access, ordering, complete collections, pricing, and product availability.</p>",
+        "open_first_question": true,
+        "enable_faq_schema": true,
+        "show_contact_button": true,
+        "contact_button_label": "Contact our team",
+        "show_contact_panel": true,
+        "contact_panel_eyebrow": "Still need help?",
+        "contact_panel_heading": "Talk with our wholesale team",
+        "contact_panel_text": "<p>Reach out with questions about account approval, product options, collection ordering, or an existing order.</p>",
+        "contact_panel_button_label": "Get in touch",
+        "background_color": "#f7f4ef",
+        "text_color": "#241f1c",
+        "muted_text_color": "#6e645d",
+        "border_color": "#d6cbc0",
+        "card_background_color": "#ffffff",
+        "accent_color": "#6b3f27",
+        "accent_text_color": "#ffffff",
+        "padding_top": 72,
+        "padding_bottom": 88
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
